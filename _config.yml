@@ -9,8 +9,8 @@ exclude:
   - "/vendor/"
 
 # Site settings
-title: Deep Generative Models, Fall 2022
-subtitle: "AIM5036 Sungkyunkwan University"
+title: Deep Generative Models
+subtitle: "AIM5036, Fall 2022"
 email: jun.park@skku.edu
 name: Jun H. Park
 description: >
