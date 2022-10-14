@@ -11,6 +11,14 @@ Latex template for this blog.
 
 Inline: $\int f(x) dx$
 
+\begin{equation}
+\int f(x) dx
+\end{equation}
+
+\begin{equation*}
+\int g(x) dx
+\end{equation*}
+
 Block:
 
 $$
