@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Latex Template"
-date:   2015-04-18T14:25:52-05:00
+date:   2022-10-14
 author: Jun H. Park
 categories: Latex
 use_math: true
