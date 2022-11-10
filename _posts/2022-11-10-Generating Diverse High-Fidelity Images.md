@@ -3,7 +3,7 @@ layout: post
 title:  "Generating Diverse High-Fidelity Images"
 date:   2022-11-10
 author: Seunghoon Lee
-categories: Latent Variable
+categories: Latent-Variable
 tags: Generating Diverse High-Fidelity Images, VQ-VAE 2.0
 use_math: true
 ---
