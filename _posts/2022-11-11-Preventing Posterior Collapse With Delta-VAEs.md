@@ -77,6 +77,35 @@ min {\theta, \phi} D_{KL}(q_{\theta}(z|x) | p_{\theta}) \geq {\delta}
 $$
 
 #### 2.1 δ-VAE with Sequential Latent Variables
+이미지, 오디오, 텍스트와 같은 데이터들은 강한 공간-시간 연속성(strong spatio-temporal continuity)를 가지고 있다. 따라서 본 논문에서는 이러한 관계를 Latent Variable들이 표현해 줏 수 있도록 Sequential Latent Varivables 방법으로 Latent variable들 간의 관계를 설정하였다. Sequential Latent Variable을 표현하기 위해서 Prior의 latent variable들은 1차 선형 autoregressive(first-order linear qutoregressive progress)한 관계를 갖는다.(Z<sub>t</sub> = αZ<sub>t-1</sub> + ε<sub>s</sub>) 이 관계를 정리한 Prior는 다음과 같다.다음은 Sequential Latent Variable setting이다.
+ 
+- Posterior
+   
+$$
+q(z_{t}|x) = N(z_{t}; \mu_{t}(x), \sigma_{t}(x))
+$$
+
+- Prior  
+ 
+$$
+p(Z_{1}) = N(0, 1)
+$$
+
+$$
+p(Z_{i}|Z_{i-1}) = N(αZ_{i-1}, \sqrt{1-\alpha^{2}}),\ if\ i > 1
+$$
+
+위의 Posterior와 Prior 관계의 mismatch를 두 분포에 대한 KL-Dievergence의 Lower Bound로 표시하면 아래 식과 같다. 여기서 mismatch가 δ로 표현된다.
+
+$$
+D_{KL}(q(z|x)||p(z)) \geq {1 \over 2} \sum_{k=1}^{d} (n-2)ln(1+\alpha_{k}^{2}) - ln(1-\alpha_{k}^{2}) = \delta
+$$
+
+여기서 n은 autoregressive time sequence의 길이이고, d는 latent variable의 dimension이다. **만약 d를 고정하면 δ는 n과 α로 표현할 수 있고** 그 관계를 아래 그래프와 같이 표현된다.
+
+<그림>
+
+오른쪽 그림은 α가 커지면서 prior의 Autoregressive한 성질이 점정 강해지고(즉, prior latent variable들 간의 correlation이 커진다.) 있는 것을 표현한 것이다. 그리고 correlation이 증가할 수록 δ도 증가하는 것을 확인할 수 있다.
 
 #### 2.2 Anti-Causal Encoder Network
 
