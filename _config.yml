@@ -41,7 +41,6 @@ kramdown:
 # https://github.com/sverrirs/jekyll-paginate-v2/blob/master/README-GENERATOR.md#site-configuration
 pagination:
   enabled: true
-  debug: true
   per_page: 5
   permalink: "/page/:num/"
   sort_reverse: true
