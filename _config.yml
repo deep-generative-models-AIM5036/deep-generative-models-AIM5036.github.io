@@ -27,6 +27,15 @@ logo: "/assets/logo.png"
 markdown: kramdown
 inter_post_navigation: true
 highlightjs_theme: "monokai-sublime"
+highlighter: rouge
+lsi: false
+excerpt_separator: "\n\n"
+incremental: false
+
+# Kramdown Settings
+kramdown:
+  input: GFM
+  math_engine: mathjax
 
 # Pagination Settings
 # https://github.com/sverrirs/jekyll-paginate-v2/blob/master/README-GENERATOR.md#site-configuration

@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
 
-  {% include head.html %}
+  <head>
+    {% include head.html %}
+    {% if page.use_math %}
+      {% include mathjax_support.html %}
+    {% endif %}
+  </head>
 
   <body>
 
