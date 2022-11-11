@@ -39,9 +39,24 @@ $max_{\theta}\sum_{i}^{N}logp_{\theta}(x^(i)) = \sum_{i}^{N}log \sum_{z}^{K}p_{z
 **이러한 과정은 K값이 작다면 아무런 문제가 되지 않는다. **
 
 만일 K값이 한정되어 있다면, 우리는 exact한 training objective (식 4)를 얻을 수 있다. 예를 들어 $p_{theta}(x|z)$가 mixture of 3 gaussians이고 $p_{z}(z)$가 uniform distribution이라고 해보겠다.
-$p_{z}(z=A)=p_{z}(z=B)=p_{z}(z=C)$이기 때문에, $p_{theta}(x|z=k) = \frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{k}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{k}))$
+$p_{theta}(x|z=k) = \frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{k}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{k})^{T}\sum_{k}^{-1}(x-\mu_{k}))$ 이면서 $p_{z}(z=A)=p_{z}(z=B)=p_{z}(z=C)$이기 때문에 training objective는 다음과 같다. 
 
--------------
+$max_{\theta}\sum_{i}logp_{\theta}(x^{(i)}) = max_{\mu, \sigma}\sum_{i}log[ \frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{A}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{A})^{T}\sum_{A}^{-1}(x-\mu_{A})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{B}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{B})^{T}\sum_{B}^{-1}(x-\mu_{B})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{C}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{C})^{T}\sum_{C}^{-1}(x-\mu_{C}))]$
+
+그림 2에서 training 결과를 볼 수 있다. Epoch이 지남에 따라 3개의 gaussian 분포로 나뉘는 것을 볼 수 있다. 
+
+![Figure1](/assets/IWAE_img/Figure2.jpg) (그림 2 result)
+
+## 2. Prior Sampling: Approximation for Large K
+
+만일 training objective (식 4)의 K값이 너무나도 커서 위의 예제처럼 전부 다 summation을 진행하는 게 불가능하다면 어떻게 해야 할까?
+아래의 식 5처럼 z값을 샘플링 (prior sampling)해서 Monte Carlo방식으로 approximate하는 방법 밖에는 없을 것이다. 그 이후에는 동일하게 gradient descent 방식으로 $\theta$를 학습하면 된다.
+
+$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}log \frac{1}{K}\sum_{k=1}^{K}p_{\theta}(x^(i)|z_{k}^{(i)})     z_{k}^{(i)} ~ p_{z}(z)$ (식 5)  
+
+이것이 IWAE이전의 VAE모델들이 채택한 방식이다. 하지만 이와 같은 방식은 K값이 클수록 중요하지 않은 샘플들이 자주 추출되는 문제가 발생한다. 
+**따라서 IWAE는 train objective에 $\frac{1}{K}\sum_{k=1}^{K}p_{\theta}(x^(i)|z_{k}^{(i)}$의 과정에서 중요하지 않은 샘플들이 뽑히는 문제를 다룬다**
+
 
 ## 2. Related Work  
   
