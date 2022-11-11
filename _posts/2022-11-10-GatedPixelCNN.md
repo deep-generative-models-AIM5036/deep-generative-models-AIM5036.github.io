@@ -43,7 +43,8 @@ $$\mathrm{y} = \tanh(W_{k,f}*\mathrm{x})\odot \sigma(W_{k,g}*\mathrm{x})$$
 
 이때 $*$는 합성곱 연산자, $\odot$은 element-wise multiplication 연산자, $k$는 layer의 인덱스, $f$는 필터, $g$는 게이트로 학습 가능한 합성곱 필터를 의미합니다.
 
-PixelRNN의 LSTM cell 안에 사용되는 multiplicative units -> complex interaction을 모델에 반영할 수 있음(?) PixelCNN에도 Gated Activation을 사용하도록 디자인하였습니다.
+PixelRNN의 LSTM cell 안에 사용되는 multiplicative units -> complex interaction을 모델에 반영할 수 있습니다.   
+PixelCNN에도 Gated Activation을 사용하도록 디자인하였습니다.
 
 ## Single layer block in a Gated PixelCNN 
 ### Process 1: Calculate the vertical stack features maps
@@ -95,7 +96,12 @@ $$ \mathbf{y} = tanh(\mathbf{W}_{k,\ f}\ * \mathbf{x}\ + \mathbf{V}_{k,\ f}\ * \
 이 때, $V_{k,g}*\mathrm{s}$는 마스킹되지 않은 1x1 합성곱입니다.
 
 ## PixelCNN Auto-Encoders
-> 내용 추가
+Conditional PixelCNN은 multimodal image distributions $p(\mathbf{x}|\mathbf{h})$ 조건을 줄 수 있기 때문에 Auto-Encoder에 decoder로 사용될 수  있습니다.  
+일반적인 Auto-Encoder에서 decoder 부분을 conditional PixelCNN으로 바꾸고 end-to-end로 학습시킵니다.  
+그렇게된다면 기존 Auto-Encoder 부분의 Encoder output은 $\mathbf{h}$ 가 되고, Conditional PixelCNN(Decoder)이 $\mathbf{h}$를 condition으로 해서 이미지를 reconstruction합니다.  
+PixelCNN은 강력한 unconditional generative model이기 때문에 reconstruction 성능이 좋아질 것으로 기대할 수 있습니다.  
+저자들은 이렇게 함으로써 low level pixel statistic을 PixelCNN에서 학습하고, Encoder output인 $\mathbf{h}$ 에서 high-level abstract information을 뽑아내는 것을 기대할 수 있다고 합니다.
+
 
 # Experiments
 ## Unconditional Modeling with Gated PixelCNN
