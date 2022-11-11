@@ -53,11 +53,34 @@ use_math: true
   : 본 논문은 위에 언급한, Posterior Collapse를 해결하기 위한 일반적인 방법을 사용하지 않고(즉, 강력한 Decoder를 사용하고 Objective를 바꾸지 않으면서) Posterior Collapse를 개선하는 방법을 제안한다. 
 ---
 ### 2. Mitigating Posterior Collapse with δ-VAEs
- - δ-VAE 
-   - VAE의 Training 과정은 ELBO를 최대화 하는 것이다. [Kingma & Welling, 2013](https://arxiv.org/pdf/1312.6114.pdf) ELBO는 아래와 같이 표현된다.  
-   - log p(x) = Eq(z|x)[log p(x, z) − log q(z | x)] + DKL(q(z | x)||p(z | x))  
-   &nasp;&nasp;&nasp;&nasp;&nasp;&nasp;≥ Eq(z|x)[log p(x, z) − log q(z | x)]   
-   &nasp;&nasp;&nasp;&nasp;&nasp;&nasp;= Eq(z|x)[log p(x | z)] − DKL(q(z | x)||p(z))  
+ #### * δ-VAE 
+   - VAE의 Training 과정은 ELBO를 최대화 하는 것이다. [Kingma & Welling, 2013](https://arxiv.org/pdf/1312.6114.pdf)  
+     ELBO는 아래와 같이 표현된다.  
+
+$$
+\begin{align}
+log\ p(x) = E_{q(z|x)}[log\ p(x, z) - log q(z|x)] + D_{KL}((q(z|x)|(p(z|x))) \\
+\geq E_{q(z|x)}[log\ p(x, z) - log\ q(z|x)] \\
+= E_{q(z|x)}[log\ p(x|z)] - D_{KL}(q(z|x)|p(z)) \\
+\end{align}
+$$
+
+$$
+\therefore ELBO = E_{q(z|x)}[log\ p(x|z)] - D_{KL}(q(z|x)|p(z)) 
+$$
+ 
+   - Posterior Collapse는 KL Divergence term에 의해서 발생한다고 알려져 있다. approximate posterior인 q(z|x)가 prior인 p(z)와 동일해 지면 KL Divergence term이 0으로 수렴하게 되고, generate할 때 Latent Variable은 input x에 대한 아무런 정보를 전달할 수 없게 되는 것이다.
+   - δ-VAE는 KL Dievergence가 0이 되지 않도록 lower bound **δ**를 설정해 주는 것이다. 논문에서는 δ를 **committed rate**라고 부른다. 따라서 KL Divergece는 아래 식과 같은 제약조건을 가지게 된다. 
+
+$$
+min {\theta, \phi} D_{KL}(q_{\theta}(z|x) | p_{\theta}) \geq {\delta} 
+$$
+
+#### 2.1 δ-VAE with Sequential Latent Variables
+
+#### 2.2 Anti-Causal Encoder Network
+
+
 ---
 ### 3. Experiments
 ---
