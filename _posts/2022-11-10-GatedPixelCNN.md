@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Conditional Image Generation with PixelCNN Decoders
-date:   2022-11-02 16:59
+date:   2022-11-10
 author: Jeongkee Lim, Doyoung Kim
-categories: [Autoregressive models]
+categories: [Auto-regressive]
 tags: generative_model
 use_math: true
 published: true
