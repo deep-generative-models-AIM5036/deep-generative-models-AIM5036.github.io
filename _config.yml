@@ -43,7 +43,7 @@ pagination:
   enabled: true
   debug: true
   per_page: 5
-  permalink: "/page/:num/"
+  permalink: "/post/:num/"
   sort_reverse: true
 
 # Archive settings (see https://github.com/jekyll/jekyll-archives/)
