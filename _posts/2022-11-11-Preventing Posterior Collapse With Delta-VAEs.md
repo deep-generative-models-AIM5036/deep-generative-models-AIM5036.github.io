@@ -109,9 +109,30 @@ $$
 
 #### 2.2 Anti-Causal Encoder Network
 
+2.1에서 Latent Variable들을 Autoregressive한 관계로 설정해 주었는데 Encoder에서도 과거에 대한 정보를 이용하는 설정을 해준다면, 이것은 낭비가 될 것이다. 따라서 본 논문에서는 Anti-Causal Encoder 구조를 제안하였다 이것은 과거가 아닌 미래의 input data x를 이용하여 Encoder를 구성해 주는 것이다. 그 구조에 대한 그림은 다음과 같다.
+
+<그림>
 
 ---
 ### 3. Experiments
+
+#### 4.1 Natural Images
+CIFAR-10, Downsampled ImageNet을 이용하여 실험을 진행하였다. 이미지에 대한 δ-VAE에 대한 구조를 decoder와 encoder로 나눠서 살펴보면 다음과 같다.
+* Decoder
+Decoder에서는 PixelSNAIL, GatedPixelCNN과 같은 강력한 Autoregressive 모델을 사용하였다. 본 논문에서 보여주고자 하는 것 중 하나가 강력한 Decoder를 사용하더라도 Posterior Collapse가 발생하지 않도록 하는 것 이었으므로, 합리적인 Design Choice라고 생각된다.
+
+ <그림>
+
+* Encoder
+Encoder에서는 아래 그림과 같이 일련의 과정들을 이용하여 Latent Variable로 Encoding하고 있다. 여기에서 처음에 reverse하는 부분은 2.2절에서 소개했던 Anti-Causal Encoder Network를 구현하기 위함이다.
+
+<그림>
+
+#### 4.2 Density Estimation Results
+
+#### 4.3 Utilization Of Latent Variables
+
+#### 4.4 Ablation Studies
 ---
 ### 4. Conclusions
 ---
