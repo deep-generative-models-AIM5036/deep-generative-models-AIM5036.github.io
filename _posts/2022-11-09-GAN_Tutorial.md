@@ -22,10 +22,6 @@ In this post, we will go through every single question and try to answer them as
 
 Generative models refer to any model that takes a training set consisting of samples drawn from a distribution p<sub>data</sub> and learns to represent an estimate of that distribution. Here p<sub>data</sub> describes the actual distribution that our training data came from. A generative model aims to learn a distribution p<sub>model</sub>, such that this distribution is close to the actual data distribution as much as possible. Generative models are classified into two main categories; Those where we represent the p<sub>model</sub> with an explicit probability distribution and those where we do not have an explicit distribution but can sample from it. GAN belongs to the second one. 
 
-<p align="center">
-  <img src="/GAN_Tutorial_img/cost_function_equation.png" alt="factorio thumbnail"/>
-</p>
-
 
 
 ## The GAN framework
@@ -33,7 +29,31 @@ Generative models refer to any model that takes a training set consisting of sam
 In GANs, there are two networks, the generators, and the discriminators. The generator's job is to generate a new sample from the latent vector, which is, in turn, sampled from some prior, and the discriminator's job is to learn to distinguish the fake image from the real image. Think of the generator as a counterfeiter, trying to make fake money, and the discriminator as police, trying to separate fake money from real one. To succeed in this game, the counterfeiter must learn to make money that is indistinguishable from real money. In other words, the generator model must learn to generate data from the same training data distribution as the data came.
 The goal of the GAN is to optimize the following equation.
 
+<p align="center">
+  <img src="/GAN_Tutorial_img/cost_function_equation.png" alt="factorio thumbnail"/>
+</p>
+
+This is a minmax game, where the discriminator minimizes this cost, while the generator maximizes it. The above equation can be written as 
+
+<p align="center">
+  <img src="/GAN_Tutorial_img/compact_equation.png" alt="factorio thumbnail"/>
+</p>
+
+The first part tends to give a large negative number if the output of the discriminator for real data is not close to 1, while the second part gives a large negative number if the output of the discriminator is not close to zero. By maximizing this term, the discriminator can successfully distinguish fake images from real ones. On the other hand, by minimizing this term, the generator can deceive the discriminator into considering the generated images as real ones. The generator can achieve this by making the output of D(G(z)) close to 1 for fake images. This is shown below
+
+<p align="center">
+  <img src="/GAN_Tutorial_img/discriminator_vs_generator.png" alt="factorio thumbnail"/>
+</p>
+
 ## Training Process
+
+To train this model, sample x from the training dataset and z from the prior distribution and feed it to the networks. After that update both the discriminator and generator networks. For the t steps, the training will look something like this
+
+<p align="center">
+  <img src="/GAN_Tutorial_img/training_process.png" alt="factorio thumbnail"/>
+</p>
+
+
 
 ## Optimal Discriminator 
 
