@@ -33,7 +33,7 @@ The goal of the GAN is to optimize the following equation.
   <img src="/GAN_Tutorial_img/cost_function_equation.png" alt="factorio thumbnail"/>
 </p>
 
-'D(x)' represents the output from the discriminator, while 'G(z)' represent the output from the generator. The first part tends to give a large negative number if the output of the discriminator for real data is not close to 1, while the second part gives a large negative number if the output of the discriminator for the fake data is not close to zero. By maximizing this term, the discriminator can successfully distinguish fake images from real ones. On the other hand, by minimizing this term, the generator can deceive the discriminator into considering the generated images as real ones. The generator can achieve this by making the output of D(G(z)) close to 1 for fake images. This is shown below
+`D(x)` represents the output from the discriminator, while `G(z)` represent the output from the generator. The first part tends to give a large negative number if the output of the discriminator for real data is not close to 1, while the second part gives a large negative number if the output of the discriminator for the fake data is not close to zero. By maximizing this term, the discriminator can successfully distinguish fake images from real ones. On the other hand, by minimizing this term, the generator can deceive the discriminator into considering the generated images as real ones. The generator can achieve this by making the output of `D(G(z))` close to 1 for fake images. This is shown below
 
 <p align="center">
   <img src="/GAN_Tutorial_img/discriminator_vs_generator.png" alt="factorio thumbnail"/>
@@ -55,15 +55,27 @@ For T steps of iterations, the training process will look something like
   <img src="/GAN_Tutorial_img/training_process.png" alt="factorio thumbnail"/>
 </p>
 
-The overall mechanism can be seen in the following figure
+The overall mechanism can be further seen in the following figure
 
 <p align="center">
   <img src="/GAN_Tutorial_img/full_picture.png" alt="factorio thumbnail"/>
 </p>
 
 
-
 ## Optimal Discriminator 
+
+Optimizing the above term from discriminator's prospective, guarantees to reach an optimal point, only when the generator learns the ratio between the p<sub>data</sub> and p<sub>model</sub>. We can write the loss function as 
+
+<p align="center">
+  <img src="/GAN_Tutorial_img/Derivative.png" alt="factorio thumbnail"/>
+</p>
+
+The goal of the discriminator is to estimate this ratio. This is shown in the following figure
+<p align="center">
+  <img src="/GAN_Tutorial_img/dis_vs_gen.png" alt="factorio thumbnail"/>
+</p>
+
+
 
 ## Non-Saturating Game
 
