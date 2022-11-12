@@ -88,7 +88,25 @@ At the beginning of the training, the discriminator gets confident about the fak
 
 ## GANs and Maximum Likelihood Game
 
+
+
+
+
 ## Divergence and GANs
+
+GAN minimizes the Jensen-Shannon divergence(JSD) between the p<sub>data</sub> and p<sub>model</sub>. To prove it, we will continue the derivation from the optimal discriminator part. 
+
+<p align="center">
+  <img src="/GAN_Tutorial_img/jsd.png" alt="factorio thumbnail"/>
+</p>
+
+We can see that minimizing the main loss function of GANs, indeed, minimizes the JSD between the two distributions. Alternatively, we can also modify the generative models to minimize the Kullback–Leibler divergence (KL) between the two distributions. Different setting results in different optimization. KL-divergence tries to fit the p<sub>model</sub> to all the peaks of the p<sub>data</sub>, and therefore average out over all the modes. On the other hand, JSD tries to fit the p<sub>model</sub> to a single peak or model. This is shown in the following figure.
+
+<p align="center">
+  <img src="/GAN_Tutorial_img/jsd.png" alt="factorio thumbnail"/>
+</p>
+
+The fact that GANs try to fit p<sub>model</sub> to a single mode rather than averaging over multiple modes might be an explanation for why GANs produce good-quality images. 
 
 ## Tips and Tricks
 
