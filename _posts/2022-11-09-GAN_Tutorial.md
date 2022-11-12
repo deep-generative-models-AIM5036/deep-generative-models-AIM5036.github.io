@@ -33,12 +33,6 @@ The goal of the GAN is to optimize the following equation.
   <img src="/GAN_Tutorial_img/cost_function_equation.png" alt="factorio thumbnail"/>
 </p>
 
-This is a minmax game, where the discriminator minimizes this cost, while the generator maximizes it. The above equation can be written as 
-
-<p align="center">
-  <img src="/GAN_Tutorial_img/compact_equation.png" alt="factorio thumbnail"/>
-</p>
-
 The first part tends to give a large negative number if the output of the discriminator for real data is not close to 1, while the second part gives a large negative number if the output of the discriminator is not close to zero. By maximizing this term, the discriminator can successfully distinguish fake images from real ones. On the other hand, by minimizing this term, the generator can deceive the discriminator into considering the generated images as real ones. The generator can achieve this by making the output of D(G(z)) close to 1 for fake images. This is shown below
 
 <p align="center">
