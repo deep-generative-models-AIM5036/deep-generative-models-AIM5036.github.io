@@ -75,6 +75,7 @@ The goal of the discriminator is to estimate this ratio. This is shown in the fo
   <img src="/GAN_Tutorial_img/dis_vs_gen.png" alt="factorio thumbnail"/>
 </p>
 
+In order for generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in cooperative setting rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
 
 
 ## Non-Saturating Game
