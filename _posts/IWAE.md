@@ -1,34 +1,62 @@
 ---
 layout: post
-title:  "DCGAN"
-date:   2022-11-10
-author: Seunghoon Lee, Seonjong Kim
-categories: GAN
-tags: DCGAN, GAN
+title:  "IWAE"
+date:   2022-11-11
+author: Jongwon Park, Kyeongrok Park
+categories: Flow
+tags: IWAE, Flow
 use_math: true
 ---
 
-# **Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks**
+# **IMPORTANCE WEIGHTED AUTOENCODERS(IWAE)**
 
-## Alec Radford, Luke Metz, Soumith Chintala [ICLR 2016]
+## Yuri Burda, Roger Grosse, Ruslan Salakhutdinov [ICLR 2015]
 -------------
-## 1. Introduction  
-  
-  
-컴퓨터 비전에서 레이블이 지정되지 않은 이미지와 비디오가 무제한으로 있다면 좋은 representation을 학습할 수 있으며, 이는 image classification과 같은 다양한 지도 학습 작업에 사용될 수 있다. 본 논문의 저자들은 좋은 이미지 표현을 구축하는 방법으로 GAN을 훈련하는 것을 제안한다. 저자들은 특히 GAN의 generator/discriminator를 feature extractor로 사용함으로써 좋은 성능을 보장할 수 있으며, GAN 자체도 maximum likelihood techinque의 훌륭한 대체재가 될 수 있다고 한다.  
-  
-  
-  
-본 논문의 기여는 다음과 같다.
-- Deep Convolutional GAN(DCGAN)이라는 아키텍쳐를 만들어 Convolutional GAN의 아키텍처 topology에 대한 제약을 제안하고 평가하여 대부분의 환경에서 안정적으로 훈련할 수 있도록 한다.
-- 훈련된 discriminator들을 이미지 분류 작업에 사용하며 다른 unsupervised algorithm과 경쟁적인 성능을 보인다.
--  GAN에서 학습한 필터를 시각화하고 특정 필터가 특정 객체를 그리는 방법을 배웠음을 보인다.
--  Generator가 생성된 샘플을 조작할 수 있는 벡터 산술 특성을 가지고 있음을 보인다.  
-  
-  
-  
 
--------------
+본 포스팅은 IWAE(IMPORTANCE WEIGHTED AUTOENCODERS)논문을 정리한 문서입니다.
+
+## 1. Preliminary: What is Latent Variable Model?   
+
+IWAE의 핵심 아이디어를 보기 전에 백드라운드로 latent variable model (LVM)에 대해 알아보겠다.
+그림 1은 가장 심플한 LVM의 예시를 보여준다. 그림에서 x는 우리가 실제로 볼 수 있는 데이터 샘플이고, z는 우리가 볼 수 없지만 x를 생성하는데 사용되는 분포다. 
+ 
+![Figure1](/assets/IWAE_img/Figure1.jpg) (그림 1 Latent Variable Model)
+
+z는 하나의 known distribution으로 정할 수도 있고, 학습을 통해 배울 수도 있는데, VAE에서는 정해 놓는 방식을 사용한다. 대표적으로 데이터가 discrete하면 bernoulli, continuous하면 gaussian 분포를 사용한다.
+만일 z를 Bernoulli로 설정했다면, 아래와 같은 식을 통해 $p_{theta}(x|z)$를 구할 수 있다. 
+
+$z = (z_{1},z_{2},...,z_{k}) ~ p(z;\beta) = \prod_{k=1}^{K} \beta_{k}^{z_{k}}(1-\beta_{k})^{1-z_{k}}$ (식 1)
+$x = (x_{1},x_{2},...,x_{k}) ~ p(x|z) = Bernoulli(x_{i}; DNN(z))$ (식 2)
+
+z가 deep neural network와 sigmoid함수를 사용하여 0~1값을 준다면, x는 해당 값을 가지고 biased coin flipping을 하듯이 샘플링 할 수 있다. 샘플에 대한 likelihood evaluation은 다음과 같다.
+
+$p_{theta}(x) = \sum_{z} P_{z}(z)p_{\theta}(x|z)$ (식 3)
+
+식 3은 특정 x에 대해서, 모든 underlying cause(z)가 주어졌을 때 해당 x가 나올 확률들을 모두 더한다. $\sum$ 기호를 풀어보면 이해가 쉬울 것이다. z가 1부터 k까지의 값을 가질 수 있을 때, $p_{\theta}(x)$는 $p_{z}(z1)p_{\theta}(x|z1)+p_{z}(z2)p_{\theta}(x|z2)+...+p_{z}(zk)p_{\theta}(x|zk)$로 나타낼 수 있다.
+
+Training은 N번 샘플된 x값들을 이용해서 likelihood evaluation (3번식)을 maximize하는 $\theta$값을 찾는 과정이다. Train objective는 다음과 같이 표현 할 수 있다.
+$max_{\theta}\sum_{i}^{N}logp_{\theta}(x^(i)) = \sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z)$ (식 4)
+**이러한 과정은 K값이 작다면 아무런 문제가 되지 않는다. **
+
+만일 K값이 한정되어 있다면, 우리는 exact한 training objective (식 4)를 얻을 수 있다. 예를 들어 $p_{theta}(x|z)$가 mixture of 3 gaussians이고 $p_{z}(z)$가 uniform distribution이라고 해보겠다.
+$p_{theta}(x|z=k) = \frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{k}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{k})^{T}\sum_{k}^{-1}(x-\mu_{k}))$ 이면서 $p_{z}(z=A)=p_{z}(z=B)=p_{z}(z=C)$이기 때문에 training objective는 다음과 같다. 
+
+$max_{\theta}\sum_{i}logp_{\theta}(x^{(i)}) = max_{\mu, \sigma}\sum_{i}log[ \frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{A}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{A})^{T}\sum_{A}^{-1}(x-\mu_{A})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{B}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{B})^{T}\sum_{B}^{-1}(x-\mu_{B})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{C}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{C})^{T}\sum_{C}^{-1}(x-\mu_{C}))]$
+
+그림 2에서 training 결과를 볼 수 있다. Epoch이 지남에 따라 3개의 gaussian 분포로 나뉘는 것을 볼 수 있다. 
+
+![Figure1](/assets/IWAE_img/Figure2.jpg) (그림 2 result)
+
+## 2. Prior Sampling: Approximation for Large K
+
+만일 training objective (식 4)의 K값이 너무나도 커서 위의 예제처럼 전부 다 summation을 진행하는 게 불가능하다면 어떻게 해야 할까?
+아래의 식 5처럼 z값을 샘플링 (prior sampling)해서 Monte Carlo방식으로 approximate하는 방법 밖에는 없을 것이다. 그 이후에는 동일하게 gradient descent 방식으로 $\theta$를 학습하면 된다.
+
+$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}log \frac{1}{K}\sum_{k=1}^{K}p_{\theta}(x^(i)|z_{k}^{(i)})     z_{k}^{(i)} ~ p_{z}(z)$ (식 5)  
+
+이것이 IWAE이전의 VAE모델들이 채택한 방식이다. 하지만 이와 같은 방식은 K값이 클수록 중요하지 않은 샘플들이 자주 추출되는 문제가 발생한다. 
+**따라서 IWAE는 train objective에 $\frac{1}{K}\sum_{k=1}^{K}p_{\theta}(x^(i)|z_{k}^{(i)}$의 과정에서 중요하지 않은 샘플들이 뽑히는 문제를 다룬다**
+
 
 ## 2. Related Work  
   
