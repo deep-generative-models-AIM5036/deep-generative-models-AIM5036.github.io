@@ -130,10 +130,38 @@ Encoder에서는 아래 그림과 같이 일련의 과정들을 이용하여 Lat
 
 #### 4.2 Density Estimation Results
 
+<그림>
+
+위 표는 prior work들과 negative log-likelihood를 비교한 결과이다. 여러 Latent Varible models과 Autoregressive Models을 비교하였을 때 δ-VAE가 가장 좋은 결과를 보여주고 있다.
+
 #### 4.3 Utilization Of Latent Variables
 
+
+<그림>
+
+본 논문에서는 Latent Variable이 실제로 global structure를 표현하는지에 대한 실험을 진행하였다. 위 그림은 Latent Variable을 동일하게 하고 다양한 Decoder를 사용하여 이미지를 생성한 결과이다. 맨 왼쪽 줄을 예로 들면 전체적인 초록색 잔디의 형태는 유지한채 가운데 동물의 그림만 변하고 있는 것을 볼 수 있다. 즉, Latent Variable은 global한 구조를, autoregressive decoder는 local한 패턴을 만들어 내고 있다는 것을 알 수 있다.
+
 #### 4.4 Ablation Studies
+* δ-VAEs
+<그림>
+
+δ-VAEs를 다른 모델들(베타 VAE)과 비교하였다. 위 그래프를 보면 다른 모델들에 비해서 δ-VAEs의 Distortion이 더 낮고, 안정적인 것을 볼 수 있다.
+
+* anti-causal encoder structure
+
+<그림>
+
+위 표는 4개의 다른 구조 모델로 train한 결과이며, Anti-causail encoder의 성능을 보여준다. 처음 두 열은 anti-causal encoder의 유무가 성능에 크게 영향을 미치지 않지만 마지막 두 열은 anti-causal encoder를 적용했을 때 더 좋은 성능을 보이고 있는 것을 확인할 수 있다. 이것은 크기가 큰 모델에서 anti-causal 구조가 효과를 보인다는 것을 알 수 있다.
+
 ---
 ### 4. Conclusions
+
+결과적으로 본 논문에서 제안한 δ-VAE는 다음 세가지의 의의를 보인다.
+1. δ-VAE는 1) objective를 변경하지 않고, 2) decoder를 약화시키지 않으면서 posteior collapse 문제를 해결하였다.  
+2. posterior collapse를 해결 한 방법이 간단하다.(committed rate)  
+3. δ-VAE는 비교 모델 중에 가장 좋은(state-of-the-art) 성능을 보였다.  
+
 ---
 ### 5. Future Work
+1. 본 논문에서는 anti-causal encoder + sequential latent variable와 anti-causal encoder + auxiliary prior의 조합으로 실험을 진행하였다. 다만 design을 어떻게 하느냐에 따라서 posterior-prior 조합은 다양하게 나올 수 있기 때문에, 이 다양한 조합에 대한 실험을 future work로 남겨두었다.  
+2. 본 논문에서 posterior collapse를 많이 개선하였지만, posterior collapse는 여전히 완전히 해결된 문제는 아니다. 따라서 posterior collapse에 대한 원인과 해결 방법들에 대한 연구에 대해서 관심을 가지고 봐야 할 것이다.
