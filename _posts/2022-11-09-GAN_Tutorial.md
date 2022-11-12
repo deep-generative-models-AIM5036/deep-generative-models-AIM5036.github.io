@@ -75,10 +75,16 @@ The goal of the discriminator is to estimate this ratio. This is shown in the fo
   <img src="/GAN_Tutorial_img/dis_vs_gen.png" alt="factorio thumbnail"/>
 </p>
 
-In order for generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in cooperative setting rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
+In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
+
 
 
 ## Non-Saturating Game
+
+At the beginning of the training, the discriminator gets confident about the fake images quite quickly, which causes a vanishing gradient problem for the generator. A vanishing gradient means that there will be no update for the generator, even for the bad samples. To fix this problem, we can change the equation for the generator from `log(1-D(G(z)))` to `-log(G(z))`. Considering a sigmoid function at the end of the discriminator network, we can see that the gradient is equal to zero at the beginning of the training. Modifying the sign reverse this phenomenon and brings the vanishing gradient problem for the real data. However, this is okay for real images, as this gradient is not used for updating the generator.This is show below
+<p align="center">
+  <img src="/GAN_Tutorial_img/non_saturating.png" alt="factorio thumbnail"/>
+</p>
 
 ## GANs and Maximum Likelihood Game
 
