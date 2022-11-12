@@ -77,6 +77,9 @@ min {\theta, \phi} D_{KL}(q_{\theta}(z|x) | p_{\theta}) \geq {\delta}
 $$
 
 #### 2.1 δ-VAE with Sequential Latent Variables
+
+![Sequential_Latent_Variables](/assets/DeltaVAEs_img/0_Sequential_Latent_Variables.png)
+
 이미지, 오디오, 텍스트와 같은 데이터들은 강한 공간-시간 연속성(strong spatio-temporal continuity)를 가지고 있다. 따라서 본 논문에서는 이러한 관계를 Latent Variable들이 표현해 줏 수 있도록 Sequential Latent Varivables 방법으로 Latent variable들 간의 관계를 설정하였다. Sequential Latent Variable을 표현하기 위해서 Prior의 latent variable들은 1차 선형 autoregressive(first-order linear qutoregressive progress)한 관계를 갖는다.(Z<sub>t</sub> = αZ<sub>t-1</sub> + ε<sub>s</sub>) 이 관계를 정리한 Prior는 다음과 같다.다음은 Sequential Latent Variable setting이다.
  
 - Posterior
@@ -103,7 +106,7 @@ $$
 
 여기서 n은 autoregressive time sequence의 길이이고, d는 latent variable의 dimension이다. **만약 d를 고정하면 δ는 n과 α로 표현할 수 있고** 그 관계를 아래 그래프와 같이 표현된다.
 
-<그림>
+![Graph](/assets/DeltaVAEs_img/1_Graph.png)
 
 오른쪽 그림은 α가 커지면서 prior의 Autoregressive한 성질이 점정 강해지고(즉, prior latent variable들 간의 correlation이 커진다.) 있는 것을 표현한 것이다. 그리고 correlation이 증가할 수록 δ도 증가하는 것을 확인할 수 있다.
 
@@ -111,7 +114,7 @@ $$
 
 2.1에서 Latent Variable들을 Autoregressive한 관계로 설정해 주었는데 Encoder에서도 과거에 대한 정보를 이용하는 설정을 해준다면, 이것은 낭비가 될 것이다. 따라서 본 논문에서는 Anti-Causal Encoder 구조를 제안하였다 이것은 과거가 아닌 미래의 input data x를 이용하여 Encoder를 구성해 주는 것이다. 그 구조에 대한 그림은 다음과 같다.
 
-<그림>
+![Anti_Causal_Inference_Model](/assets/DeltaVAEs_img/2_Anti_Causal_Inference_Model.png)
 
 ---
 ### 3. Experiments
@@ -121,35 +124,35 @@ CIFAR-10, Downsampled ImageNet을 이용하여 실험을 진행하였다. 이미
 * Decoder
 Decoder에서는 PixelSNAIL, GatedPixelCNN과 같은 강력한 Autoregressive 모델을 사용하였다. 본 논문에서 보여주고자 하는 것 중 하나가 강력한 Decoder를 사용하더라도 Posterior Collapse가 발생하지 않도록 하는 것 이었으므로, 합리적인 Design Choice라고 생각된다.
 
- <그림>
+![Decoder](/assets/DeltaVAEs_img/3_decoder.png)
 
 * Encoder
 Encoder에서는 아래 그림과 같이 일련의 과정들을 이용하여 Latent Variable로 Encoding하고 있다. 여기에서 처음에 reverse하는 부분은 2.2절에서 소개했던 Anti-Causal Encoder Network를 구현하기 위함이다.
 
-<그림>
+![Encoder](/assets/DeltaVAEs_img/4_encoder.png)
 
 #### 4.2 Density Estimation Results
 
-<그림>
+![ensity_Estimation_Results](/assets/DeltaVAEs_img/5_Density_Estimation_Results.png)
 
 위 표는 prior work들과 negative log-likelihood를 비교한 결과이다. 여러 Latent Varible models과 Autoregressive Models을 비교하였을 때 δ-VAE가 가장 좋은 결과를 보여주고 있다.
 
 #### 4.3 Utilization Of Latent Variables
 
-
-<그림>
+![untilization_of_latent_variable](/assets/DeltaVAEs_img/6_untilization_of_latent_variable.png)
 
 본 논문에서는 Latent Variable이 실제로 global structure를 표현하는지에 대한 실험을 진행하였다. 위 그림은 Latent Variable을 동일하게 하고 다양한 Decoder를 사용하여 이미지를 생성한 결과이다. 맨 왼쪽 줄을 예로 들면 전체적인 초록색 잔디의 형태는 유지한채 가운데 동물의 그림만 변하고 있는 것을 볼 수 있다. 즉, Latent Variable은 global한 구조를, autoregressive decoder는 local한 패턴을 만들어 내고 있다는 것을 알 수 있다.
 
 #### 4.4 Ablation Studies
 * δ-VAEs
-<그림>
+
+![Rate_Distortion](/assets/DeltaVAEs_img/7_Rate_Distortion.png)
 
 δ-VAEs를 다른 모델들(베타 VAE)과 비교하였다. 위 그래프를 보면 다른 모델들에 비해서 δ-VAEs의 Distortion이 더 낮고, 안정적인 것을 볼 수 있다.
 
 * anti-causal encoder structure
 
-<그림>
+![Encoder_Ablation](/assets/DeltaVAEs_img/8_Encoder_Ablation.png)
 
 위 표는 4개의 다른 구조 모델로 train한 결과이며, Anti-causail encoder의 성능을 보여준다. 처음 두 열은 anti-causal encoder의 유무가 성능에 크게 영향을 미치지 않지만 마지막 두 열은 anti-causal encoder를 적용했을 때 더 좋은 성능을 보이고 있는 것을 확인할 수 있다. 이것은 크기가 큰 모델에서 anti-causal 구조가 효과를 보인다는 것을 알 수 있다.
 
@@ -163,5 +166,5 @@ Encoder에서는 아래 그림과 같이 일련의 과정들을 이용하여 Lat
 
 ---
 ### 5. Future Work
-1. 본 논문에서는 anti-causal encoder + sequential latent variable와 anti-causal encoder + auxiliary prior의 조합으로 실험을 진행하였다. 다만 design을 어떻게 하느냐에 따라서 posterior-prior 조합은 다양하게 나올 수 있기 때문에, 이 다양한 조합에 대한 실험을 future work로 남겨두었다.  
-2. 본 논문에서 posterior collapse를 많이 개선하였지만, posterior collapse는 여전히 완전히 해결된 문제는 아니다. 따라서 posterior collapse에 대한 원인과 해결 방법들에 대한 연구에 대해서 관심을 가지고 봐야 할 것이다.
+1. 본 논문에서는 Anti-Causal Encoder + Sequential Latent Variable와 Anti-Causal Encoder + Auxiliary prior의 조합으로 실험을 진행하였다. 다만 design을 어떻게 하느냐에 따라서 posterior-prior 조합은 다양하게 나올 수 있기 때문에, 이 다양한 조합에 대한 실험을 future work로 남겨두었다.  
+2. 본 논문에서 Posterior Collapse를 많이 개선하였지만, Posterior Collapse는 여전히 완전히 해결된 문제는 아니다. 따라서 Posterior Collapse에 대한 원인과 해결 방법들에 대한 연구에 대해서 관심을 가지고 봐야 할 것이다.
