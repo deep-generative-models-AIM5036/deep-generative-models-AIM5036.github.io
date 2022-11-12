@@ -20,7 +20,7 @@ In this post, we will go through every single question and try to answer them as
 
 # Internals Of GANs
 
-Generative models refer to any model that takes a training set consisting of samples drawn from a distribution \(p_{data}\) and learns to represent an estimate of that distribution. Here \(p_{data}\) describes the actual distribution that our training data came from. A generative model aims to learn a distribution \(p_{model}\), such that this distribution is close to the actual data distribution as much as possible. Generative models are classified into two main categories; Those where we represent the \(p_{model}\) with an explicit probability distribution and those where we do not have an explicit distribution but can sample from it. GAN belongs to the second one. 
+Generative models refer to any model that takes a training set consisting of samples drawn from a distribution \(p_{data}\) and learns to represent an estimate of that distribution. Here p<sub>data</sub> describes the actual distribution that our training data came from. A generative model aims to learn a distribution \(p_{model}\), such that this distribution is close to the actual data distribution as much as possible. Generative models are classified into two main categories; Those where we represent the \(p_{model}\) with an explicit probability distribution and those where we do not have an explicit distribution but can sample from it. GAN belongs to the second one. 
 
 ## The GAN framework
 
