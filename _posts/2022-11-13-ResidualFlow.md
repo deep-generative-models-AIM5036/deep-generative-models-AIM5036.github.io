@@ -238,7 +238,7 @@ $$
 ##### 3.2 Memory-Efficient Backpropagation
 
 $$
-log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{{\sum_{k=1}^{n}}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
+log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{ \sum_{k=1}^{n}} \frac{ (-1)^{k+1} }{k} \frac{v^T[\boxed{{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
 $$
 
 이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스에서 n번의 계산을 해야하고, 두번째 박스에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
@@ -305,4 +305,148 @@ $$
 <img src="https://user-images.githubusercontent.com/76925973/200821897-be1bf86c-4666-4cd6-9ade-2001592f339f.png"  width="500" height="120">
 
 
+---
 
+### 4. Experiment
+
+##### 4.1 Mixed Matrix Norm
+립시츠 조건을 만족시키기 위해서는 $|g(x)'| \leq 1$이라는 조건을 만족시켜야 합니다. i-ResNet에서는 이 조건을 만족시키기 위해 Spectral Norms를 사용했는데, Residual Flow에서는 그에 더해 P-Norms과 Mixed Matrix Norms를 추가로 사용하였습니다.
+
+심층신경망을 사용하는 $g(x)$는 다음과 같이 나타낼 수 있습니다.
+
+$$
+z_l = W_lh_{l-1} + b_l, \qquad h_l = \phi (z_l)
+$$
+
+여기서 $z_l$은 각 layer의 output을 의미하며, $\phi$는 activation function을 의미합니다. 한 가지 특이한 점은 activation function을 layer를 지난 후가 아니라 지나기 전에 사용했다는 점 입니다.
+
+먼저 spectral norms에서는 다음의 두 가지 방법으로 립시츠 조건을 만족시킵니다.
+
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $ \vert \phi '(z) \vert \leq 1 $
+2. Weight matrices의 spectral norms으로 bound
+
+$$
+\Vert J_g(x) \Vert _2 = \Vert W_L \cdots W_z\phi ' (z_1) W_1 \phi ' (z_0)\Vert_2 \leq \Vert W_l \Vert_2 \cdots \Vert W_2 \Vert_2 \Vert \phi ' (z_1) \Vert_2 \Vert W_1 \Vert_2 \Vert \phi ' (z_0) \Vert_2 \leq \Vert W_l \Vert_2 \cdots \Vert W_2 \Vert_2 \Vert W_1 \Vert_2
+$$
+
+즉, $|\phi '(z)| \leq 1$을 만족시키는 $\phi$를 사용하며, 각 weight matrices의 spectral norm으로 결과값을 나눠주게 되면 함수 $g(x)$는 립시츠 조건을 만족하게 됩니다.
+
+P-norms에서도 spectral norm과 마찬가지 방법을 사용하였으며, 각 weight를 2-norm이 아니라 p-norm을 통해 계산하였다는 차이점이 있습니다.
+
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $|\phi '(z)| \leq 1$
+2. Weight matrices의 p-norms으로 bound
+
+$$
+\Vert J_g(x) \Vert _{\color{red}{p}} = \Vert W_L \cdots W_z\phi ' (z_1) W_1 \phi ' (z_0)\Vert_{\color{red}{p}} \leq \Vert W_l \Vert_{\color{red}{p}} \cdots \Vert W_2 \Vert_{\color{red}{p}} \Vert W_1 \Vert_{\color{red}{p}}
+$$
+
+Residual Flow에서는 이 p 값 역시 trainable parameter로 정하여 학습을 통해 결정하였습니다.
+
+Mixed Matrix Norms에서는 각 matrix 값을 자신의 norm로 bound 해주지 않고, 옆의 matrix의 norm으로 교차하여 bound를 해주었습니다. $W_2$는 $\Vert W_1 \Vert$으로, $W_3$은 $\Vert W_2 \Vert$로, $W_L$은 $\Vert W_{L-1} \Vert$로, 다시 $W_1$은 $\Vert W_L \Vert$로 bound 해주어, 각 layer는 립시츠 조건을 만족시키지 못하지만, 전체 network $g(x)$를 보았을 때는 립시츠 조건을 만족시키게끔 하였습니다.
+
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $|\phi '(z)| \leq 1$
+2. Weight matrices의 mixed matrix norms으로 bound
+
+$$
+\Vert J_g(x) \Vert _{\color{red}{p}} = \Vert W_L \cdots W_z\phi ' (z_1) W_1 \phi ' (z_0)\Vert_{\color{red}{p}} \leq \Vert W_l \Vert_{\color{red}{p_{L-1} \rightarrow p_{L}}} \cdots \Vert W_2 \Vert_{\color{red}{p_{1} \rightarrow p_{2}}}  \Vert W_1 \Vert_{\color{red}{p_{1} \rightarrow p}}
+$$
+
+Residual Flow에서는 학습된 p으로 mixed matrix norms를 사용하여 0.003 bits/dim의 성능 개선을 보였습니다.
+
+##### 4.2 Density & Generative Modeling
+
+Residual Flow를 다른 flow-based model과 성능을 비교해본 결과 입니다.
+
+<img src="https://user-images.githubusercontent.com/76925973/201391954-32ff92a5-65c8-4c3d-a1c5-7e02ec4a16c3.png"  width="400" height="130">
+
+bits/dim을 비교하였을 때, Residual Flow가 다른 모델들에 비해 MNIST, CIFAR-10, ImageNet32, ImageNet64, CelebA-HQ256의 다섯 가지 데이터셋에 대해 더 좋은 성능을 내는 것을 실험을 통해 확인할 수 있었습니다.
+
+##### 4.3 Sample Quality
+
+<img src="https://user-images.githubusercontent.com/76925973/201392100-6c6ba9c4-147c-477d-abc1-94af3f249404.png"  width="700" height="100">
+
+Residual Flow를 통해 생성된 이미지 샘플입니다. 왼쪽 이미지는 CelebA-HQ256 데이터셋에 있는 실제 이미지이며, 오른쪽 이미지는 Residual Flow를 통해 생성된 이미지 입니다.
+
+<img src="https://user-images.githubusercontent.com/76925973/201392242-f4824450-ba49-436e-9927-262a7c071379.png"  width="700">
+
+CIFAR-10 데이터셋의 이미지 및 다른 모델을 통해 생성된 이미지와 함께 비교를 해보았습니다. 비록 PixelCNN이나 Variational Dequantized Flow++로 생성된 이미지들 보다 bits/dim은 오히려 안 좋은 결과를 보여주지만, 저자들은 log-likelihood가 이미지의 퀄리티와 정확하게 매치되는 것은 아니며, Residual Flow를 통해 생성된 이미지가 더 일관된 이미지를 잘 생성한다고 주장합니다.
+
+<img src="https://user-images.githubusercontent.com/76925973/201392340-b1fe988b-fc04-4892-9cd9-08f3c16f4308.png"  width="200" >
+
+FID 값을 통해 생성된 이미지를 비교해 보았을 때, DCGAN이나 WGAN-GP와 같은 GAN 기반의 모델들 보다는 떨어지지만, 다른 flow-based model이나 autoregressive model보다 더 좋은 성능을 보이는 것을 확인할 수 있습니다.
+
+##### 4.4 Residual Flow
+
+Residual Flow 모델의 특징을 살펴보면 다음과 같습니다.
+
+- Log-likelihood의 unbiased estimator
+- 메모리 효율적인 
+- LipSwish activation function 사용
+
+다음의 그래프와 표는 첫 번째와 세 번째 특징에 대한 ablation 실험 결과입니다.
+
+<img src="https://user-images.githubusercontent.com/76925973/201392495-7ab8faa3-58dc-49b7-8053-07baa7cd8484.png"  width="700" >
+
+왼쪽의 그래프를 보면 LipSwhish를 사용했을때 bits/dim이 더 낮아 성능이 좋은 것을 확인할 수 있습니다. 오르쪽의 그래프는 두 가지에 대해 보여주고 있습니다. 첫 번째와 두 번째 행을 보면, 동일하게 ELU를 activation function으로 사용하였을 때 i-ResNet과 Residual Flow의 성능 차이를 보이고 있는데, Residual Flow가 unbiased estimator이기 때문에 더 좋은 성능을 보이는 것을 확인할 수 있습니다. 또한 두 번째와 세 번째 행을 보면, 같은 Residual FLow 모델에 activation function을 ELU와 LipSwish로 변경하며 실험을 진행하였는데, LipSwish를 사용한 모델이 더 성능이 좋은 것을 확인할 수 있습니다.
+
+##### 4.5 Hybrid Modeling
+
+선행 모델인 i-ResNet이 생성모델과 분류기를 동시에 학습시킨 모델임을 고려하여 Residual Flow에서도 hybrid modeling 실험을 진행하였습니다.
+
+주어진 데이터 $x$와 데이터의 라벨 $y$에 대한 확률은 다음과 같이 나타낼 수 있습니다.
+
+$$
+log p(x, y) = log p(x) + log p(y|x)
+$$
+
+여기에서 $log p(x)$는 log-likelihood를 의미하기 때문에 생성모델의 학습을, $log p(y|x)$는 주어진 데이터의 라벨 예측을 의미하기 때문에 분류기의 학습을 의미한다고 볼 수 있습니다. Hybrid modeling을 하는 경우, 주로 관심이 있는 쪽은 생성모델의 학습보다 분류기의 학습이기 때문에, $\lambda$라는 1보다 작은 양수의 hyperparameter를 도입하여 weighted maximum likelihood objective[^2]를 최종 objective function으로 사용하며, 이는 다음과 같습니다.
+
+$$
+\mathbb{E}_{(x, y) \thicksim p_{data}} \big[\lambda log p(x) + log p(y|x) \big]
+$$
+
+각 모델의 inference 과정 후에 Multi-layer Perceptron을 통해 분류를 진행하였으며, 그 결과는 다음과 같습니다.
+
+<img src="https://user-images.githubusercontent.com/76925973/201392697-b9823a21-ac7e-4a46-a70d-063a304fd782.png"  width="500" >
+
+$\lambda = 0$일 때는 분류기의 학습만을 진행한 것이며, $\lambda = 1$일 때는 생성모델과 분류기의 중요도를 동일하게 생각한 것 입니다. RealNVP(Coupling) 및 Glow(+ 1 X 1 Conv)와 성능을 비교한 결과 분류기의 학습만을 진행 ($\lambda = 0$)했을 때는 Glow의 성능이 조금 더 높았지만, 다른 경우에 대해서는 모두 Residual Flow가 가장 좋은 것을 확인할 수 있습니다.
+
+---
+### 5. Conclusion & Application
+##### 5.1 Residual Flow
+
+Residual Flow의 장점은 다음과 같습니다.
+
+- 립시츠 조건만을 이용하여 flow-based model을 구성
+- log likelihood의 unbiased estimator
+- 메모리 효율적인 학습
+- 1-Lipschitz 조건을 만족시키는 activation function인 LipSwish 제안
+- 일반화된 spectral normalization
+
+하지만 앞선 실험에서 확인한 것처럼 초창기에 제안된 GAN 기반의 모델들 보다 생성된 이미지의 퀄리티가 낮은 것을 확인할 수 있었습니다. 그렇기 때문에 flow-based model이 log-likelihood를 직접 계산할 수 있고, inference 역시 가능하다는 장점을 갖고 있음에도 불구하고 GAN 기반의 모델이 생성모델로서 연구가 더 활발한 것이라고 생각해볼 수 있습니다.
+
+##### 5.2 Application
+
+Residual Flow가 사용된 예시입니다.
+
+- Graph Residual Flow for Molecular Graph Generation[^3]에서는 Residual Flow를 기반으로 분자구조 그래프의 생성모델을 구축하였습니다.
+
+    <img src="https://user-images.githubusercontent.com/76925973/201393817-904a50c5-747e-4ecf-9946-c7e3d08ebc16.png"  width="600" >
+
+- Hybrid Models for Open Set Recognition2[^4]에서는 Residual Flow의 inference를 통해 out-of-distribution detection을 진행하였습니다. 이는 데이터의 분포를 알아야 하기 때문에 flow-based model을 사용하기에 아주 적합하며, 기존의 다른 flow-based model과 달리 Residual Flow는 unbiased estimator를 구축하였기에 Residual Flow가 가장 적합하게 사용된 사례 중 하나로 꼽을 수 있습니다.
+    
+    $$
+    pred(x) = \begin{cases}
+   k + 1 & log p(x) < \tau \\
+   argmax_{j \in \set{1, \cdots, k}} p(y_j | x) &\text{otherwise } 
+\end{cases}
+    $$
+
+    <img src="https://user-images.githubusercontent.com/76925973/201393919-600f8123-0d4a-455c-8411-72b4a9a3f5da.png"  width="600">
+
+
+
+[^1]: Behrmann, J., Grathwohl, W., Chen, R. T., Duvenaud, D., & Jacobsen, J. H. (2019, May). Invertible residual networks. In International Conference on Machine Learning (pp. 573-582). PMLR.
+[^2]: Nalisnick, E., Matsukawa, A., Teh, Y. W., Gorur, D., & Lakshminarayanan, B. (2019, May). Hybrid models with deep and invertible features. In International Conference on Machine Learning (pp. 4723-4732). PMLR.
+[^3]:Honda, S., Akita, H., Ishiguro, K., Nakanishi, T., & Oono, K. (2019). Graph residual flow for molecular graph generation. arXiv preprint arXiv:1909.13521.
+[^4]:Zhang, H., Li, A., Guo, J., & Guo, Y. (2020, August). Hybrid models for open set recognition. In European Conference on Computer Vision (pp. 102-117). Springer, Cham.
