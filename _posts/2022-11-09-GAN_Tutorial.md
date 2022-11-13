@@ -171,7 +171,7 @@ In reality, our data has multiple modes in the distribution, known as multi-moda
 Basically, we have two options to optimize the objective function for the GANs. One is 
 <p align="center">
     <img src="/GAN_Tutorial_img/minmaxgenerator.png" width="150" height="100"/>
-</p>, 
+</p>
 while the other is 
 <p align="center">
     <img src="/GAN_Tutorial_img/maxmingenerator.png" width="140" height="100"/>
