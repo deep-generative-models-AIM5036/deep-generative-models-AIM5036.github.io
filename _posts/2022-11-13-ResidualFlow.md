@@ -2,10 +2,11 @@
 layout: post
 title:  "Residual Flows for Invertible Generative Modeling"
 date:   2022-11-13
-author: 이민영 & 이주엽
+author: 이민영, 이주엽
 categories: Flow
 use_math: true
 ---
+
 
 
 # Residual Flows for Invertible Generative Modeling
@@ -24,7 +25,7 @@ $log p(X) = log p(f(X)) + log |det\frac{\partial z}{\partial x}|$
 역변환을 계산하는 과정에서는 함수 f(X)에 대한 자코비안(Jacobian)을 계산하게 되는데, 기존 flow-based model에서는 계산을 쉽게 하기 위해 자코비안 행렬이 sparse하거나 삼각행렬과 같은 특수한 모양이 나오도록 하였습니다. 그러나, 자코비안이 sparse하거나 특정 모양을 따르게 되면 효율적으로 계산을 할 수는 있지만, 그런 조건을 만족시키는 함수 $f(X)$를 설계하는 것이 어렵고 비용이 많이 발생한다는 단점이 있습니다.   
 
 또한 기존에 사용한 coupling block이나 ordinary differential equation 방법의 경우 강한 inductive bias를 야기하여 학습한 task이외의 task에는 적용하기 어렵다는 한계 역시 존재합니다.
-그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 <mark style='background-color: #fff5b1'> Residual Flow </mark> 모델입니다.   
+그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 Residual Flow 모델입니다.   
 
 ---
 
@@ -68,7 +69,7 @@ $$
 determinant의 log값을 trace로 변환할 수 있는 방법입니다. 
 
 $$
-    A = U \cdot D \cdot U^{-1}  \qquad   f(A) = U\cdot f(D) \cdot U^{-1} \\
+    A = U \cdot D \cdot U^{-1}  \qquad    f(A) = U\cdot f(D) \cdot U^{-1} \\
 $$
 
 $$
@@ -91,7 +92,7 @@ $$
 $$
     \begin{aligned}
         &=> det (exp (A)) = \prod_aexp(\lambda_a) = exp \sum_a\lambda_a = exp (tr(A)) \\
-        &=> det(J) = exp (tr(logJ)) \qquad \qquad  A = log J \\
+        &=> det(J) = exp (tr(logJ)) \qquad \qquad A = log J \\
         &=> log (det(J)) = tr(log J)
     \end{aligned}
 $$
@@ -130,7 +131,7 @@ $$
         &= tr(A \cdot E(zz^T)) \\
         &= E[tr(Azz^T)] \\
         &= E[z^TAz] \\ 
-        z \thicksim Gaussian
+        z ~ Gaussian
     \end{aligned}
 $$
 
@@ -175,7 +176,7 @@ $$
 식에서 박스가 쳐진 부분은 무한급수의 형태로 계산하기가 어렵다는 한계가 있었습니다.
 그래서 이를 해결하고자 기존의 방법들은 $n$번째까지만 계산하여 무한 급수의 값을 추정하는 방법을 사용하였습니다.
 그러나 이때 $n+1$번째이후로의 계산되는 부분이 bias값이 되어 biased estimator를 사용할 수 밖에 없었습니다.
-아래 식에서 우항의 앞 부분이 급수를 추정하기 위해 사용되는 1부터 n번째까지의 합이고, 우항의 뒷 부분은 계산을 생략한 n+1번째부터의 합을 의미하는데, 여기서 추정값의 표현력을 높이기 위해서는 n의 값을 키워 더 많은 값을 계산할 수 있지만 n이 커질수록 계산량이 늘어나게 됩니다.
+아래 식에서 파란색 부분이 급수를 추정하기 위해 사용되는 1부터 n번째까지의 합이고, 초록색 부분은 계산을 생략한 n+1번째부터의 합을 의미하는데, 여기서 추정값의 표현력을 높이기 위해서는 n의 값을 키워 더 많은 값을 계산할 수 있지만 n이 커질수록 계산량이 늘어나게 됩니다.
 반대로 계산량을 줄이기 위해서 n의 값을 줄인다면 계산을 하지 않는 부분이 많아져 bias가 높아지게 되어 expressive와 bias사이의 trade-off가 발생하게 되는 것입니다.
 
 $$ 
@@ -238,12 +239,12 @@ $$
 ##### 3.2 Memory-Efficient Backpropagation
 
 $$
-log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{ \sum_{k=1}^{n}} \frac{ (-1)^{k+1} }{k} \frac{v^T[\boxed{{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
+log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{{\sum_{k=1}^{n}}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
 $$
 
-이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스에서 n번의 계산을 해야하고, 두번째 박스에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
+이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스(파란글씨)에서 n번의 계산을 해야하고, 두번째 박스(빨간글씨)에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
 
-따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. 
+따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. $\mathbb{E}[\displaystyle\sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\frac{v^T[J_g(x)]^kv}{\mathbb{P}(N\geq k)}]$ 는 $log|det(I+J_g(x))|$를 추정한 값이므로 log determinant값을 backpropagation에 사용하는 것입니다. 
 
 $$
 \begin{aligned}
@@ -287,23 +288,22 @@ Loss를 미분할때 log determinant의 미분을 사용한다면 위 (3.2.3) �
 ##### 3.3 LipSwish Activation Function
 Backpropagation을 진행할 때 메모리 뿐만 아니라 activation derivative saturation 문제 역시 발생할 수 있습니다. Jacobian을 계산하는 과정에서 일차 미분을 진행하게 되고 gradient를 계산하는 과정에서 이차 미분이 진행되는데, 이때 일차 미분값이 상수가 되면 이차 미분 값이 0이 되면서 gradient vanishing 문제가 발생하는 것입니다. 그래서 논문에서는 립시츠 조건을 만족시키면서 gradient vanishing 문제가 발생하지 않도록 하기 위한 activation function의 두가지 조건을 제시하였습니다.  
 
-1) 일차 미분 값이 $|\phi'(z)| \leq 1 \qquad \forall z$   를 만족해야 한다.
-2) $|\phi'(z)|$ 가 1과 가까운 점에서의 이차 미분 값이 0이 되어 vanish되서는 안된다.
+- 일차 미분 값이 $|\phi'(z)| \leq 1 \text{ } \forall z$   를 만족해야 한다.
+- $|\phi'(z)|$ 가 1과 가까운 점에서의 이차 미분 값이 0이 되어 vanish되서는 안된다.
 
 대부분의 activation function이 첫번째 조건은 만족시키지만 두번째 조건을 만족시키기 어려워 본 논문에서는 두번째 조건을 만족시킬 수 있는 Swish function을 사용했다고 합니다. Swish activaton function은 $f(x) = x \cdot \sigma(\beta x)$ 로 밑의 그림 중 파란색으로 그려진 함수입니다. 그림을 통해서 알 수 있듯이 ReLU의 경우 미분값이 일정해지는 구간이 발생하여 이차 미분 시 gradient vanishing 문제를 야기하지만 Swish 함수의 경우 그렇지 않아 두번째 조건을 만족할 수 있습니다.
 
 <img src="https://user-images.githubusercontent.com/76925973/200821177-8131b782-b746-445a-8b78-3295eba52e03.png"  width="400" height="200">
 
-그러나 Swish 함수의 경우 일차 미분값이 $ | \frac{d}{dz} Swish(z) | \lesssim 1.1 $ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
+그러나 Swish 함수의 경우 일차 미분값이 $|\frac{d}{dz}Swish(z)| \lesssim 1.1$ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
 
 $$
-LipSwish(z) = \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
+LipSwish(z) \coloneqq \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
 $$
 
 이를 activation function으로 사용하였습니다. 이때 $\beta$ 값은 softplus를 통해 양수를 유지하도록 학습시켰습니다.
 
 <img src="https://user-images.githubusercontent.com/76925973/200821897-be1bf86c-4666-4cd6-9ade-2001592f339f.png"  width="500" height="120">
-
 
 ---
 
@@ -322,7 +322,7 @@ $$
 
 먼저 spectral norms에서는 다음의 두 가지 방법으로 립시츠 조건을 만족시킵니다.
 
-1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $ \vert \phi '(z) \vert \leq 1 $
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $|\phi '(z)| \leq 1$
 2. Weight matrices의 spectral norms으로 bound
 
 $$
@@ -371,7 +371,7 @@ Residual Flow를 통해 생성된 이미지 샘플입니다. 왼쪽 이미지는
 
 CIFAR-10 데이터셋의 이미지 및 다른 모델을 통해 생성된 이미지와 함께 비교를 해보았습니다. 비록 PixelCNN이나 Variational Dequantized Flow++로 생성된 이미지들 보다 bits/dim은 오히려 안 좋은 결과를 보여주지만, 저자들은 log-likelihood가 이미지의 퀄리티와 정확하게 매치되는 것은 아니며, Residual Flow를 통해 생성된 이미지가 더 일관된 이미지를 잘 생성한다고 주장합니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/201392340-b1fe988b-fc04-4892-9cd9-08f3c16f4308.png"  width="200" >
+<img src="https://user-images.githubusercontent.com/76925973/201392340-b1fe988b-fc04-4892-9cd9-08f3c16f4308.png"  width="200" height="200">
 
 FID 값을 통해 생성된 이미지를 비교해 보았을 때, DCGAN이나 WGAN-GP와 같은 GAN 기반의 모델들 보다는 떨어지지만, 다른 flow-based model이나 autoregressive model보다 더 좋은 성능을 보이는 것을 확인할 수 있습니다.
 
