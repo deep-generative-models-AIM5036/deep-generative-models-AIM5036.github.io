@@ -121,6 +121,64 @@ $min_{q(z)}KL(q(z)||p_{\theta}(z|x^{(i)}))
 
 IWAE는 기존의 VAE방식의 발전된 방법론으로 알려져 있다. 둘의 직접적인 비교를 위해 VAE를 짧게 소개한다. 추가적인 설명은 이번 포스팅 이전에 있는 VAE와 SBAI(Stochastic Backpropagation and Approximate Inference in DGM) 포스팅을 통해 학습할 것을 추천한다.
 
+VAE는 generation process $p(x|\theta)$와 recognition model $q(h|x)$를 여러 non-linear hidden layer(h)를 통한 ancestral sampling으로 학습한다. 
+$p(x|\theta) = \sum_{h^1,...,h^L}p(h^L|\theta)p(h^{L-1}|h^L,\theta)...p(x|h^1,\theta)$와
+$q(h|x) = q(h^1|x)q(h2|h1)...q(h^L|h^{L-1})$로 나타낸다.
+여기서 prior distribution과 conditional distributions $p(h^l|h^{l+1})$과 $q(h^l|h^{l-1})$은 모두 Normal Gaussian을 정의한다.
+
+이 정의에 따라 기존 VAE의 objective function은 ELBO라고 불리는 $logp(x) \geq \E_{q(h|x)}[log\frac{p(x,h)}{q(h|x)}]$이다. 
+이때 IWAE와 똑같이 q를 parameterize해준다면 VAE의 gradient식은 아래와 같다.
+$\nabla_{\theta}log\E_{h~q(h|x,\theta)}[\frac{p(x,h|\theta)}{q(h|x.\theta)}] = \E_{\epsilon^1,...,\epsilon^L ~ N(o,I)[\nabla_{\theta}log frac{p(x,h(\epsilon,x,\theta)|\theta)}{q(h(\epsilon,x,\theta)|x,\theta)}]$ (식 9)
+
+이에 반해 IWAE의 gradient는 다음과 같다. 
+$\E_{\epsilon ~ N(o,I)[frac{1}{k}\sum_{i}^{K}\nabla_{\theta}log frac{p(x,h(\epsilon_{i},x,\theta)|\theta)}{q(h(\epsilon_{i},x,\theta)|x,\theta)}]$
+이는 importance weight $w(x,h,\theta) = \frac{p(x,h|\theta)}{q(h|x,\theta)}$로 두고, normalized importance weight $\tilde{w_i}$를 $\frac{w_i}{\sum_{i=1}^kw_i}$로 두면 $\sum_{i=1}^{k}\tilde{w_i}\nabla_{\theta}logw(x,h(\epsilon_i,x,\theta),theta)$ (식 10)
+
+VAE의 gradient식 (식 9)와 IWAE의 gradient식 (식 10)은 k=1로 두면 완전히 동일함을 볼 수 있다. 
+
+**Tighter Lower Bound & More spead-out over predictins**
+
+IWAE와 standard VAE의 objective에 두 가지 차이가 있음을 저자는 논문에서 밝히고 있다. 
+첫 번째로 IWAE의 objective는 다음과 같이 두개의 term으로 분해 될 수 있다.
+$\nabla_{\theta}logw(x,h(\epsilon_i,x,\theta),theta) = \nabla_{\theta}logp(x,h(x,\epsilon_i,\theta)|\theta) - \nabla_{\theta}logq(h(x,\epsilon_i,\theta)|x,\theta)$
+
+첫 term은 recognition network가 hidden representation에 adjust 함으로써 더 좋은 예측을 만들어 내는 것, 두 번째 term은 recognition network가 predictions들에 대해 더 spread-out distribution을 가지도록 하는 것이다. 이러한 objective를 통한 update는 importance weight로 곱해진 샘플들의 평균으로 일어난다. spead-out distribution에 대한 설명은 논문에 나와있지 않지만 "Tackling Over-pruning in Variational Autoencoders"논문에 따르면 VAE의 over-pruning 문제를 해결한 중요한 property이다. 이는 Experiment때 다시 한번 돌아오겠다.
+
+두 번째로 저자는 IWAE가 더 tigher한 lower bound를 가지고 있음을 증명하고 있다.  
+$logp(x) \geq \mathical{L_{k+1}} \geq \mathical{L_{K}}$에 대한 증명은 다음과 같다.
+$\mathical{L_k} = \E_{h}[log\frac{1}{k}\sum_{i=1}^k\frac{p(x,h_i)}{q(h_i|x)}] \geq \E_{h}[\E_{I={i_1,...,i_m}}[log\frac{1}{m}\sum_{j=1}^m \frac{p(x,h_{ij})}{q(h_{ij}|x)}]] = \mathical{L_m}$
+해당 증명은 논문의 appendix에 더 상세히 적혀있음으로 본 논문을 참고하는 것을 추천한다.
+
+## 7. Experiment
+
+논문에서 제공한 실험 결과 테이블은 두 가지이다.
+
+![Figure6](/assets/IWAE_img/Figure6.jpg) (그림 6 Table 1)
+
+테이블 1은 IWAE와 VAE의 전반적인 결과를 보여준다. IWAE가 VAE보다 전반적으로 더 좋은 겨로가를 보여주며, K 수를 늘릴 때 IWAE는 확실히 NLL이 낮아지는 것을 볼 수 있다. 두 모델 전부 레이어 수를 2로 늘릴 때 더 좋은 결과를 보여준다.
+
+![Figure7](/assets/IWAE_img/Figure7.jpg) (그림 7 Correlation between active units and KL)
+
+Inactive units은 collapsed to the prior문제를 나타낸다. 다른 표현으로는 over-pruning problem이라고 부른다. 모든 데이터를 표현하기 위해서는 D-dimension이 필요할지라도, each individual example은 훨씬 작은 d-dimension으로도 표현 할 수 있다. D-dimension과 더 작은 d-dimension간의 차이만큼 inactive units가 발생한다고 볼 수 있다.
+
+IWAE는 위에서 보았듯이 prediction distribution을 더 spead-out하게 하는 objective function을 가지고 있어 generalize power가 강하기 때문에 active units이 더 많다고 볼 수 있다.
+
+![Figure8](/assets/IWAE_img/Figure8.jpg) (그림 8 테이블 2)
+
+테이블 2의 experiment1은 VAE objective로 training을 시작한 후 IWAE objective로 변경한 것이고, experiment 2는 IWAE objective로 시작한 후 VAE objective로 변경한 것이다. 
+실험 결과가 optimization 문제가 아닌 objective functions 으로 인해 나온 의도된 결과임을 보여주는 실험이다. 
+
+
+## 8. Potential Short-Coming & Future Work
+
+
+
+
+
+}
+
+
+
 
 
   
