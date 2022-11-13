@@ -9,16 +9,6 @@ use_math: true
 ---
 - Tim Salimans, Diederik P. Kingma, and Max Welling. Markov Chain Monte Carlo and Variational Inference: Bridging the Gap. Proceedings of the 32nd International Conference on Machine Learning, 2015
 
-1. Introduction
-2. Modifications
-3. oDiscretized Logistic Mixture Likelihood
-4. Conditioning on Whole Pixels
-5. Downsampling Versus Dilated Convolution
-6. Adding Short-cut Connections
-7. Regularization Using Dropout
-8. Unconditional Generation (CIFAR10)
-9. From PixelCNN to PixelSNAIL
-10. Concusion
 
 ## Introduction
 Markov Chain Monte Carlo(MCMC)는 보다 정확한 모델을 계산할 수 있지만 샘플링에 시간이 매우 오래 걸리는 단점이 있고, Variational Inference(VI)는 드는 시간을 단축시켰지만 모델의 표현력이 떨어지는 문제가 존재합니다.
@@ -58,17 +48,13 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 이러한 동작을 반복하면 실제 분포를 얻어낼 수 있게 됩니다.
 
 <p align="center" width="100%">
-    <img width="50%" src="/assets/MCMCandVI/mcmc_dist.jpg">
+    <img width="50%" src="/assets/MCMCandVI/mcmc_dist.gif">
 </p>
 
 위 시뮬레이션은 (https://chi-feng.github.io/mcmc-demo/app.html
 )[https://chi-feng.github.io/mcmc-demo/app.html] 에서 직접 수행해보실 수 있습니다.
 
  
-<p align="center" width="100%">
-    <img width="50%" src="/assets/PixelCNN++_img/softvsmoldist.png">
-</p>
-
 ### This paper
 
 #### Background
@@ -84,52 +70,9 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 
 
 ## MCMC, more details
+앞서 설명드렸던 Metropolis의 일부분에서, 단순히 정규분포 값을 활용해서 이동한다면 Local Optima에 갇히는 현상이 발생하게 됩니다.
+이를 해결하기 위해 일정 수준 이하로 가능성이 낮아지는 경우 수용하도록 한 것이 Metropolis 알고리즘입니다.
+다만 이러한 경우에도 Local Optima 근처에서 맴도는 현상이 종종 발생하는 단점은 존재합니다.
 
-기존 PixelCNN에서는 비교적 receptive field이 작은 convolution을 사용합니다. long dependency 관계를 포착하기 위해 인풋을 dilated convolution으로 압축하면서 receptive field를 늘립니다 (그런 후 feature map을 다시 spatially 키워줍니다). 하지만 computation cost 측면에서 convolution의 stride를 키워주면서 인풋을 압축하는 게 더 유리합니다. 따라서 여기는 dilated convolution을 사용하지 않고 stride가 더 높은 convolution을 사용합니다.                   
-
-<p align="center" width="100%">
-    <img width="50%" src="/assets/PixelCNN++_img/stride.png">
-</p>
-
-#### Adding Short-cut Connections
-
-Stride가 높을수록 정보 손실이 일어날 수 있습니다. 이 점을 보완하기 위해서 short-cut connection을 사용합니다 (ResNet layer 1과 6, 2와 5, 3과 4에 short-cut connection).
-
-<p align="center" width="100%">
-    <img width="65%" src="/assets/PixelCNN++_img/architecture.png">
-</p>
-
-Short-cut connection을 적용한 것과 비교했을 때 NLL가 다음과 같습니다. 
-
-<p align="center" width="100%">
-    <img width="65%" src="/assets/PixelCNN++_img/shortcut.png">
-</p>
-
-#### Regularization Using Dropout
-
-PixelCNN는 충분히 overfit 할 capacity를 갖고 있습니다. 따라서 dropout으로 regularize 해줍니다. 실제로 dropout을 사용하지 않았을 때 training set에서 NLL가 2.0 bits per-sub-pixel로 측정이 되는데 test set에서는 6.0을 넘는다. 아래 이미지는 dropout 없이 학습하고 생성한 것이다.
-
-<p align="center" width="100%">
-    <img width="30%" src="/assets/PixelCNN++_img/dropout.png">
-</p>
-
-#### Unconditional Generation (CIFAR10)
-
-PixelRNN는 NLL가 우수한 대신 느리다는 단점이 있고, 반면에 PixelCNN는 빠르지만, PixelRNN보다 NLL이 높습니다. PixelCNN의 문제점들을 해결한 후, PixelCNN++는 SOTA인 2.92 bits per sub-pixel를 얻었습니다 (CIFAR10). 
-
-<p align="center" width="100%">
-    <img width="40%" src="/assets/PixelCNN++_img/result.png">
-</p>
-
-#### From PixelCNN to PixelSNAIL
-
-그럼 실제로 PixelCNN의 receptive field는 어떻게 작동될까요?
-아래 그림을 보시면 중앙 픽셀에 생성에 있어서 전 픽셀들의 영향을 계산합니다. Random initialization에서 각 픽셀의 gradient를 계산하고 값이 0.001보다 클 경우 칠해줍니다. 보시다시피 PixelCNN 비해 PixelCNN++가 더 큰 receptive field를 갖고 있습니다. 아마 short-cut connection때문에 그러지 않을까 예상합니다. 하지만 둘 다 여전히 이전 픽셀들 전체를 고려하는게 아니라는게 단점입니다. 이걸 해결하기 위헤 PixelSNAIL는 attention block을 residual block과 함께 사용해서 long-dependency 관계도 고려하게 됩니다.
-
-<p align="center" width="100%">
-    <img width="75%" src="/assets/PixelCNN++_img/receptivefield.png">
-</p>
-
-#### Conclusion
-
-PixeCNN++의 문제 설정과 문제 해결법은 간단합니다. PixelCNN 구조로 더 뛰어난 성능을 보여줄 수 있다고 가설을 세웠고, 개선점들을 적용한 후 실제로 성능이 증가했다는 것을 보여줬습니다. 현재 PixelCNN/PixelCNN의 대표적 application은 latent 분포를 학습하는 데에 있습니다. 예를 들어 VQVAE의 latent 분포는 지정된 prior 분포가 아니고, 그 분포를 PixelCNN로 학습하게 되면 Encoder 없이 랜덤 생성이 가능합니다.
+이러한 MCMC의 단점을 해결하는 것은 더 좋은 Markov Chain을 구성하는 것, 즉 더 나은 샘플링 기법을 고안하는 것입니다.
+이를 위해서는 본 논문에 제시된 Gibbs Sampling, Over-relaxation 등을 포함하여 Hamiltonian MC(HMC) 등의 많은 기법이 연구되고 있으며 Jiaming Song (2017) A-NICE-MC: Adversarial Training for MCMC 과 같은 관련 논문도 제시되고 있습니다.
