@@ -72,7 +72,7 @@ Optimizing the above term from discriminator's prospective, guarantees to reach 
 
 The goal of the discriminator is to estimate this ratio. This is shown in the following figure
 <p align="center">
-  <img src="/GAN_Tutorial_img/dis_vs_gen.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/dis_vs_gen.png" alt="factorio thumbnail", width = "500", height="500"/>
 </p>
 
 In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
@@ -175,7 +175,7 @@ In `maxmin` game, the generator minimizes the cost function first. It does this 
 What we actually want the network to do is `minmax`, however, since we update the newtork simultaneously, we end up performing `maxmin`. This give rise to the mode collapse. The following figure shows this behaviour
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/mode_collapse.png" alt="factorio thumbnail",  height="600" />
+  <img src="/GAN_Tutorial_img/model_collapse.png" alt="factorio thumbnail",  height="600" />
 </p>
 
 The generator visits one mode after another instead of learning to visit all different modes. The generator will identify some modes, that the discriminator believes is higly likely and place all of its mass there, and then discriminator will learn not to be fooled by going to only a single mode. Instead of genearator learning to use multiple modes, the geneartor will switch to different mode and this cycle goes on.
