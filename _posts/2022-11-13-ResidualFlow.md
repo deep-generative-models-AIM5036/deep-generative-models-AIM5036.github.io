@@ -176,11 +176,11 @@ $$
 식에서 박스가 쳐진 부분은 무한급수의 형태로 계산하기가 어렵다는 한계가 있었습니다.
 그래서 이를 해결하고자 기존의 방법들은 $n$번째까지만 계산하여 무한 급수의 값을 추정하는 방법을 사용하였습니다.
 그러나 이때 $n+1$번째이후로의 계산되는 부분이 bias값이 되어 biased estimator를 사용할 수 밖에 없었습니다.
-아래 식에서 파란색 부분이 급수를 추정하기 위해 사용되는 1부터 n번째까지의 합이고, 초록색 부분은 계산을 생략한 n+1번째부터의 합을 의미하는데, 여기서 추정값의 표현력을 높이기 위해서는 n의 값을 키워 더 많은 값을 계산할 수 있지만 n이 커질수록 계산량이 늘어나게 됩니다.
+아래 식에서 우항의 앞 부분이 급수를 추정하기 위해 사용되는 1부터 n번째까지의 합이고, 우항의 뒷 부분은 계산을 생략한 n+1번째부터의 합을 의미하는데, 여기서 추정값의 표현력을 높이기 위해서는 n의 값을 키워 더 많은 값을 계산할 수 있지만 n이 커질수록 계산량이 늘어나게 됩니다.
 반대로 계산량을 줄이기 위해서 n의 값을 줄인다면 계산을 하지 않는 부분이 많아져 bias가 높아지게 되어 expressive와 bias사이의 trade-off가 발생하게 되는 것입니다.
 
 $$ 
-\sum_{k=1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)  = \textcolor{blue}{\sum_{k=1}^n (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)} + \textcolor{green}{\sum_{k=n+1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)}
+\sum_{k=1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)  = {\sum_{k=1}^n (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)} + {\sum_{k=n+1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)}
 $$
 
 그래서 Residual Flow는 계산을 진행한 n을 미리 정하는 것이 아니라, 다음 계산을 계속 할지 그만둘지를 확률에 기반하여 선택하는 방법을 사용하였습니다. 
@@ -295,10 +295,10 @@ Backpropagation을 진행할 때 메모리 뿐만 아니라 activation derivativ
 
 <img src="https://user-images.githubusercontent.com/76925973/200821177-8131b782-b746-445a-8b78-3295eba52e03.png"  width="400" height="200">
 
-그러나 Swish 함수의 경우 일차 미분값이 $|\frac{d}{dz}Swish(z)| \lesssim 1.1$ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
+그러나 Swish 함수의 경우 일차 미분값이 $ | \frac{d}{dz} Swish(z) | \lesssim 1.1 $ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
 
 $$
-LipSwish(z) \coloneqq \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
+LipSwish(z) = \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
 $$
 
 이를 activation function으로 사용하였습니다. 이때 $\beta$ 값은 softplus를 통해 양수를 유지하도록 학습시켰습니다.
@@ -322,7 +322,7 @@ $$
 
 먼저 spectral norms에서는 다음의 두 가지 방법으로 립시츠 조건을 만족시킵니다.
 
-1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $|\phi '(z)| \leq 1$
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $ \vert \phi '(z) \vert \leq 1 $
 2. Weight matrices의 spectral norms으로 bound
 
 $$
