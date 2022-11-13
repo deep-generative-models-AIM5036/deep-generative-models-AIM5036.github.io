@@ -174,7 +174,7 @@ Basically, we have two options to optimize the objective function for the GANs. 
 </p>, 
 while the other is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />
+    <img src="/GAN_Tutorial_img/maxmingenerator.png" alt="factorio thumbnail", width="100", height="100" />
 </p>. 
 They are different, and optimizing them corresponds to optimizing two different functions. 
 
