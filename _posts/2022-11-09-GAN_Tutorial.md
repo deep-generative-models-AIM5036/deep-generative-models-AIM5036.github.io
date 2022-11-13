@@ -215,8 +215,8 @@ Initially, when we update the networks simultaneously, we do not consider the ma
 
 [3] [https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2020/] (Deep Learning for Computer Vision)
 
-[4] [https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987] (https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987)
+[4] [https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987] (Training in GANs)
 
-[5] [https://jonathan-hui.medium.com/gan-whats-generative-adversarial-networks-and-its-application-f39ed278ef09] (https://tech.kakaoenterprise.com/66)
+[5] [https://jonathan-hui.medium.com/gan-whats-generative-adversarial-networks-and-its-application-f39ed278ef09] (GANs)
 
 
