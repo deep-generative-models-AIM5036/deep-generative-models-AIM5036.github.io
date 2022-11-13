@@ -444,7 +444,7 @@ Residual Flow가 사용된 예시입니다.
 
     <img src="https://user-images.githubusercontent.com/76925973/201393919-600f8123-0d4a-455c-8411-72b4a9a3f5da.png"  width="600">
 
-
+ 
 
 [^1]: Behrmann, J., Grathwohl, W., Chen, R. T., Duvenaud, D., & Jacobsen, J. H. (2019, May). Invertible residual networks. In International Conference on Machine Learning (pp. 573-582). PMLR.
 [^2]: Nalisnick, E., Matsukawa, A., Teh, Y. W., Gorur, D., & Lakshminarayanan, B. (2019, May). Hybrid models with deep and invertible features. In International Conference on Machine Learning (pp. 4723-4732). PMLR.
