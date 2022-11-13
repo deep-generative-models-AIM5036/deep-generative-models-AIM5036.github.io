@@ -85,13 +85,13 @@ $$p(\mathrm{x|h})=\prod_{i=1}^{n^2}p(x_i|x_1, \space \dots,x_{i-1}, \mathrm{h})$
 
 저자들은 $\mathrm{h}$에 관한 항을 추가하여 조건부 분포를 모델링하였습니다.
 
-$$ \mathbf{y} = \tanh(\mathbf{W}_{k,\ f}\ * \mathbf{x}\ + \mathbf{V}_{k,\ f}^T\mathbf{h})\ \circledcirc\ \sigma(\mathbf{W}_{k,\ g}\ * \mathbf{x}\ + \mathbf{V}_{k,\ g}^T\mathbf{h})  $$
+$$ \mathbf{y} = \tanh(\mathbf{W}_{k,\ f}\ * \mathbf{x}\ + \mathbf{V}_{k,\ f}^T\mathbf{h}) \odot \sigma(\mathbf{W}_{k,\ g}\ * \mathbf{x}\ + \mathbf{V}_{k,\ g}^T\mathbf{h})  $$
 
 만약, $\mathrm{h}$가 특정 클래스에 대한 원-핫 엔코딩이라면 이는 모든 layer에 class dependent bias를 추가하는 것과 같습니다. 이러한 조건은 이미지에서 픽셀의 위치에 대한 정보가 아니라는 점을 주목하세요. 즉, $\mathrm{h}$는 이미지의 어디인지가 아닌 이미지가 무엇인지에 대한 정보만을 포함하고 있습니다.
 
 또한, 저자들은 위치를 조건으로 활용하는 함수를 개발하였습니다. 이는 이미지에서 어떠한 구조의 위치에 대한 정보가 임베딩된 $\mathrm{h}$를 활용하는데 유용합니다. $\mathrm{h}$를 deconvolutional 신경망 $m()$를 통해 spatial representation $s=m(\mathrm{h})$로 맵핑함으로써, 아래와 같은 식을 얻을 수 있습니다.
 
-$$ \mathbf{y} = tanh(\mathbf{W}_{k,\ f}\ * \mathbf{x}\ + \mathbf{V}_{k,\ f}\ * \mathbf{s})\ \circledcirc\ \sigma(\mathbf{W}_{k,\ g}\ * \mathbf{x}\ + \mathbf{V}_{k,\ g}\ * \mathbf{s})  $$
+$$ \mathbf{y} = \tanh(\mathbf{W}_{k,\ f}\ * \mathbf{x}\ + \mathbf{V}_{k,\ f}\ * \mathbf{s}) \odot \sigma(\mathbf{W}_{k,\ g}\ * \mathbf{x}\ + \mathbf{V}_{k,\ g}\ * \mathbf{s})  $$
 
 이 때, $V_{k,g}*\mathrm{s}$는 마스킹되지 않은 1x1 합성곱입니다.
 
