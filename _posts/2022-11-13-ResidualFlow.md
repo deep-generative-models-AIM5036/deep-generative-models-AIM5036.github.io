@@ -239,7 +239,7 @@ $$
 ##### 3.2 Memory-Efficient Backpropagation
 
 $$
-log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{{\sum_{k=1}^{n}}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
+log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{\sum_{k=1}^{n}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
 $$
 
 이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스(파란글씨)에서 n번의 계산을 해야하고, 두번째 박스(빨간글씨)에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
