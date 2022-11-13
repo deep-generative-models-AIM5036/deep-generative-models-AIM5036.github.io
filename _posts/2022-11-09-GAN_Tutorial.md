@@ -154,7 +154,7 @@ Back when this paper was published, GANs were relatively new and had many resear
 The nature of the GAN settings is such that the two networks compete with each other. In simple words, one network maximizes a value while the other network minimizes the same value. This is also known as a zero-sum non-cooperative game. In game theory, GAN converges when both networks reach nash equilibrium. In nash equilibrium, one network's actions will not affect the course of the other network's actions. Consider the following optimization problem, 
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/minmax.png" width="100" height="35"/>
+  <img src="/GAN_Tutorial_img/minmax.png" width="100" height="30"/>
 </p>
 
 The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
