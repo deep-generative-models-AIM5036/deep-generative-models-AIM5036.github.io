@@ -12,11 +12,12 @@ This post contains a review of the paper [Variational Inference with Normalizing
 
 This paper aims to solve one of the problems of Variationa Inference, i.e. choosing the approximate posterior distribution, since the approach porposed is able to recover the true posterior distribution and outperform other competing approaches. In a few words, what Normalizing Flows does is tranforming an simple initial density into a more complex density by using a sequence og invertible transformations named 'flows'. 
 
-To further explain this approach, it will be divided in 3 points
+To further explain this approach, it will be divided in 4 points
 
 1. Background 
 2. Proposed model 
 3. Testing and Results 
+4. Additional Remarks
 
 #  1. Background 
 
