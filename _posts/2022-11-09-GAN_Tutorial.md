@@ -3,7 +3,7 @@ layout: post
 title:  "GAN Tutorial"
 date:   2022-11-12
 author: Kim JeongHyeon, Khan Osama
-categories: Generative Adversarial Networks
+categories: Adversarial Networks
 tags: GAN Tutorial
 use_math: True
 ---
@@ -174,7 +174,7 @@ Basically, we have two options to optimize the objective function for the GANs. 
 </p>, 
 while the other is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/maxmingenerator.png" width="120" height="100"/>
+    <img src="/GAN_Tutorial_img/maxmingenerator.png" width="140" height="100"/>
 </p>. 
 They are different, and optimizing them corresponds to optimizing two different functions. 
 
