@@ -147,7 +147,19 @@ The applications of generative models are not restricted to the above-mentioned 
 
 # Research Frontiers
 
+Back when this paper was published, GANs were relatively new and had many research oppurtunities.
+
 ## Non-convergence
+
+The nature of the GAN settings is such that the two networks compete with each other. In simple words, one network maximizes a value, while the other network minimizes the same value. This is also known as zero-sum non-cooperative game. In game theory, GAN converges when both networks reach nash equilibrium. In nash equilibrium, one networks actions will not affect the course of other network's actions. Consider the following optimization problem, 
+<p align="center">
+  <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail"/>
+</p>
+
+The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
+<p align="center">
+  <img src="/GAN_Tutorial_img/oscillations.png" alt="factorio thumbnail"/>
+</p>
 
 ## Mode Collapse
 
