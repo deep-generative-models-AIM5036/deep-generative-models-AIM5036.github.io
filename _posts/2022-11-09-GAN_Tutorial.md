@@ -159,7 +159,7 @@ The nature of the GAN settings is such that the two networks compete with each o
 
 The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
 <p align="center">
-  <img src="/GAN_Tutorial_img/oscillations.png" alt="factorio thumbnail", width="1000", height="1000" />
+  <img src="/GAN_Tutorial_img/oscillations.png" alt="factorio thumbnail", width="800", height="800" />
 </p>
 
 ## Mode Collapse
