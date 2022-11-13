@@ -103,7 +103,7 @@ GAN minimizes the Jensen-Shannon divergence(JSD) between the p<sub>data</sub> an
 We can see that minimizing the main loss function of GANs, indeed, minimizes the JSD between the two distributions. Alternatively, we can also modify the generative models to minimize the Kullback–Leibler divergence (KL) between the two distributions. This would allow the GAN to do maximum likeliood learning. In order to do so, we need to change the loss function for the generator. Specifically, changing the loss function for the generator to the following loss function will allow the GAN to minimize the KL divergence.
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/new_cost_mle" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/new_cost_mle.png" alt="factorio thumbnail"/>
 </p>
 
 
