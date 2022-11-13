@@ -6,7 +6,7 @@ author: Sungmin Kang
 categories: latent-variable
 use_math: true
 ---
-- Tim Salimans, Diederik P. Kingma, and Max Welling. Markov Chain Monte Carlo and Variational Inference: Bridging the Gap. arXiv preprint arXiv:1410.6460, 2015
+- Tim Salimans, Diederik P. Kingma, and Max Welling. Markov Chain Monte Carlo and Variational Inference: Bridging the Gap. Proceedings of the 32nd International Conference on Machine Learning, 2015
 
 1. Introduction
 2. Modifications
@@ -20,21 +20,30 @@ use_math: true
 10. Concusion
 
 ## Introduction
-2016년 당시에 likelihood-based autoregressive 생성 모델이 유행했습니다. 그중에서도 log-likelihood metric 측면에서 SOTA인 PixelCNN이 주목받았습니다. PixelCNN는 $p(x_i|x_{<_i})$ 분포를 CNN으로 학습합니다. PixelCNN에 관한 자세한 설명은 [여기서](https://github.com/deep-generative-models-AIM5036/deep-generative-models-AIM5036.github.io/blob/main/_posts/2022-11-10-GatedPixelCNN.md) 확인하실 수 있습니다.저자들은 이런 PixelCNN을 더 개선해서 성능이 더 높은 PixelCNN++를 제안합니다. 각 문제점과 개선 방법을 소개하겠습니다.
-                                              
-#### Discretized Logistic Mixture Likelihood
-PixelCNN에서 하나의 pixel 값을 예측하는 것은 즉 0~255 값을 softmax을 이용해 classification으로 접근한다 (pixel 값마다 하나의 클래스). 그래서 class들간의 관계가 없는 상태로 학습이 시작하기 때문에 생성을 위한 학습 외에 그 관계를 먼저 학습해야 한다는 점도 발생합니다.
+Markov Chain Monte Carlo(MCMC)는 보다 정확한 모델을 계산할 수 있지만 샘플링에 시간이 매우 오래 걸리는 단점이 있고, Variational Inference(VI)는 드는 시간을 단축시켰지만 모델의 표현력이 떨어지는 문제가 존재합니다.
+본 논문 Markov Chain Monte Carlo and Variational Inference: Bridging the Gap(이하 MCMC and VI)에서는 두 개의 간극을 메우는 방법을 제시하고, 이 방법의 실제 구현으로 Hamiltonian VI 구현체를 제시합니다.
+
+### Markov Chain Monte Carlo
+Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에서도 많이 다루어졌으므로 내용은 생략하고, Markov Chain Monte Carlo에 대해 간략하게 설명하고 넘어가도록 하겠습니다.
+
+#### Monte Carlo
+무작위로 매우 많은 시행을 할 경우, 실제 값에 근사한 결과가 나오는 것을 활용합니다.
+이 예시로 흔히 보신 것은 -1~1 사이에 점을 무수히 많이 찍어서, 원 범위 안에 있는 점의 개수를 구한 뒤, 원주율을 근사하는 것이 있을 것 같습니다.
+실제로 적절한 무작위 생성이 있다면 시행 횟수가 늘어남에 따라 실제 원주율 값에 근사하는 것을 보실 수 있습니다.
 
 <p align="center" width="100%">
-    <img width="65%" src="/assets/PixelCNN++_img/softmaxvsmol.png">
+    <img width="65%" src="/assets/MCMCandVI/monte_carlo.png">
 </p>
 
-PixelCNN++에서는 softmax을 사용하는 대신 예측되는 pixel 값의 분포 파라미터를 출력하게끔 설정합니다. 이런 파라미터가 주어지면, 쉽게 심플링이 가능하게 됩니다. 여기서 좀 더 복잡한 분포를 출력할 수 있도록 mixture of distribution을 사용하게 됩니다. 좀 더 정확하게 logistic 분포의 조합(mixture)를 사용합니다. 
+#### Markov Chain
+Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향이 가도록 구성된 체인입니다.
+간단한 예시를 들자면, 어제 비가 왔을 때 오늘 비가 올 확률과 오지 않을 확률이 있고 - 어제 비가 오지 않았을 때 오늘 비가 올 확률과 오지 않을 확률이 제시된 상황을 생각해보시면 됩니다.
 
 <p align="center" width="100%">
-    <img width="65%" src="/assets/PixelCNN++_img/formula(1,2).png">
+    <img width="65%" src="/assets/MCMCandVI/markov_chain.png">
 </p>
-                                                                
+
+#### Monte Carlo + Markov Chain
 저희가 계산해야 할 부분은 모델이 출력한 logistic 분포의 파라미터로 정답인 x픽셀 값을 예측할 확률을 구하는 것입니다. 그럼 모델이 출력한 분포값이 나올 부분을 적분하면 됩니다. 적분을 구하기 위해 저희는 logistic 분포의 CDF인 sigmoid를 사용합니다.
 
 식(1)은 mixture of logistic distribution식이다. pi로 각 logistic distribution의 기여도를 결정하고, 각 logistic 분포의 파라미터 mu와 scale이 존재합니다. 식(2)를 이해하기 위해서 그래프를 가져와봤습니다. 더 심플하게 설명하기 위해 mixture가 아닌 simple logistic으로 설명해보겠습니다. 윗 그래프는 분포로 Logistic PDF이고 아래는 각자 해당되는 CDF이고 (variance를 scale로 해석해주시면 됩니다), CDF+과 CDF-는 픽셀 구간(PixelCNN 같은 경우 +0.5와 -0.5)입니다.보시다시피 빨간색 분포에서 CDF+와 CDF-이 CDF 함수를 만나는 지점들이 간격이 제일 큽니다. 확률적으로 해석하면 0에 샘플링될 확률이 셋 중에서 제일 높다는 뜻입니다. 그럼 이젠 식(2)를 둘러보겠습니다. 보시다시피 X = mu = 0일 때 빨간 그래프 상황이 이루어지고 그럴 경우에 P(X)가 극대화됩니다. P(x)에 -log만 추가해주면 로스 함수로 만들고 학습이 가능합니다. 이와 함께 분포의 weight값 pi도 학습하게 됩니다.
