@@ -168,7 +168,7 @@ This clearly shows that some cost functions might not converge using gradient de
 
 In reality, our data has multiple modes in the distribution, known as multi-modal distributions. However, sometimes, the network can only consider some of these modes when generating images. This gives rise to the problem called model collapse. In model collapse, only a few modes of data are generated. 
 
-Basically, we have two options to optimize the objective function for the GANs. One is <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />, while the other is <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />. They are different, and optimizing them corresponds to optimizing two different functions. 
+Basically, we have two options to optimize the objective function for the GANs. One is <p><img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" /></p>, while the other is <p><img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" /></p>. They are different, and optimizing them corresponds to optimizing two different functions. 
 
 In the `maxmin` game, the generator minimizes the cost function first. It does this by mapping all the values of `z` to a particular `x`, which can be used to deceive the discriminator. And hence generator will not be learning useful mapping. On the other hand, in the `minmax` game, we first allow the discriminator to learn and then guide the generator to find the modes of the underlying data. 
 
