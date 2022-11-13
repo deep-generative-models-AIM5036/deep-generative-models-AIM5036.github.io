@@ -3,7 +3,7 @@ layout: post
 title:  "GAN Tutorial"
 date:   2022-11-12
 author: Kim JeongHyeon, Khan Osama
-categories: Adversarial Networks
+categories: Generative Adversarial Networks
 tags: GAN Tutorial
 use_math: True
 ---
@@ -151,11 +151,7 @@ Back when this paper was published, GANs were relatively new and had many resear
 
 ## Non-convergence
 
-The nature of the GAN settings is such that the two networks compete with each other. In simple words, one network maximizes a value while the other network minimizes the same value. This is also known as a zero-sum non-cooperative game. In game theory, GAN converges when both networks reach nash equilibrium. In nash equilibrium, one network's actions will not affect the course of the other network's actions. Consider the following optimization problem, 
-
-<p align="center">
-  <img src="/GAN_Tutorial_img/minmax.png" width="100" height="30"/>
-</p>
+The nature of the GAN settings is such that the two networks compete with each other. In simple words, one network maximizes a value while the other network minimizes the same value. This is also known as a zero-sum non-cooperative game. In game theory, GAN converges when both networks reach nash equilibrium. In nash equilibrium, one network's actions will not affect the course of the other network's actions. Consider the following optimization problem: `minmax V(G,D) = xy` 
 
 The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
 <p align="center">
@@ -170,11 +166,11 @@ In reality, our data has multiple modes in the distribution, known as multi-moda
 
 Basically, we have two options to optimize the objective function for the GANs. One is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/minmaxgenerator.png" width="150" height="100"/>
+    <img src="/GAN_Tutorial_img/minmaxgenerator.png" />
 </p>
 while the other is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/maxmingenerator.png" width="140" height="100"/>
+    <img src="/GAN_Tutorial_img/maxmingenerator.png"/>
 </p>. 
 They are different, and optimizing them corresponds to optimizing two different functions. 
 
