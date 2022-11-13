@@ -19,8 +19,9 @@ use_math: true
 
 IWAE의 핵심 아이디어를 보기 전에 백드라운드로 latent variable model (LVM)에 대해 알아보겠다.
 그림 1은 가장 심플한 LVM의 예시를 보여준다. 그림에서 x는 우리가 실제로 볼 수 있는 데이터 샘플이고, z는 우리가 볼 수 없지만 x를 생성하는데 사용되는 분포다. 
- 
-![Figure1](/assets/IWAE_img/Figure1.jpg) (그림 1 Latent Variable Model)
+
+<p align="center"><img src="/assets/IWAE_img/Figure1.jpg" width="300" height="400"> (그림 1 Latent Variable Model)
+
 
 z는 하나의 known distribution으로 정할 수도 있고, 학습을 통해 배울 수도 있는데, VAE에서는 정해 놓는 방식을 사용한다. 대표적으로 데이터가 discrete하면 bernoulli, continuous하면 gaussian 분포를 사용한다.
 만일 z를 Bernoulli로 설정했다면, 아래와 같은 식을 통해 $p_{theta}(x|z)$를 구할 수 있다. 
@@ -51,9 +52,10 @@ $$max_{\mu, \sigma}\sum_{i}log[ \frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{
 
 
 그림 2에서 training 결과를 볼 수 있다. Epoch이 지남에 따라 3개의 gaussian 분포로 나뉘는 것을 볼 수 있다. 
+  
+<p align="center"><img src="/assets/IWAE_img/Figure2.jpg" width="500" height="300"> (그림 2 result)
 
-![Figure2](/assets/IWAE_img/Figure2.jpg) (그림 2 result)
-
+  
 ## 2. Prior Sampling: Approximation for Large K
 
 만일 training objective의 K값이 너무나도 커서 위의 예제처럼 전부 다 summation을 진행하는 게 불가능하다면 어떻게 해야 할까?
@@ -64,11 +66,11 @@ $$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}lo
 
 이것이 IWAE이전의 VAE모델들이 채택한 방식이다. 하지만 이와 같은 방식은 K값이 클수록 중요하지 않은 샘플들이 자주 추출되는 문제가 발생한다. 
 
-### 따라서 IWAE는 train objective에 $\frac{1}{K}\sump_{\theta}(x^{(i)}|z_{k}^{(i)})$의 과정에서 중요하지 않은 샘플들이 뽑히는 문제를 다룬다
+### 따라서 IWAE는 train objective에 $\frac{1}{K}\sum p_{\theta}(x^{(i)}|z_{k}^{(i)})$의 과정에서 중요하지 않은 샘플들이 뽑히는 문제를 다룬다
 
-예를들어 그림 3과 같이 데이터가 K개의 cluster들로 나뉘어 있고, $x^{(i)}$가 마지막 cluster에 있다고 가정한다. 그러면 prior distribution z에서 uniform sampling을 진행했을 때 $\frac{1}{K}$ term만이 유용할 것이다. 
+예를들어 그림 3과 같이 데이터가 여러 cluster들로 나뉘어 있고 $x^{(i)}$가 그중 빨간색 cluster 0에만 있다고 가정한다. Uniform distribution을 적용한다면 likelihood evaluation에서 $\frac{1}{5}$term만 유용할 것이다. 같은 논리로 K개의 cluster들로 나뉘어 있고, $x^{(i)}$가 마지막 cluster에 있다고 가정한다. 그러면 prior distribution z에서 uniform sampling을 진행했을 때 $\frac{1}{K}$ term만이 유용할 것이다. 
 
-![Figure3](/assets/IWAE_img/Figure3.jpg) (그림 3 K-Clusters)
+<p align="center"><img src="/assets/IWAE_img/Figure3.jpg" width="450" height="400"> (그림 3 K-Clusters)
 
 이해를 돕기 위해 likelihood evaluation을 뜻하는 3번식 $p_{theta}(x) = \sum_{z} P_{z}(z)p_{\theta}(x|z)$을 다시 한 번 본다. 만일 우리가 MNIST데이터를 다루고 있고 (K=10), 숫자 1에 해당하는 데이터  $x^{(i)}$를 추출했다면, $p_{theta}(x) = \frac{1}{10}p_{theta}(x^{(i)}|z_{1}) + \frac{1}{10}\times0 + ... + + \frac{1}{10}\times0$가 될 것이다. $p_{theta}(x^{(i)}|z_{2})$를 포함한 다른 cluster에서 숫자 1에 해당하는 데이터가 뽑힐 확률은 0이기 때문이다.  
 
@@ -80,7 +82,8 @@ $$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}lo
 우리의 목적을 다시 한 번 상기하자면, $E_{z~pz(z)}[p_{\theta}(x^{(i)}|z_{k}^{i})]$를 구하고 싶은 것이다. 그림 4를 통해 어떠한 경우에 문제가 되는 지 다시 한 번 보겠다.
 4번과 5번 그림은 Mutual Information 채널의 Importance Sampling동영상에서 가져왔음을 밝힌다. 
 
-![Figure4](/assets/IWAE_img/Figure4.jpg) (그림 4 Problem Case)
+<p align="center"><img src="/assets/IWAE_img/Figure4.jpg" width="450" height="400"> (그림 4 Problem Case)
+
 
 그림 4에서 붉은색 $f(z)$가 $p_{\theta}(x^{(i)}|z_{k}^{i})$를 나타낸다. 그림에서 처럼 $p_{\theta}(x^{(i)}|z_{k}^{i})$가 높은 곳에서 $p_{z}(z)$가 낮으면 문제가 된다. $p_{z}(z)$에 따라 샘플된 데이터가 informative하지 않기 때문이다. 
 $p_{\theta}(x^{(i)}|z_{k}^{i})$가 논문을 포함한 VAE모델에서 recognition network라고 지칭한다는 것을 알고 있다면, “VAE harshly penalizes approximate posterior samples which are unlikely to explain data, even if the recognition network puts much of its probability mass on good explanations.”라는 문장을 여기서 이해할 수 있다. VAE는 $p_{\theta}(x^{(i)}|z_{k}^{i})$값이 높더라도 $p_{z}(z)$값이 낮다면 해당 샘플을 사용하지 못한다. 앞서 보았듯이 likelihood evaluation이 0에 가까워지기 되기 때문이다.    
@@ -107,8 +110,9 @@ $$
  
 우리는 이러한 과정을 $f(z)$가 높은 곳에서 높은 값을 가지는 $q(z)$를 찾는 문제로 보았지만, 조금 다른 관점으로 $f(z) \times q(z)$가 높도록 $q(z)$를 설정하는 문제로도, $Var_{z \sim q}[\frac{p(z)}{q(z)}f(z)] < Var_{z~p}[f(z)]$가 되도록 하는 문제로도 볼 수 있다. 여기서 $\frac{p}{q}$로 $f(z)$를 reweight해주는 걸로 볼 수 있는데, 아래의 그림 5로 그럴 때 $p(z)$와 같아지는 것을 볼 수 있다. 다른 분포에서 뽑는 bias를 correct해주는 효과라고 이해할 수 있다. 또한 초록색 q확률을 따라 reweighted된 주황색 값을 뽑으면 그 variance가 매우 작음을 그림을 통해 확인 할 수 있다. 따라서 다른 sampling 방식들 (ex. rejection sampling)들과는 다르게 모든 샘플들을 사용할 수 있다. 
 
-![Figure5](/assets/IWAE_img/Figure5.jpg) (그림 5 Solved Case)
+<p align="center"><img src="/assets/IWAE_img/Figure5.jpg" width="450" height="400"> (그림 5 Solved Case)
 
+  
 ## 4. Variational Approach for q(z): Ammortized Inference
 
 이제 문제는 위에서 밝힌 조건들을 만족하는 좋은 q(z)를 찾는 것으로 바뀐다. 결국 샘플 $x^{(i)}$가 주어졌을 때 어떤 z가 informative한지 z를 uniform이 아닌 z sampler 를 통해 선정하는 것으로 볼 수 있다. 물론 Bayes rule을 사용하면 $p_{\theta}(z|x^{(i)}) = \frac{p_{\theta}(x^{(i)}|z) p_{z}(z)}{p_{\theta}(x^{(i)})}$가 되지만, 분모의 normalizing constant를 얻을 수 없기 때문에 $q(z)$를 샘플링하기 쉬운 known distribution으로 설정하는 variational approach를 사용한다. 논문에서는 Gaussian으로 설정하였고, KL divergence를 사용하여 근사시켰다. 전개하면 다음과 같다.
@@ -179,18 +183,21 @@ $$L_k = E_{h}[log\frac{1}{k}\sum_{i=1}^k\frac{p(x,h_i)}{q(h_i|x)}] \geq E_{h}[E_
 
 논문에서 제공한 실험 결과 테이블은 두 가지이다.
 
-![Figure6](/assets/IWAE_img/Figure6.jpg) (그림 6 Table 1)
+  
+<p align="center"><img src="/assets/IWAE_img/Figure6.jpg" width="600" height="400"> (그림 6 Table 1)
+
 
 테이블 1은 IWAE와 VAE의 전반적인 결과를 보여준다. IWAE가 VAE보다 전반적으로 더 좋은 결과를 보여주며, K 수를 늘릴 때 IWAE는 확실히 NLL이 낮아지는 것을 볼 수 있다. 두 모델 전부 레이어 수를 2로 늘릴 때 더 좋은 결과를 보여준다.
 
-![Figure7](/assets/IWAE_img/Figure7.jpg) (그림 7 Correlation between active units and KL)
+<p align="center"><img src="/assets/IWAE_img/Figure7.jpg" width="500" height="450"> (그림 7 Correlation between active units and KL)
 
 Inactive units은 collapsed to the prior문제를 나타낸다. 다른 표현으로는 over-pruning problem이라고 부른다. 모든 데이터를 표현하기 위해서는 D-dimension이 필요할지라도, each individual example은 훨씬 작은 d-dimension으로도 표현 할 수 있다. D-dimension과 더 작은 d-dimension간의 차이만큼 inactive units가 발생한다고 볼 수 있다.
 
 IWAE는 위에서 보았듯이 prediction distribution을 더 spead-out하게 하는 objective function을 가지고 있어 generalize power가 강하기 때문에 active units이 더 많다고 볼 수 있다.
 
-![Figure8](/assets/IWAE_img/Figure8.jpg) (그림 8 테이블 2) { width=50% }
+<p align="center"><img src="/assets/IWAE_img/Figure8.jpg" width="600" height="300"> (그림 8 테이블 2)
 
+  
 테이블 2의 experiment1은 VAE objective로 training을 시작한 후 IWAE objective로 변경한 것이고, experiment 2는 IWAE objective로 시작한 후 VAE objective로 변경한 것이다. 실험 결과가 saddle point나 local minimizer같은 문제로 대변되는 optimization 문제가 아닌 objective functions 으로 인해 나온 의도된 결과임을 보여주는 실험이다. 
 
 
@@ -205,7 +212,7 @@ q분포를 정하는 데 있어 편의를 위해 Gaussian혹은 Bernoulli분포�
 
 해당 논문은 IWAE의 bound를 biased estimator라고 정의하고, 그 bias를 줄이는 데 Jacknife bias correction방식을 사용한다. 기존 논문의 가장 큰 한계점을 뽑으라면 importance sampling에서 발생하는 variance가 작다는 것을 mean absolute deviation (MAD)을 통해 low variance를 간접적으로만 증명한 것이라고 생각한다. 
 
-![Figure9](/assets/IWAE_img/Figure9.jpg) (그림 9 Jacknife bias correction) { width=50% }
+<p align="center"><img src="/assets/IWAE_img/Figure9.jpg" width="500" height="450"> (그림 9 Jacknife bias correction)
 
 Jacknife방식은 1954년 처음 소개된 방식으로 그 동작 방법이 매우 간단하다. 기존의 샘플링 방식은 n개의 샘플로 $\hat{t}$을 예측한다. 하지만, 다양한 갯수의 샘플로 예측한 값을 함께 사용하면 bias를 줄일 수 있다. 그림 9에서 볼 수 있듯이 n개만 사용하면 $t_{green point} - \hat{t_{n}}$의 bias가 존재하지만, $\hat{t_{n-1}}$의 값을 함꼐 사용하여 linear approximation을 진행하면 $t_{green point}  - \hat{t_{\inf}}$의 훨씬 작은 bias만이 존재하게 된다. 해당 논문은 이러한 방식을 통해 실제 bias값을 줄인 것 이외에도 이론적으로 IWAE의 bias와 variance를 연구한 것이 주요 contribution이다.
 
@@ -216,7 +223,9 @@ Jacknife방식은 1954년 처음 소개된 방식으로 그 동작 방법이 매
 $$q_{\phi}(z) = \int q_{\phi}(z|\psi)q_{\phi}(\psi)d\psi $$
 훨씬 더 flexible한 q분포를 사용할 수 있으므로 더 정확한 variational inference가 가능해진다. 
 
-![Figure10](/assets/IWAE_img/Figure10.jpg) (그림 10 Approximating target distribution with SIVI) { width=50% }
+  
+<p align="center"><img src="/assets/IWAE_img/Figure10.jpg" width="600" height="300"> (그림 10 Approximating target distribution with SIVI)
+
 
 그림 10을 보면 q분포가 기존의 Gaussian모양을 벗어나서 multi-modal한 모습과 매우 flexible한 모습을 보여주는 것을 볼 수 있다. 해당 방식은 VAE라는 큰 필드에서의 발전으로 graph neural network를 포함한 매우 다양한 분야에서 사용이 되고 있다. 
 
