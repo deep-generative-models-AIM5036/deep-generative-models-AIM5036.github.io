@@ -25,7 +25,7 @@ $log p(X) = log p(f(X)) + log |det\frac{\partial z}{\partial x}|$
 역변환을 계산하는 과정에서는 함수 f(X)에 대한 자코비안(Jacobian)을 계산하게 되는데, 기존 flow-based model에서는 계산을 쉽게 하기 위해 자코비안 행렬이 sparse하거나 삼각행렬과 같은 특수한 모양이 나오도록 하였습니다. 그러나, 자코비안이 sparse하거나 특정 모양을 따르게 되면 효율적으로 계산을 할 수는 있지만, 그런 조건을 만족시키는 함수 $f(X)$를 설계하는 것이 어렵고 비용이 많이 발생한다는 단점이 있습니다.   
 
 또한 기존에 사용한 coupling block이나 ordinary differential equation 방법의 경우 강한 inductive bias를 야기하여 학습한 task이외의 task에는 적용하기 어렵다는 한계 역시 존재합니다.
-그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 $\colorbox{#FFFFB7}{\textbf{Residual Flow}}$ 모델입니다.   
+그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 $\colorbox{yellow}{\textbf{Residual Flow}}$ 모델입니다.   
 
 ---
 
@@ -69,7 +69,7 @@ $$
 determinant의 log값을 trace로 변환할 수 있는 방법입니다. 
 
 $$
-    A = U \cdot D \cdot U^{-1}  &nbsp;    f(A) = U\cdot f(D) \cdot U^{-1} \\
+    A = U \cdot D \cdot U^{-1}  \qquad   f(A) = U\cdot f(D) \cdot U^{-1} \\
 $$
 
 $$
@@ -92,7 +92,7 @@ $$
 $$
     \begin{aligned}
         &=> det (exp (A)) = \prod_aexp(\lambda_a) = exp \sum_a\lambda_a = exp (tr(A)) \\
-        &=> det(J) = exp (tr(logJ)) &nbsp;  &nbsp; A = log J \\
+        &=> det(J) = exp (tr(logJ)) \qquad \qquad  A = log J \\
         &=> log (det(J)) = tr(log J)
     \end{aligned}
 $$
@@ -105,7 +105,7 @@ $$
 $$
     \begin{aligned}
         log (1 + x) &= x - \frac{x^2}{2} + \frac{x^3}{3} - \frac{x^4}{4} + \cdots \\
-        &= \sum_{n=1}^{\infty}\frac{(-1)^{n+1}}{x}x^n &nbsp; &nbsp; &nbsp; for -1< x \leq 1
+        &= \sum_{n=1}^{\infty}\frac{(-1)^{n+1}}{x}x^n \qquad \qquad \qquad  for -1< x \leq 1
     \end{aligned}
 $$
 
@@ -131,7 +131,7 @@ $$
         &= tr(A \cdot E(zz^T)) \\
         &= E[tr(Azz^T)] \\
         &= E[z^TAz] \\ 
-        z ~ Gaussian
+        z \thicksim Gaussian
     \end{aligned}
 $$
 
@@ -244,7 +244,9 @@ $$
 
 이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스(파란글씨)에서 n번의 계산을 해야하고, 두번째 박스(빨간글씨)에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
 
-따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. $\mathbb{E}[\displaystyle\sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\frac{v^T[J_g(x)]^kv}{\mathbb{P}(N\geq k)}]$ 는 $log|det(I+J_g(x))|$를 추정한 값이므로 log determinant값을 backpropagation에 사용하는 것입니다. 
+따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. 
+
+$\mathbb{E}[\displaystyle\sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\frac{v^T[J_g(x)]^kv}{\mathbb{P}(N\geq k)}]$ 는 $log|det(I+J_g(x))|$를 추정한 값이므로 log determinant값을 backpropagation에 사용하는 것입니다. 
 
 $$
 \begin{aligned}
@@ -371,7 +373,7 @@ Residual Flow를 통해 생성된 이미지 샘플입니다. 왼쪽 이미지는
 
 CIFAR-10 데이터셋의 이미지 및 다른 모델을 통해 생성된 이미지와 함께 비교를 해보았습니다. 비록 PixelCNN이나 Variational Dequantized Flow++로 생성된 이미지들 보다 bits/dim은 오히려 안 좋은 결과를 보여주지만, 저자들은 log-likelihood가 이미지의 퀄리티와 정확하게 매치되는 것은 아니며, Residual Flow를 통해 생성된 이미지가 더 일관된 이미지를 잘 생성한다고 주장합니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/201392340-b1fe988b-fc04-4892-9cd9-08f3c16f4308.png"  width="200" height="200">
+<img src="https://user-images.githubusercontent.com/76925973/201392340-b1fe988b-fc04-4892-9cd9-08f3c16f4308.png"  width="200" >
 
 FID 값을 통해 생성된 이미지를 비교해 보았을 때, DCGAN이나 WGAN-GP와 같은 GAN 기반의 모델들 보다는 떨어지지만, 다른 flow-based model이나 autoregressive model보다 더 좋은 성능을 보이는 것을 확인할 수 있습니다.
 
