@@ -3,7 +3,7 @@ layout: post
 title:  "Residual Flows for Invertible Generative Modeling"
 date:   2022-11-13
 author: Minyoung.Lee & Juyeob.Lee
-categories: Latex
+categories: Flow
 use_math: true
 ---
 
