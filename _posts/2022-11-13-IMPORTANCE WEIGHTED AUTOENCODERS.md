@@ -23,8 +23,8 @@ IWAE의 핵심 아이디어를 보기 전에 백드라운드로 latent variable 
 <p align="center"><img src="/assets/IWAE_img/Figure1.jpg" width="300" height="400"> (그림 1 Latent Variable Model)
 
 
-z는 하나의 known distribution으로 정할 수도 있고, 학습을 통해 배울 수도 있는데, VAE에서는 정해 놓는 방식을 사용한다. 대표적으로 데이터가 discrete하면 bernoulli, continuous하면 gaussian 분포를 사용한다.
-만일 z를 Bernoulli로 설정했다면, 아래와 같은 식을 통해 $p_{theta}(x|z)$를 구할 수 있다. 
+VAE에서는 z의 형태를 하나의 known distribution으로 정해 놓는 방식을 사용한다. 대표적으로 데이터가 discrete하면 bernoulli, continuous하면 gaussian 분포를 사용한다.
+만일 z를 Bernoulli로 설정했다면, 아래와 같은 식을 통해 $p_{\theta}(x|z)$를 구할 수 있다. 
 
 $$z = (z_{1},z_{2},...,z_{k}) ~ p(z;\beta) = \prod_{k=1}^{K} \beta_{k}^{z_{k}}(1-\beta_{k})^{1-z_{k}} $$ 
 
@@ -32,18 +32,18 @@ $$x = (x_{1},x_{2},...,x_{k}) ~ p(x|z) = Bernoulli(x_{i}; DNN(z))$$
 
 z가 deep neural network와 sigmoid함수를 사용하여 0~1값을 준다면, x는 해당 값을 가지고 biased coin flipping을 하듯이 샘플링 할 수 있다. 샘플에 대한 likelihood evaluation은 다음과 같다.
 
-$$p_{theta}(x) = \sum_{z} P_{z}(z)p_{\theta}(x|z)$$
+$$p_{\theta}(x) = \sum_{z} P_{z}(z)p_{\theta}(x|z)$$
 
 특정 x에 대해서, 모든 underlying cause(z)가 주어졌을 때 해당 x가 나올 확률들을 모두 더한다. $\sum$ 기호를 풀어보면 이해가 쉬울 것이다. z가 1부터 k까지의 값을 가질 수 있을 때, $p_{\theta}(x)$는 $p_{z}(z1)p_{\theta}(x|z1)+p_{z}(z2)p_{\theta}(x|z2)+...+p_{z}(zk)p_{\theta}(x|zk)$로 나타낼 수 있다.
 
-Training은 N번 샘플된 x값들을 이용해서 likelihood evaluation (3번식)을 maximize하는 $\theta$값을 찾는 과정이다. Train objective는 다음과 같이 표현 할 수 있다.
+Training은 N번 샘플된 x값들을 이용해서 likelihood evaluation을 maximize하는 $\theta$값을 찾는 과정이다. Train objective는 다음과 같이 표현 할 수 있다.
 
-$$max_{\theta}\sum_{i}^{N}logp_{\theta}(x^(i)) = \sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z)$$
+$$max_{\theta}\sum_{i}^{N}logp_{\theta}(x^{(i)}) = \sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^{(i)}|z)$$
 
 ### 이러한 과정은 K값이 작다면 아무런 문제가 되지 않는다.
 
-만일 K값이 한정되어 있다면, 우리는 exact한 training objective (식 4)를 얻을 수 있다. 예를 들어 $p_{theta}(x|z)$가 mixture of 3 gaussians이고 $p_{z}(z)$가 uniform distribution이라고 해보겠다.
-$$p_{theta}(x|z=k) = \frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{k}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{k})^{T}\sum_{k}^{-1}(x-\mu_{k}))$$ 이면서 $$p_{z}(z=A)=p_{z}(z=B)=p_{z}(z=C)$$이기 때문에 training objective는 다음과 같다. 
+만일 K값이 한정되어 있다면, 우리는 exact한 training objective를 얻을 수 있다. 예를 들어 $p_{theta}(x|z)$가 mixture of 3 gaussians이고 $p_{z}(z)$가 uniform distribution이라고 해보겠다.
+$$p_{\theta}(x|z=k) = \frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{k}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{k})^{T}\sum_{k}^{-1}(x-\mu_{k}))$$ 이면서 $$p_{z}(z=A)=p_{z}(z=B)=p_{z}(z=C)$$이기 때문에 training objective는 다음과 같다. 
 
 
 $$max_{\theta}\sum_{i}logp_{\theta}(x^{(i)}) =$$
@@ -51,7 +51,7 @@ $$max_{\theta}\sum_{i}logp_{\theta}(x^{(i)}) =$$
 $$max_{\mu, \sigma}\sum_{i}log[ \frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{A}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{A})^{T}\sum_{A}^{-1}(x-\mu_{A})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{B}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{B})^{T}\sum_{B}^{-1}(x-\mu_{B})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{C}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{C})^{T}\sum_{C}^{-1}(x-\mu_{C}))]$$
 
 
-그림 2에서 training 결과를 볼 수 있다. Epoch이 지남에 따라 3개의 gaussian 분포로 나뉘는 것을 볼 수 있다. 
+위 식의 모든 term은 계산이 가능하고 그 과정이 복잡하지 않다. 그림 2에서 볼 수 있듯이 Epoch이 지남에 따라 3개의 gaussian 분포로 나뉘는 것을 볼 수 있다. 
   
 <p align="center"><img src="/assets/IWAE_img/Figure2.jpg" width="500" height="300"> (그림 2 result)
 
@@ -62,13 +62,14 @@ $$max_{\mu, \sigma}\sum_{i}log[ \frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{
 
 아래의 식 5처럼 z값을 샘플링 (prior sampling)해서 Monte Carlo방식으로 approximate하는 방법 밖에는 없을 것이다. 그 이후에는 동일하게 gradient descent 방식으로 $\theta$를 학습하면 된다.
 
-$$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}log \frac{1}{K}\sum_{k=1}^{K}p_{\theta}(x^(i)|z_{k}^{(i)})     z_{k}^{(i)} ~ p_{z}(z)$$
+$$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^{(i)}|z) \approx \sum_{i}^{N}log \frac{1}{K}\sum_{k=1}^{K}p_{\theta}(x^{(i)}|z_{k}^{(i)})     z_{k}^{(i)} ~ p_{z}(z)$$
 
 이것이 IWAE이전의 VAE모델들이 채택한 방식이다. 하지만 이와 같은 방식은 K값이 클수록 중요하지 않은 샘플들이 자주 추출되는 문제가 발생한다. 
 
 ### 따라서 IWAE는 train objective에 $\frac{1}{K}\sum p_{\theta}(x^{(i)}|z_{k}^{(i)})$의 과정에서 중요하지 않은 샘플들이 뽑히는 문제를 다룬다
 
-예를들어 그림 3과 같이 데이터가 여러 cluster들로 나뉘어 있고 $x^{(i)}$가 그중 빨간색 cluster 0에만 있다고 가정한다. Uniform distribution을 적용한다면 likelihood evaluation에서 $\frac{1}{5}$term만 유용할 것이다. 같은 논리로 K개의 cluster들로 나뉘어 있고, $x^{(i)}$가 마지막 cluster에 있다고 가정한다. 그러면 prior distribution z에서 uniform sampling을 진행했을 때 $\frac{1}{K}$ term만이 유용할 것이다. 
+예를들어 그림 3과 같이 데이터가 여러 cluster들로 나뉘어 있고 $x^{(i)}$가 그중 빨간색 cluster 0에만 있다고 가정한다. Uniform distribution을 적용한다면 likelihood evaluation에서 $\frac{1}{5}$term만 유용할 것이다. 
+같은 논리로 K개의 cluster들로 나뉘어 있고, $x^{(i)}$가 마지막 cluster에 있다고 가정한다. 그러면 prior distribution z에서 uniform sampling을 진행했을 때 $\frac{1}{K}$ term만이 유용할 것이다. 
 
 <p align="center"><img src="/assets/IWAE_img/Figure3.jpg" width="450" height="400"> (그림 3 K-Clusters)
 
@@ -79,7 +80,7 @@ $$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}lo
 
 ## 3. Importance Sampling: How to Sample Meaningful Data
   
-우리의 목적을 다시 한 번 상기하자면, $E_{z~pz(z)}[p_{\theta}(x^{(i)}|z_{k}^{i})]$를 구하고 싶은 것이다. 그림 4를 통해 어떠한 경우에 문제가 되는 지 다시 한 번 보겠다.
+우리의 목적을 다시 한 번 상기하자면, $E_{z \sim pz(z)}[p_{\theta}(x^{(i)}|z_{k}^{i})]$를 구하고 싶은 것이다. 그림 4를 통해 어떠한 경우에 문제가 되는 지 다시 한 번 보겠다.
 4번과 5번 그림은 Mutual Information 채널의 Importance Sampling동영상에서 가져왔음을 밝힌다. 
 
 <p align="center"><img src="/assets/IWAE_img/Figure4.jpg" width="450" height="400"> (그림 4 Problem Case)
@@ -139,9 +140,9 @@ $$
 
 ## 5. Final Objective Function of IWAE
 
-결론적으로 IWAE의 objective function은 latent variable model의 objective인 $$max_{\theta}\sum_{i}^{N}logp_{\theta}(x^(i)) = \sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z)$$에서 Importance Sampling을 통해 $$\approx \sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^(i))}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) \quad with \quad z_{k}^{(i)} \sim q(z_{k}^{(i)})$$ 다음과 같이 변형된 것과, ammortized inference를 사용해 q분포를 제한다면서 $$min_{\phi}\sum_{i}KL(q_{\phi}(z|x^{(i)})||p_{\theta}(z|x^{(i)}))$$을 동시에 사용하게 된다. 
+결론적으로 IWAE의 objective function은 latent variable model의 objective인 $$max_{\theta}\sum_{i}^{N}logp_{\theta}(x^{(i)}) = \sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^{(i)}|z)$$에서 Importance Sampling을 통해 $$\approx \sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^{(i)})}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) \quad with \quad z_{k}^{(i)} \sim q(z_{k}^{(i)})$$ 다음과 같이 변형된 것과, ammortized inference를 사용해 q분포를 제한다면서 $$min_{\phi}\sum_{i}KL(q_{\phi}(z|x^{(i)})||p_{\theta}(z|x^{(i)}))$$을 동시에 사용하게 된다. 
 
-따라서 final objective function은 $$max_{\theta,\phi}(\sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^(i))}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) - \sum_{i}KL(q_{\phi}(z|x^{(i)})||p_{\theta}(z|x^{(i)})))$$이 된다. 
+따라서 final objective function은 $$max_{\theta,\phi}(\sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^{(i)})}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) - \sum_{i}KL(q_{\phi}(z|x^{(i)})||p_{\theta}(z|x^{(i)})))$$이 된다. 
 
 ## 6. Variational Auto-Encoder(VAE)와의 비교
 
@@ -224,7 +225,8 @@ $$q_{\phi}(z) = \int q_{\phi}(z|\psi)q_{\phi}(\psi)d\psi $$
 훨씬 더 flexible한 q분포를 사용할 수 있으므로 더 정확한 variational inference가 가능해진다. 
 
   
-<p align="center"><img src="/assets/IWAE_img/Figure10.jpg" width="600" height="300"> (그림 10 Approximating target distribution with SIVI)
+<p align="center"><img src="/assets/IWAE_img/Figure10.jpg" width="600" height="300"> 
+  (그림 10 Approximating target distribution with SIVI)
 
 
 그림 10을 보면 q분포가 기존의 Gaussian모양을 벗어나서 multi-modal한 모습과 매우 flexible한 모습을 보여주는 것을 볼 수 있다. 해당 방식은 VAE라는 큰 필드에서의 발전으로 graph neural network를 포함한 매우 다양한 분야에서 사용이 되고 있다. 
