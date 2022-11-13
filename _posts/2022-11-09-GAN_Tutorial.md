@@ -2,7 +2,7 @@
 layout: post
 title:  "GAN Tutorial"
 date:   2022-11-12
-author: Kim JeongHyeon and Khan Osama
+author: Kim JeongHyeon, Khan Osama
 categories: Generative Adversarial Networks
 tags: GAN Tutorial
 use_math: True
@@ -18,7 +18,7 @@ This report summarizes the tutorial presented by Ian Goodfellow at NIPS in 2016.
 In this post, we will go through every single question and try to answer them as clearly as possible. To better grasp GANs, we modified the order of these questions.
 
 
-# Internals Of GANs
+# Internals of GANs
 
 Generative models refer to any model that takes a training set consisting of samples drawn from a distribution p<sub>data</sub> and learns to represent an estimate of that distribution. Here p<sub>data</sub> describes the actual distribution that our training data came from. A generative model aims to learn a distribution p<sub>model</sub>, such that this distribution is close to the actual data distribution as much as possible. Generative models are classified into two main categories; Those where we represent the p<sub>model</sub> with an explicit probability distribution and those where we do not have an explicit distribution but can sample from it. GAN belongs to the second one. 
 
@@ -36,7 +36,7 @@ The goal of the GAN is to optimize the following equation.
 `D(x)` represents the output from the discriminator, while `G(z)` represent the output from the generator. The first part tends to give a large negative number if the output of the discriminator for real data is not close to 1, while the second part gives a large negative number if the output of the discriminator for the fake data is not close to zero. By maximizing this term, the discriminator can successfully distinguish fake images from real ones. On the other hand, by minimizing this term, the generator can deceive the discriminator into considering the generated images as real ones. The generator can achieve this by making the output of `D(G(z))` close to 1 for fake images. This is shown below
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/discriminator_vs_generator.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/discriminator_vs_generator.png" />
 </p>
 
 
@@ -52,13 +52,13 @@ Following are the steps to train a GAN model.
 For T steps of iterations, the training process will look something like
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/training_process.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/training_process.png" />
 </p>
 
 The overall mechanism can be further seen in the following figure
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/full_picture.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/full_picture.png" />
 </p>
 
 
@@ -67,12 +67,12 @@ The overall mechanism can be further seen in the following figure
 Optimizing the above term from discriminator's prospective, guarantees to reach an optimal point, only when the generator learns the ratio between the p<sub>data</sub> and p<sub>model</sub>. We can write the loss function as 
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/Derivative.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/Derivative.png" />
 </p>
 
 The goal of the discriminator is to estimate this ratio. This is shown in the following figure
 <p align="center">
-  <img src="/GAN_Tutorial_img/dis_vs_gen.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/dis_vs_gen.png" width="500" height="500"/>
 </p>
 
 In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
@@ -83,7 +83,7 @@ In order for the generator to align the p<sub>model</sub> distribution with the 
 
 At the beginning of the training, the discriminator gets confident about the fake images quite quickly, which causes a vanishing gradient problem for the generator. A vanishing gradient means that there will be no update for the generator, even for the bad samples. To fix this problem, we can change the equation for the generator from `log(1-D(G(z)))` to `-log(G(z))`. Considering a sigmoid function at the end of the discriminator network, we can see that the gradient is equal to zero at the beginning of the training. Modifying the sign reverse this phenomenon and brings the vanishing gradient problem for the real data. However, this is okay for real images, as this gradient is not used for updating the generator.This is show below
 <p align="center">
-  <img src="/GAN_Tutorial_img/non_saturating.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/non_saturating.png" />
 </p>
 
 ## GANs and Maximum Likelihood Game
@@ -128,7 +128,7 @@ Smoothing the labels for the fake samples will generate unexpected behaviors.
 
 Batch Normalization creates a dependency between the samples in a batch. This results in generated images that are not independent of each other. The following figure shows this phenomenon
 <p align="center">
-  <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail" />
+  <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail" width="500" height="500"/>
 </p>
 
 The generated images in the same batch (Two batches, top and down) are similar. Virtual batch normalization avoids this problem by sampling a reference batch before training and finding this batch's normalization parameters. In the subsequent training steps, these normalization parameters are used together with the current batch to recompute the normalization parameters and use them during the training process.
@@ -154,12 +154,12 @@ Back when this paper was published, GANs were relatively new and had many resear
 The nature of the GAN settings is such that the two networks compete with each other. In simple words, one network maximizes a value while the other network minimizes the same value. This is also known as a zero-sum non-cooperative game. In game theory, GAN converges when both networks reach nash equilibrium. In nash equilibrium, one network's actions will not affect the course of the other network's actions. Consider the following optimization problem, 
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/minmax.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/minmax.png" width="100" height="100"/>
 </p>
 
 The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
 <p align="center">
-  <img src="/GAN_Tutorial_img/oscillations.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/oscillations.png" width="300" height="300"/>
 </p>
 
 This clearly shows that some cost functions might not converge using gradient descent.
@@ -170,11 +170,11 @@ In reality, our data has multiple modes in the distribution, known as multi-moda
 
 Basically, we have two options to optimize the objective function for the GANs. One is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail" />
+    <img src="/GAN_Tutorial_img/minmaxgenerator.png" />
 </p>, 
 while the other is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/maxmingenerator.png" alt="factorio thumbnail" />
+    <img src="/GAN_Tutorial_img/maxmingenerator.png" />
 </p>. 
 They are different, and optimizing them corresponds to optimizing two different functions. 
 
