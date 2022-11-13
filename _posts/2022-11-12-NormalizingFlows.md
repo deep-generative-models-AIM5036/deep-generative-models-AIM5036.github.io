@@ -136,7 +136,7 @@ These two concepts will be further explained after, with visual representations 
 
 ## Infinitesimal flow 
 
-In this case, it doesn't mean to apply an infinite number of flows but as " a partial differential equation describing how the initial density $q_0(z)$ evolves over 'time': $\frac{\partial}{\partial t}q_t(z) = \mathcal{T}_t|q_t(z)|$, where $\mathcal{T} $ describes the continuous-time dynamics"; according to the paper. These are divided in Langevin and Hamiltonian Flow. 
+In this case, it doesn't mean to apply an infinite number of flows but as "a partial differential equation describing how the initial density $q_0(z)$ evolves over 'time': $\frac{\partial}{\partial t}q_t(z) = \mathcal{T}_t|q_t(z)|$, where $\mathcal{T} $ describes the continuous-time dynamics"; according to the paper. These are divided in Langevin and Hamiltonian Flows. 
 
 **Langevin Flow**
 
