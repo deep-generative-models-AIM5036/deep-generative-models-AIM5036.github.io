@@ -72,7 +72,7 @@ Optimizing the above term from discriminator's prospective, guarantees to reach 
 
 The goal of the discriminator is to estimate this ratio. This is shown in the following figure
 <p align="center">
-  <img src="/GAN_Tutorial_img/dis_vs_gen.png" alt="factorio thumbnail", width = "500", height="500"/>
+  <img src="/GAN_Tutorial_img/dis_vs_gen.png" alt="factorio thumbnail"/>
 </p>
 
 In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
@@ -128,7 +128,7 @@ Smoothing the labels for the fake samples will generate unexpected behaviors.
 
 Batch Normalization creates a dependency between the samples in a batch. This results in generated images that are not independent of each other. The following figure shows this phenomenon
 <p align="center">
-  <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail" , width="800", height="800"/>
+  <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail" />
 </p>
 
 The generated images in the same batch (Two batches, top and down) are similar. Virtual batch normalization avoids this problem by sampling a reference batch before training and finding this batch's normalization parameters. In the subsequent training steps, these normalization parameters are used together with the current batch to recompute the normalization parameters and use them during the training process.
@@ -154,12 +154,12 @@ Back when this paper was published, GANs were relatively new and had many resear
 The nature of the GAN settings is such that the two networks compete with each other. In simple words, one network maximizes a value while the other network minimizes the same value. This is also known as a zero-sum non-cooperative game. In game theory, GAN converges when both networks reach nash equilibrium. In nash equilibrium, one network's actions will not affect the course of the other network's actions. Consider the following optimization problem, 
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/minmax.png" alt="factorio thumbnail", width="200", height="200"/>
+  <img src="/GAN_Tutorial_img/minmax.png" alt="factorio thumbnail"/>
 </p>
 
 The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
 <p align="center">
-  <img src="/GAN_Tutorial_img/oscillations.png" alt="factorio thumbnail", width="800", height="800" />
+  <img src="/GAN_Tutorial_img/oscillations.png" alt="factorio thumbnail"/>
 </p>
 
 This clearly shows that some cost functions might not converge using gradient descent.
@@ -170,11 +170,11 @@ In reality, our data has multiple modes in the distribution, known as multi-moda
 
 Basically, we have two options to optimize the objective function for the GANs. One is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />
+    <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail" />
 </p>, 
 while the other is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/maxmingenerator.png" alt="factorio thumbnail", width="100", height="100" />
+    <img src="/GAN_Tutorial_img/maxmingenerator.png" alt="factorio thumbnail" />
 </p>. 
 They are different, and optimizing them corresponds to optimizing two different functions. 
 
