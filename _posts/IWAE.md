@@ -45,7 +45,7 @@ $max_{\theta}\sum_{i}logp_{\theta}(x^{(i)}) = max_{\mu, \sigma}\sum_{i}log[ \fra
 
 그림 2에서 training 결과를 볼 수 있다. Epoch이 지남에 따라 3개의 gaussian 분포로 나뉘는 것을 볼 수 있다. 
 
-![Figure1](/assets/IWAE_img/Figure2.jpg) (그림 2 result)
+![Figure2](/assets/IWAE_img/Figure2.jpg) (그림 2 result)
 
 ## 2. Prior Sampling: Approximation for Large K
 
@@ -57,128 +57,70 @@ $\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}log
 이것이 IWAE이전의 VAE모델들이 채택한 방식이다. 하지만 이와 같은 방식은 K값이 클수록 중요하지 않은 샘플들이 자주 추출되는 문제가 발생한다. 
 **따라서 IWAE는 train objective에 $\frac{1}{K}\sum_{k=1}^{K}p_{\theta}(x^(i)|z_{k}^{(i)}$의 과정에서 중요하지 않은 샘플들이 뽑히는 문제를 다룬다**
 
+예를들어 그림 3과 같이 데이터가 K개의 cluster들로 나뉘어 있고, $x^{(i)}$가 마지막 cluster에 있다고 가정한다. 그러면 prior distribution z에서 uniform sampling을 진행했을 때 $\frac{1}{K}$ term만이 유용할 것이다. 
 
-## 2. Related Work  
-  
-  
-* **레이블이 없는 데이터로부터의 Representation learning**
-  * Clustering on the data(e.g. K-means)
-  * Leveraging the clusters for improved classification scores
-  * Hierarchical clustering of image patches
-  * Auto-Encoder
-  * Deep belief networks  
-  
-  
-* **이미지 생성**
-  * **Parametric** (Models with fixed number of parameters) : MNIST 등과 같은 단순한 data generation에는 용이하지만 flexibility가 낮기 때문에 이미지 생성에는 성과가 아직 없다.
-  * **Non-Parametric** (Models which number of parameters grow along-side the amount of training data) : 기존 이미지의 데이터베이스에서 매칭을 수행하며 특정 분포를 따르지 않아 flexible.  
-  
-  
-* **CNN 내부 시각화**
-  * Neural Network(NN)에 자주 제기되는 문제는 이들이 'black-box' 방식이며 내부에서 어떤 방식으로 작용하는지 사람이 알기 어렵다는 점이다.
-  * CNN에서 Zeiler et. al (Zeiler & Fergus, 2014)는 deconvolution과 maximal activation을 filtering 하는 것으로 각 convolution가 어떤 작업을 하는지 대략적으로 알게 되었고, Morvintsev et al.은 gradient descent를 input에 사용하는 것으로 어떤 이미지가 특정 filter를 activate하는지 알아보았다.  
-  
-  
-  
--------------
+![Figure3](/assets/IWAE_img/Figure3.jpg) (그림 3 K-Clusters)
 
-## 3. Model Architecture  
+이해를 돕기 위해 likelihood evaluation을 뜻하는 3번식 $p_{theta}(x) = \sum_{z} P_{z}(z)p_{\theta}(x|z)$을 다시 한 번 본다. 만일 우리가 MNIST데이터를 다루고 있고 (K=10), 숫자 1에 해당하는 데이터  $x^{(i)}$를 추출했다면, $p_{theta}(x) = \frac{1}{10}p_{theta}(x^{(i)}|z_{1}) + \frac{1}{10}\times0 + ... + + \frac{1}{10}\times0$가 될 것이다. $p_{theta}(x^{(i)}|z_{2})$를 포함한 다른 cluster에서 숫자 1에 해당하는 데이터가 뽑힐 확률은 0이기 때문이다.  
+
+따라서 K값이 클수록 대부분의 샘플들은 meaningless해진다. 수천번의 샘플링을 하고도 training에 도움이 전혀 안된다면 문제가 있다고 할 수 있다.
+
+
+## 3. Importance Sampling: How to Sample Meaningful Data
   
-지도학습에서 흔히 사용되고 있는 CNN을 이용하여 GAN의 성능을 향상시키는 것은 모두 실패로 돌아가왔다. 저자들은 흔히 사용되던 CNN 구조에서 벗어나 고품질/성능의 생성모델을 훈련시킬 수 있는 새로운 계보의 architecture를 찾아냈다.
+우리의 목적을 다시 한 번 상기하자면, $\E_{z~pz(z)}[p_{\theta}(x^{(i)}|z_{k}^{i})]$를 구하고 싶은 것이다. 그림 4를 통해 어떠한 경우에 문제가 되는 지 다시 한 번 보겠다.
+4번과 5번 그림은 Mutual Information 채널의 Importance Sampling동영상에서 가져왔음을 밝힌다. 
 
-### Modifying three changes to CNN architecture
-1. **Convolution Net :** Deterministic spatial pooling function을 strided convolution으로 대체하여 네트워크가 자체의 spatial downsampling을 학습할 수 있도록 한다. 해당 논리는 그대로 generator에 적용되어 generator가 자체적으로 spatial upsampling과 discriminator를 학습할 수 있게 한다.  
-  
-  
-2. **Convolutional features 위의 fully connected layers를 제거 :** Global average pooling을 가장 흔한 예로 들 수 있는데, 보통 이는 모델의 안정성을 증가시켰지만 수렴 속도를 저하시킨다. 저자들은 이 통찰을 이용하여 highest convolutional feature를 generator의 input과 discriminator의 output에 직접적으로 연결시킨다. 모델의 architecture는 Figure 1을 통해 볼 수 있다.  
-  
-  
-3. **Batch Normalization :** Batch normalization은 각 unit에 대한 input을 mean & unit variance가 0이 되도록 정규화하여 poor initialization으로 인한 문제를 해결하는 것으로 학습을 안정화시킨다. GAN에서는 모든 sample들이 하나의 point로 collapse하는 현상이 자주 일어나는데(mode collapse), batch normalization은 이를 방지하는데 주 역할을 한다.  
-  
+![Figure4](/assets/IWAE_img/Figure4.jpg) (그림 4 Problem Case)
 
-![Figure1](/assets/DCGAN_img/Figure1.jpg)
+그림 4처럼 $p_{\theta}(x^{(i)}|z_{k}^{i})$가 높은 곳에서 $p_{z}(z)$가 낮으면 문제가 된다. $p_{z}(z)$에 따라 샘플된 데이터가 informative하지 않기 때문이다. 
+$p_{\theta}(x^{(i)}|z_{k}^{i})$가 논문을 포함한 VAE모델에서 recognition network라고 지칭한다는 것을 알고 있다면, “VAE harshly penalizes approximate posterior samples which are unlikely to explain data, even if the recognition network puts much of its probability mass on good explanations.”라는 문장을 여기서 이해할 수 있다. VAE는 $p_{\theta}(x^{(i)}|z_{k}^{i})$값이 높더라도 $p_{z}(z)$값이 낮다면 해당 샘플을 사용하지 못한다.  
 
-다음은 본 논문에서 제시한 DCGAN을 만들기 위한 architecture guideline이다.
-> **Architecture guidelines for stable Deep Convolutional GANs**
-> Replace any pooling layers with strided convolutions (discriminator) and fractional-strided convolutions (generator).
-> Use batchnorm in both the generator and the discriminator.
-> Remove fully connected hidden layers for deeper architectures.
-> Use ReLU activation in generator for all layers except for the output, which uses Tanh.
-> Use LeakyReLU activation in the discriminator for all layers.
-  
-  
-  
-  
-### Details of Adversarial training
+이러한 경우에 Importance Sampling기법을 사용해서 $p_{\theta}(x^{(i)}|z_{k}^{i})$에 대해 informative한 q distribution을 새롭게 정의하고, q distribution을 따라 샘플링한 데이터로 $p_{z}(z)$에 대한 기댓값을 찾는다. 
+Importance sampling의 수식 유도 과정은 다음과 같다. 편의를 위해 discrete한 데이터 분포를 가정하고, $p_{\theta}(x^{(i)}|z_{k}^{i})$를 $f(z)$로 놓는다.
 
-DCGAN은 Large-scale Scene Understanding(LSUN), Imagenet-1k, Faces dataset에 훈련되었다. 
+**Importance Sampling Formulation**
 
-LSUN은 더 많은 데이터와 더 높은 해상도의 이미지 생성에 따라 모델이 어떻게 확장되는지 확인하기 위해 훈련되었다. Figure 2는 1 epoch 후의 sample들이며, Figure 3은 convergence 이후의 sample들이다. 해당 생성 이미지를 통해 DCGAN은 overfitting이나 training example을 단순히 기억하는 것을 통해 고품질의 이미지를 생성하지 않는 다는 것을 알 수 있다. 특히, 더욱에나 generator가 기억하는 것을 억제하기 위해  3072-128-3072 de-noising dropout regularized RELU autoencoder를 32x32 downsampled center-crops of 훈련 example에 적용 시키는 방식으로 de-duplication을 진행한다.
+$\E_{z~pz(z)}[f(z)] 
+      = \sum_{z}p_{z}(z)f(z)
+      = \sum_{z}\frac{q(z)}{q(z)}p_{z}(z)f(z)
+      = \sum_{z~q(z)}\frac{p_{z}(z)}{q(z)}f(z)
+      = \E_{z~q(z)}[\frac{p_{z}(z)}{q(z)}f(z)
+      \approx \frac{1}{K}\sum_{i=1}^{K}\frac{p_{z}(z^{(i)})}{q(zx^{(i)})f(z^{(i)}) with z^{(i)} ~ q(z) $ (식 6)
+ 
+ 식 6에서 볼 수 있듯이 이제는 $z^{i}$를 $q(z)$에서 샘플링하면서 원래의 train objective값을 구할 수 있다. 따라서 원래의 train objective가 4번식 $\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z)$이었다면, 다음과 같이 변경된다. $\approx \sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^(i))}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) with z_{k}^{(i)} ~ q(z_{k}^{(i)})$로 바뀌게 된다. 
+ 
+우리는 이러한 과정을 $f(z)$가 높은 곳에서 높은 값을 가지는 $q(z)$를 찾는 문제로 보았지만, 조금 다른 관점으로 $f(z) \times q(z)$가 높도록 $q(z)$를 설정하는 문제로도, $Var_{z~q}[\frac{p(z)}{q(z)}f(z)] < Var_{z~p}[f(z)]$가 되도록 하는 문제로도 볼 수 있다. 여기서 $\frac{p}{q}$로 $f(z)$를 reweight해주는 걸로 볼 수 있는데, 아래의 그림 5로 그럴 때 $p(z)$와 같아지는 것을 볼 수 있다. 또한 초록색 q확률을 따라 reweighted된 주황색 값을 뽑으면 그 variance가 매우 작음을 그림을 통해 확인 할 수 있다. 
 
-Imagenet-1k는 32x32 min-resized center crop 된 상태로 사용 되었으며, Faces dataset은 웹상에 존재하는 1만명의 300만개의 이미지로 만들어졌다. 각 결과는 Figure 10과 11에서 볼 수 있다.
+![Figure5](/assets/IWAE_img/Figure5.jpg) (그림 5 Solved Case)
 
-![Figure2](/assets/DCGAN_img/Figure2.jpg)
-![Figure3](/assets/DCGAN_img/Figure3.jpg)
-![Figure11](/assets/DCGAN_img/Figure11.jpg)
-![Figure10](/assets/DCGAN_img/Figure10.jpg)  
-  
-  
-  
-  
-  
--------------
+## 4. Variational Approach for q(z): Ammortized Inference
 
-## 4. Validation
+이제 문제는 위에서 밝힌 조건들을 만족하는 좋은 q(z)를 찾는 것으로 바뀐다. 결국 샘플 $x^{(i)}$가 주어졌을 때 어떤 z가 informative한지 z를 uniform이 아닌 z sampler 를 통해 선정하는 것으로 볼 수 있다. 물론 Bayes rule을 사용하면 $p_{\theta}(z|x^{(i)}) = \frac{p_{\theta}(x^{(i)}|z) p_{z}(z)}{p_{\theta}(x^{(i)})}$가 되지만, 분모의 normalizing constant를 얻을 수 없기 때문에 $q(z)$를 샘플링하기 쉬운 known distribution으로 설정하는 variational approach를 사용한다. 논문에서는 Gaussian으로 설정하였고, KL divergence를 사용하여 근사시켰다. 전개하면 다음과 같다.
 
-Unsupervised representation learning algorithm의 품질을 평가하는 일반적인 기술 중 하나는 supervised dataset에 feature extractor로 적용하고 이러한 기능 위에 fit된 선형 모델의 성능을 평가하는 것이다.
+$min_{q(z)}KL(q(z)||p_{\theta}(z|x^{(i)}))
+  = min_{q(z)}\E_{z~q(z)}log(\frac{q(z)}{p_{\theta}(z|x^{(i)})})
+  = min_{q(z)}\E_{z~q(z)}log(frac{q(z)}{p_{\theta}(x^{(i)}|z)p_{z}(z)/p_{\theta}(x^{(i)})})
+  = min_{q(z)}\E_{z~q(z)}[logq(z)-logp_{z}(z)-logp_{\theta}(x^{(i)}|z)]+logp_{\theta}(x^{(i)})$ 
 
-Supervised tasks를 위해 DCGAN에서 학습되는 representation의 품질을 평가하기 위해 DCGAN을 Imagenet-1k로 훈련시키고 모든 layer에서부터 오는 discriminator의 convolutional feature를 사용한다. 이 결과 82.8%의 정확도를 내며 Table1에서 보이는 K-mean 기반의 방식들보다 높은 정확도를 보이지만, Exemplar CNN보다는 낮은 정확도를 갖는다.
+이와같은 새로운 objective를 얻을 수 있다. 각 term을 모두 계산하는 것은 가능하지만 각 데이터 $x^{(i)}$마다 q를 찾는 건 비효율 적이기 때문에 같은 inference problem을 줄이기 위한 방법으로 Ammortized Inference방식을 사용해 효율적인 계산을 사용한다. 즉, q분포를 $\phi$ 파라미터를 가지는 Neural Network로 표현하는 것이다. 
+결국 다음과 같은 $min_{\phi}\sum_{i}KL(q_{\phi}(z|x^{(i)})||p_{\theta}(z|x^{(i)}))$ (식 8)로 q를 찾아낸다. 
 
-![Table1](/assets/DCGAN_img/Table1.jpg)
+논문에서 “The recognition network generates multiple approximate posterior samples, and their weights are averaged.”는 이와 같은 f(z)에 informative한 amortized inferenced된 q분포에서 샘플을 얻는 부분을 의미한다. 
 
-StreetView House Numbers dataset(SVHN) 또한 평가를 위해 사용되었는데, DCGAN은 다른 방식들에 비해 현저히 낮은 error rate를 보인다.
 
-![Table2](/assets/DCGAN_img/Table2.jpg)  
-  
-  
-  
+이제 q(z)는 reparameterization trick을 사용한 gaussian 분포로 $q_{\phi} = N(\mu_{\phi}(x), \sigma_{\phi}^{2}(x)), Equivalently: z = \mu_{\phi}(x)+\epsilon\sigma_{\phi}(x), \epsilon ~ N(0,I)$로 표현 될 수 있고, 그림 1의 Latent variable Model에 점선으로 표현된 inference 과정을 의미한다. 
 
--------------
+## 5. Final Objective Function of IWAE
 
-## 5. Visualization
+결론적으로 IWAE의 objective function은 latent variable model의 objective인 4번식 $max_{\theta}\sum_{i}^{N}logp_{\theta}(x^(i)) = \sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z)$에서 Importance Sampling을 통해 $\approx \sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^(i))}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) with z_{k}^{(i)} ~ q(z_{k}^{(i)})$ 다음과 같이 변형된 것과, ammortized inference를 사용해 q분포를 제한다면서 8번식 $min_{\phi}\sum_{i}KL(q_{\phi}(z|x^{(i)})||p_{\theta}(z|x^{(i)}))$을 동시에 사용하게 된다. 
 
-### Investigating
+따라서 final objective function은 $max_{\theta,\phi}(\sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^(i))}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) - \sum_{i}KL(q_{\phi}(z|x^{(i)})||p_{\theta}(z|x^{(i)})))$이 된다. 
 
-Visualization에 앞서 latent space의 landscape를 확인하며 space가 계층적으로 collapse되는 과정을 본다. Figure 4를 확인인하는 것을 통해 모델이 이미지 생성에 있어 어떤 표현을 학습했는지 볼 수 있다.
+## 6. Variational Auto-Encoder(VAE)와의 비교
 
-![Figure4](/assets/DCGAN_img/Figure4.jpg)
+IWAE는 기존의 VAE방식의 발전된 방법론으로 알려져 있다. 둘의 직접적인 비교를 위해 VAE를 짧게 소개한다. 추가적인 설명은 이번 포스팅 이전에 있는 VAE와 SBAI(Stochastic Backpropagation and Approximate Inference in DGM) 포스팅을 통해 학습할 것을 추천한다.
 
-Figure 5는 DCGAN이 어떤 계층적 feature를 배웠는지 나타낸다.
 
-![Figure5](/assets/DCGAN_img/Figure5.jpg)
 
-### Manipulating the Generator Representation
-
-DCGAN의 generator는 특정 물체(예: 침대, 창만, 램프 등)를 훈련하여 생성한다. 본 논문의 저자들은 이러한 feature가 취하는 형태를 알아보기 위해 generator에서 창문을 완전히 제거해보는 실험을 한다. 2번째로 높은 convolution layer feature에서 해당 feature activation이 창문을 가르키고 있는지 확인을 한 뒤 해당 feature map들은 drop 된다.
-
-![Figure6](/assets/DCGAN_img/Figure6.jpg)
-
-창문 dropout이 적용/미적용된 이미지는 Figure 6을 통해 모두 확인할 수 있다, 대부분의 네트워크는 침실에 창문을를 그리는 것을 대부분 잊어버리고 다른 객체로 대체한다.
-
-본 논문은 (Mikolov et al., 2013)(vector(”King”) - vector(”Man”) + vector(”Woman”) = nearest vector("Queen"))에 기반하여 vector arithmetic에 대한 실험을 진행한다. 저자들은 generator의 Z 표현에 유사한 구조가 나타나는지 조사하는데, 시각적 개념에 대한 예제 샘플 세트의 Z 벡터에 대해 유사한 계산을 수행한다. Single sample per concept를 대상으로 한 실험은 불안정했지만, 세 가지 examplars에 대해 Z 벡터를 평균하는 것은 안정적인 결과를 보여주었다. Figure 7에는 물체 조작, Figure 8에는 face pose modeling을 보인다.
-
-![Figure7](/assets/DCGAN_img/Figure7.jpg)
-![Figure8](/assets/DCGAN_img/Figure8.jpg)  
-  
-  
-  
-
--------------
-
-## 6. Conclusion & Future Work  
-  
-  
-
-본 논문은 GAN을 훈련하기 위한 achitecture를 제안하고 adversarial network가 지도 학습 및 생성 모델링을 위해 이미지의 'good representation'을 학습한다는 것을 보인다. 하지만, 아직 모델이 더 오래 훈련되면 때때로 필터의 하위 집합을 단일 진동 모드로 축소하는 등의 불안정성이 여전히 남아 있으며 이를 해결 하는 것을 저자들은 future work로 두었다.  
-  
   
