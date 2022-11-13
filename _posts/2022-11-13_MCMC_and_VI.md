@@ -45,29 +45,45 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 </p>
 
 #### Monte Carlo + Markov Chain
-저희가 계산해야 할 부분은 모델이 출력한 logistic 분포의 파라미터로 정답인 x픽셀 값을 예측할 확률을 구하는 것입니다. 그럼 모델이 출력한 분포값이 나올 부분을 적분하면 됩니다. 적분을 구하기 위해 저희는 logistic 분포의 CDF인 sigmoid를 사용합니다.
+둘을 결합한 Markov Chain Monte Carlo는, Markov Chain에서의 확률을 바탕으로 실제로 무작위 샘플링을 통해 시뮬레이션하는 Monte Carlo식으로 하는 것입니다.
+즉, 이전 상태값을 활용한 무작위 동작을 무한히 반복한다면, 실제 분포와 근사한 분포를 얻을 수 있다는 것입니다.
 
-식(1)은 mixture of logistic distribution식이다. pi로 각 logistic distribution의 기여도를 결정하고, 각 logistic 분포의 파라미터 mu와 scale이 존재합니다. 식(2)를 이해하기 위해서 그래프를 가져와봤습니다. 더 심플하게 설명하기 위해 mixture가 아닌 simple logistic으로 설명해보겠습니다. 윗 그래프는 분포로 Logistic PDF이고 아래는 각자 해당되는 CDF이고 (variance를 scale로 해석해주시면 됩니다), CDF+과 CDF-는 픽셀 구간(PixelCNN 같은 경우 +0.5와 -0.5)입니다.보시다시피 빨간색 분포에서 CDF+와 CDF-이 CDF 함수를 만나는 지점들이 간격이 제일 큽니다. 확률적으로 해석하면 0에 샘플링될 확률이 셋 중에서 제일 높다는 뜻입니다. 그럼 이젠 식(2)를 둘러보겠습니다. 보시다시피 X = mu = 0일 때 빨간 그래프 상황이 이루어지고 그럴 경우에 P(X)가 극대화됩니다. P(x)에 -log만 추가해주면 로스 함수로 만들고 학습이 가능합니다. 이와 함께 분포의 weight값 pi도 학습하게 됩니다.
+'이 이전 상태값을 활용한 무작위 동작'은 여러가지 방식이 있습니다. 간단한 예시인 Metropolis 알고리즘을 예로 들면, 현재 위치에서 정규분포상의 무작위 값을 바탕으로 근처로 이동을 시도합니다. 이동했을 때의 가능성이 더 높다면 실제로 이동하고, 그렇지 않다면 거절합니다. 다만 때때로 거절할 상황에도 수용하는 상황이 생깁니다.
 
 <p align="center" width="100%">
-    <img width="50%" src="/assets/PixelCNN++_img/gaussian_pdf_cdf.png">
+    <img width="50%" src="/assets/MCMCandVI/mcmc_move.png">
 </p>
 
- Discretized Logistic Mixture Likelihood을 사용한 점이 이 논문의 핵심이 됩니다. 저희가 모델링하는 대상 이미지는 natural하고 continuous한 분포를 따르는데, softmax을 사용했을 때 그런 분포를 학습하는 게 어렵습니다. 아래 분포는 모두 랜덤 픽셀값 생성 분포이고, 상단에는 softmax로 학습한 것이고 하단은 mixture of logistic distributions을 사용했습니다. Logistic distribution을 사용한 버전이 실제 데이터 분포를 더 반영하고 있다는 것이 바로 확인됩니다.
+왼쪽은 더 가능성이 높아 이동한 경우, 중앙은 가능성이 더 낮아져 이동하지 않은 경우, 오른쪽은 가능성이 낮아지는 경우임에도 수용한 경우입니다.
+이러한 동작을 반복하면 실제 분포를 얻어낼 수 있게 됩니다.
+
+<p align="center" width="100%">
+    <img width="50%" src="/assets/MCMCandVI/mcmc_dist.jpg">
+</p>
+
+위 시뮬레이션은 (https://chi-feng.github.io/mcmc-demo/app.html
+)[https://chi-feng.github.io/mcmc-demo/app.html] 에서 직접 수행해보실 수 있습니다.
+
  
 <p align="center" width="100%">
     <img width="50%" src="/assets/PixelCNN++_img/softvsmoldist.png">
 </p>
 
-#### Conditioning on Whole Pixels
+### This paper
 
-기존 PixelCNN에서 각 RGB값을 생성할 때 autoregressive하게 factorized하게 생성합니다. PixelCNN++에서는 RGB를 autoregressive하게 생성하지만 모두 동일한 feature map을 사용하고 서로 linear한 관계를 갖게 설정했습니다. 그 뜻은, green 과 red, 또는 blue와 green,red의 관계를 coefficient로 표현이 가능하다는 것입니다. 그럼 모델이 실질적으로 출력하는 값들은 mixture logistic distribution의 파라미터들과 linear coefficients $\alpha$ , $\beta$ 와 $\gamma$ 입니다.
+#### Background
+위에서 설명드린 내용을 바탕으로, MCMC는 점근적으로(asymptotically) 정확해집니다. 
+다만 이 과정에서 극도로 많은 시뮬레이션이 필요할 것이므로 느립니다.
+더불어 좋은 Markov Chain을 구성하는 데에 어려움이 있고, 값이 실제에 근사했는지를 확인하는 것조차 어렵습니다.
 
-<p align="center" width="100%">
-    <img width="65%" src="/assets/PixelCNN++_img/conditioning_on_whole_pixels.png">
-</p>
+이에 반해 VI는 정확한 분포를 예측할 수 있다는 사실 자체를 보장할 수 없는 문제가 있지만 더 빠르게 수행할 수 있습니다.
 
-#### Downsampling Versus Dilated Convolution
+#### Contribution
+본 논문은 MCMC가 실제 분포에 근사할 수 있다는 가능성과, VI의 낮은 비용을 가져오는 것을 제안합니다.
+더불어 이의 실제 구현체인 Hamiltonian VI를 Auxiliary variable과 Stochastic Gradent VI를 활용하여 만들었습니다.
+
+
+## MCMC, more details
 
 기존 PixelCNN에서는 비교적 receptive field이 작은 convolution을 사용합니다. long dependency 관계를 포착하기 위해 인풋을 dilated convolution으로 압축하면서 receptive field를 늘립니다 (그런 후 feature map을 다시 spatially 키워줍니다). 하지만 computation cost 측면에서 convolution의 stride를 키워주면서 인풋을 압축하는 게 더 유리합니다. 따라서 여기는 dilated convolution을 사용하지 않고 stride가 더 높은 convolution을 사용합니다.                   
 
