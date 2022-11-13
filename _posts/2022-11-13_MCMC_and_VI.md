@@ -3,10 +3,10 @@ layout: post
 title:  "Markov Chain Monte Carlo and Variational Inference: Bridging the Gap."
 date:   2022-11-13
 author: Sungmin Kang
-categories: Latent-variable
+categories: latent-variable
 use_math: true
 ---
-- Tim Salimans, Andrej Karpathy, Xi Chen, and Diederik P Kingma. Pixelcnn++: Improving the pixelcnn with discretized logistic mixture likelihood and other modifications. arXiv preprint arXiv:1701.05517, 2017
+- Tim Salimans, Diederik P. Kingma, and Max Welling. Markov Chain Monte Carlo and Variational Inference: Bridging the Gap. arXiv preprint arXiv:1410.6460, 2015
 
 1. Introduction
 2. Modifications
