@@ -204,7 +204,7 @@ Initially, when we update the networks simultaneously, we do not consider the ma
 1. GANs are type of generative models which is based upon the game theory. Specifically, in GANs, two networks compete against each other.
 2. GANs use supervised ratio estimation technique to approximate many cost functions, including the KL divergence used for maximum likelihood estimation.
 2. Training GANs require Nash equilibrium which is high dimentional, continuous, non-convex games. 
-4. GANs are crucial to many state of the art image generation and manipulation systems and have many potentials in the future. 
+4. GANs are crucial to many state of the art image generation and manipulation systems and have many potentials in the future.  
 
 
 **References**
