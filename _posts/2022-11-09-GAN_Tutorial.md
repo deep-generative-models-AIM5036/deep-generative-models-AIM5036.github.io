@@ -128,7 +128,7 @@ Smoothing the labels for the fake samples will generate unexpected behaviors.
 
 Batch Normalization creates a dependency between the samples in a batch. This results in generated images that are not independent of each other. The following figure shows this phenomenon
 <p align="center">
-  <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail"/>
+  <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail" , width="800", height="800"/>
 </p>
 
 The generated images in the same batch (Two batches, top and down) are similar. Virtual batch normalization avoids this problem by sampling a reference batch before training and finding this batch's normalization parameters. In the subsequent training steps, these normalization parameters are used together with the current batch to recompute the normalization parameters and use them during the training process.
@@ -162,7 +162,33 @@ The nash equilibrium of this state reaches when `x=y=0`. The following figure sh
   <img src="/GAN_Tutorial_img/oscillations.png" alt="factorio thumbnail", width="800", height="800" />
 </p>
 
-## Mode Collapse
+This clearly shows that some cost functions might not converge using gradient descent.
+
+### Mode Collapse
+
+In reality, our data has multiple modes in the distribution, known as multi-modal distributions. However, sometimes, the network cannot consider all these modes when generating an images. This give rise to the problem called model collapse. In model collapse, only few modes of data are generated. 
+
+Basically, we have two options to optimize the objective function for the GANs. One is <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />, while the other is <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />. They are different and optimizing them corresponds to optimizing two different functions. 
+
+In `maxmin` game, the generator minimizes the cost function first. It does this by mapping all the values of `z` to a particular `x`, that can be used to decevie the discriminator. And hence generator will not be learning a useful mapping. On the other hand, in `minmax` game, we first allow the discriminator to learn and then guide the generator to find the modes of the underlying data. 
+
+What we actually want the network to do is `minmax`, however, since we update the newtork simultaneously, we end up performing `maxmin`. This give rise to the mode collapse. The following figure shows this behaviour
+
+<p align="center">
+  <img src="/GAN_Tutorial_img/mode_collapse.png" alt="factorio thumbnail",  height="600" />
+</p>
+
+The generator visits one mode after another instead of learning to visit all different modes. The generator will identify some modes, that the discriminator believes is higly likely and place all of its mass there, and then discriminator will learn not to be fooled by going to only a single mode. Instead of genearator learning to use multiple modes, the geneartor will switch to different mode and this cycle goes on.
+
+Two common methods to mitigate this problem is minibatch features and unrolled GANs. 
+
+In minibatch discrimination, we feed real images and generated images into the discriminator separately in different batches and compute the similarity of the image x with images in the same batch. We append this similarity to one of the layers in the discriminator. If the model starts to collapse, the similarity of generated images increases. This is a hint for the discriminator to use this score and penalize the generator form putting alot of mass in one region. 
+
+Initially, when we update the networks simultaneously, we do not consider the maximized value of discriminator for the generator. In unrolled GANs, we can train the discriminator for `k` steps and build the graph for each of this step. Finally, we can propagate through all these steps and update the generator. By doing so, we can update the generator not only with respect to the loss, but also how did the discriminator responded to these losses. 
+
+<p align="center">
+  <img src="/GAN_Tutorial_img/mode_solved.png" alt="factorio thumbnail",  height="600" />
+</p>
 
 ## Evaluation of GANs
 
