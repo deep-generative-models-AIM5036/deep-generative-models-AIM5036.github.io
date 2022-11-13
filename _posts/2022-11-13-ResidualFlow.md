@@ -25,7 +25,7 @@ $log p(X) = log p(f(X)) + log |det\frac{\partial z}{\partial x}|$
 역변환을 계산하는 과정에서는 함수 f(X)에 대한 자코비안(Jacobian)을 계산하게 되는데, 기존 flow-based model에서는 계산을 쉽게 하기 위해 자코비안 행렬이 sparse하거나 삼각행렬과 같은 특수한 모양이 나오도록 하였습니다. 그러나, 자코비안이 sparse하거나 특정 모양을 따르게 되면 효율적으로 계산을 할 수는 있지만, 그런 조건을 만족시키는 함수 $f(X)$를 설계하는 것이 어렵고 비용이 많이 발생한다는 단점이 있습니다.   
 
 또한 기존에 사용한 coupling block이나 ordinary differential equation 방법의 경우 강한 inductive bias를 야기하여 학습한 task이외의 task에는 적용하기 어렵다는 한계 역시 존재합니다.
-그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 $\colorbox{yellow}{\textbf{Residual Flow}}$ 모델입니다.   
+그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 <mark style='background-color: #fff5b1'> Residual Flow </mark> 모델입니다.   
 
 ---
 
@@ -239,14 +239,12 @@ $$
 ##### 3.2 Memory-Efficient Backpropagation
 
 $$
-log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{\textcolor{blue}{\sum_{k=1}^{n}}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{\textcolor{red}{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
+log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{{\sum_{k=1}^{n}}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
 $$
 
-이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스(파란글씨)에서 n번의 계산을 해야하고, 두번째 박스(빨간글씨)에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
+이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스에서 n번의 계산을 해야하고, 두번째 박스에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
 
 따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. 
-
-$\mathbb{E}[\displaystyle\sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\frac{v^T[J_g(x)]^kv}{\mathbb{P}(N\geq k)}]$ 는 $log|det(I+J_g(x))|$를 추정한 값이므로 log determinant값을 backpropagation에 사용하는 것입니다. 
 
 $$
 \begin{aligned}
@@ -290,8 +288,8 @@ Loss를 미분할때 log determinant의 미분을 사용한다면 위 (3.2.3) �
 ##### 3.3 LipSwish Activation Function
 Backpropagation을 진행할 때 메모리 뿐만 아니라 activation derivative saturation 문제 역시 발생할 수 있습니다. Jacobian을 계산하는 과정에서 일차 미분을 진행하게 되고 gradient를 계산하는 과정에서 이차 미분이 진행되는데, 이때 일차 미분값이 상수가 되면 이차 미분 값이 0이 되면서 gradient vanishing 문제가 발생하는 것입니다. 그래서 논문에서는 립시츠 조건을 만족시키면서 gradient vanishing 문제가 발생하지 않도록 하기 위한 activation function의 두가지 조건을 제시하였습니다.  
 
-- 일차 미분 값이 $|\phi'(z)| \leq 1 \text{ } \forall z$   를 만족해야 한다.
-- $|\phi'(z)|$ 가 1과 가까운 점에서의 이차 미분 값이 0이 되어 vanish되서는 안된다.
+1) 일차 미분 값이 $|\phi'(z)| \leq 1 \qquad \forall z$   를 만족해야 한다.
+2) $|\phi'(z)|$ 가 1과 가까운 점에서의 이차 미분 값이 0이 되어 vanish되서는 안된다.
 
 대부분의 activation function이 첫번째 조건은 만족시키지만 두번째 조건을 만족시키기 어려워 본 논문에서는 두번째 조건을 만족시킬 수 있는 Swish function을 사용했다고 합니다. Swish activaton function은 $f(x) = x \cdot \sigma(\beta x)$ 로 밑의 그림 중 파란색으로 그려진 함수입니다. 그림을 통해서 알 수 있듯이 ReLU의 경우 미분값이 일정해지는 구간이 발생하여 이차 미분 시 gradient vanishing 문제를 야기하지만 Swish 함수의 경우 그렇지 않아 두번째 조건을 만족할 수 있습니다.
 
