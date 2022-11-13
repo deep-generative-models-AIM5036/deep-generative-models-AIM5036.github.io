@@ -3,7 +3,8 @@ layout: post
 title:  "Markov Chain Monte Carlo and Variational Inference: Bridging the Gap."
 date:   2022-11-13
 author: Sungmin Kang
-categories: latent-variable
+categories: Latent-Variable
+tags: VI latent-variable MCMC
 use_math: true
 ---
 - Tim Salimans, Diederik P. Kingma, and Max Welling. Markov Chain Monte Carlo and Variational Inference: Bridging the Gap. Proceedings of the 32nd International Conference on Machine Learning, 2015
