@@ -51,8 +51,7 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
     <img width="50%" src="/assets/MCMCandVI/mcmc_dist.gif">
 </p>
 
-위 시뮬레이션은 [https://chi-feng.github.io/mcmc-demo/app.html
-](https://chi-feng.github.io/mcmc-demo/app.html) 에서 직접 수행해보실 수 있습니다.
+위 시뮬레이션은 [https://chi-feng.github.io/mcmc-demo/app.html](https://chi-feng.github.io/mcmc-demo/app.html) 에서 직접 수행해보실 수 있습니다.
 
  
 ### This paper
