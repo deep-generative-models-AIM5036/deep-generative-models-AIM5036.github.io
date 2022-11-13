@@ -151,7 +151,7 @@ Back when this paper was published, GANs were relatively new and had many resear
 
 ## Non-convergence
 
-The nature of the GAN settings is such that the two networks compete with each other. In simple words, one network maximizes a value, while the other network minimizes the same value. This is also known as zero-sum non-cooperative game. In game theory, GAN converges when both networks reach nash equilibrium. In nash equilibrium, one networks actions will not affect the course of other network's actions. Consider the following optimization problem, 
+The nature of the GAN settings is such that the two networks compete with each other. In simple words, one network maximizes a value while the other network minimizes the same value. This is also known as a zero-sum non-cooperative game. In game theory, GAN converges when both networks reach nash equilibrium. In nash equilibrium, one network's actions will not affect the course of the other network's actions. Consider the following optimization problem, 
 
 <p align="center">
   <img src="/GAN_Tutorial_img/minmax.png" alt="factorio thumbnail", width="200", height="200"/>
@@ -166,35 +166,33 @@ This clearly shows that some cost functions might not converge using gradient de
 
 ### Mode Collapse
 
-In reality, our data has multiple modes in the distribution, known as multi-modal distributions. However, sometimes, the network cannot consider all these modes when generating an images. This give rise to the problem called model collapse. In model collapse, only few modes of data are generated. 
+In reality, our data has multiple modes in the distribution, known as multi-modal distributions. However, sometimes, the network can only consider some of these modes when generating images. This gives rise to the problem called model collapse. In model collapse, only a few modes of data are generated. 
 
-Basically, we have two options to optimize the objective function for the GANs. One is <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />, while the other is <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />. They are different and optimizing them corresponds to optimizing two different functions. 
+Basically, we have two options to optimize the objective function for the GANs. One is <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />, while the other is <img src="/GAN_Tutorial_img/minmaxgenerator.png" alt="factorio thumbnail", width="100", height="100" />. They are different, and optimizing them corresponds to optimizing two different functions. 
 
-In `maxmin` game, the generator minimizes the cost function first. It does this by mapping all the values of `z` to a particular `x`, that can be used to decevie the discriminator. And hence generator will not be learning a useful mapping. On the other hand, in `minmax` game, we first allow the discriminator to learn and then guide the generator to find the modes of the underlying data. 
+In the `maxmin` game, the generator minimizes the cost function first. It does this by mapping all the values of `z` to a particular `x`, which can be used to deceive the discriminator. And hence generator will not be learning useful mapping. On the other hand, in the `minmax` game, we first allow the discriminator to learn and then guide the generator to find the modes of the underlying data. 
 
-What we actually want the network to do is `minmax`, however, since we update the newtork simultaneously, we end up performing `maxmin`. This give rise to the mode collapse. The following figure shows this behaviour
+What we want the network to do is `minmax`; however, since we update the networks simultaneously, we end up performing `maxmin`. This gives rise to the mode collapse. The following figure shows this behavior
 
 <p align="center">
   <img src="/GAN_Tutorial_img/model_collapse.png" alt="factorio thumbnail" />
 </p>
 
-The generator visits one mode after another instead of learning to visit all different modes. The generator will identify some modes, that the discriminator believes is higly likely and place all of its mass there, and then discriminator will learn not to be fooled by going to only a single mode. Instead of genearator learning to use multiple modes, the geneartor will switch to different mode and this cycle goes on.
+The generator visits one mode after another instead of learning to visit all different modes. The generator will identify some modes that the discriminator believes are highly likely and place all of its mass there, and then the discriminator will learn not to be fooled by going to only a single mode. Instead of the generator learning to use multiple modes, the generator will switch to a different mode, and this cycle goes on.
 
-Two common methods to mitigate this problem is minibatch features and unrolled GANs. 
+Two common methods to mitigate this problem are minibatch features and unrolled GANs. 
 
-In minibatch discrimination, we feed real images and generated images into the discriminator separately in different batches and compute the similarity of the image x with images in the same batch. We append this similarity to one of the layers in the discriminator. If the model starts to collapse, the similarity of generated images increases. This is a hint for the discriminator to use this score and penalize the generator form putting alot of mass in one region. 
+In minibatch discrimination, we feed real images and generated images into the discriminator separately in different batches and compute the similarity of the image x with images in the same batch. We append this similarity to one of the layers in the discriminator. If the model starts to collapse, the similarity of generated images increases. This is a hint for the discriminator to use this score and penalize the generator for putting a lot of mass in one region. 
 
-Initially, when we update the networks simultaneously, we do not consider the maximized value of discriminator for the generator. In unrolled GANs, we can train the discriminator for `k` steps and build the graph for each of this step. Finally, we can propagate through all these steps and update the generator. By doing so, we can update the generator not only with respect to the loss, but also how did the discriminator responded to these losses. 
+Initially, when we update the networks simultaneously, we do not consider the maximized value of the discriminator for the generator. In unrolled GANs, we can train the discriminator for `k` steps and build the graph for each of these steps. Finally, we can propagate through all these steps and update the generator. By doing so, we can update the generator not only with respect to the loss but also with respect to the discriminator's response to these losses. This is proved to be helpful in mode-collapse problems, as shown below.
 
 <p align="center">
   <img src="/GAN_Tutorial_img/mode_solved.png" alt="factorio thumbnail" />
 </p>
 
-## Evaluation of GANs
 
-## Discrete Outputs
+## Comparison to Other Networks
 
-## Others
 
 
 
