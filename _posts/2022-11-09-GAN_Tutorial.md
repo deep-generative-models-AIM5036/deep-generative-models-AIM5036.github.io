@@ -183,7 +183,7 @@ In the `maxmin` game, the generator minimizes the cost function first. It does t
 What we want the network to do is `minmax`; however, since we update the networks simultaneously, we end up performing `maxmin`. This gives rise to the mode collapse. The following figure shows this behavior
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/model_collapse.png" alt="factorio thumbnail" />
+  <img src="/GAN_Tutorial_img/model_collapse.png" />
 </p>
 
 The generator visits one mode after another instead of learning to visit all different modes. The generator will identify some modes that the discriminator believes are highly likely and place all of its mass there, and then the discriminator will learn not to be fooled by going to only a single mode. Instead of the generator learning to use multiple modes, the generator will switch to a different mode, and this cycle goes on.
@@ -195,7 +195,7 @@ In minibatch discrimination, we feed real images and generated images into the d
 Initially, when we update the networks simultaneously, we do not consider the maximized value of the discriminator for the generator. In unrolled GANs, we can train the discriminator for `k` steps and build the graph for each of these steps. Finally, we can propagate through all these steps and update the generator. By doing so, we can update the generator not only with respect to the loss but also with respect to the discriminator's response to these losses. This is proved to be helpful in mode-collapse problems, as shown below.
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/mode_solved.png" alt="factorio thumbnail" />
+  <img src="/GAN_Tutorial_img/mode_solved.png"  />
 </p>
 
 
