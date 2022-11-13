@@ -20,7 +20,7 @@ use_math: true
 IWAE의 핵심 아이디어를 보기 전에 백드라운드로 latent variable model (LVM)에 대해 알아보겠다.
 그림 1은 가장 심플한 LVM의 예시를 보여준다. 그림에서 x는 우리가 실제로 볼 수 있는 데이터 샘플이고, z는 우리가 볼 수 없지만 x를 생성하는데 사용되는 분포다. 
  
-![Figure1](/assets/IWAE_img/Figure1.jpeg) (그림 1 Latent Variable Model)
+![Figure1](/assets/IWAE_img/Figure1.jpg) (그림 1 Latent Variable Model)
 
 z는 하나의 known distribution으로 정할 수도 있고, 학습을 통해 배울 수도 있는데, VAE에서는 정해 놓는 방식을 사용한다. 대표적으로 데이터가 discrete하면 bernoulli, continuous하면 gaussian 분포를 사용한다.
 만일 z를 Bernoulli로 설정했다면, 아래와 같은 식을 통해 $p_{theta}(x|z)$를 구할 수 있다. 
@@ -82,8 +82,8 @@ $$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}lo
 
 ![Figure4](/assets/IWAE_img/Figure4.jpg) (그림 4 Problem Case)
 
-그림 4처럼 $p_{\theta}(x^{(i)}|z_{k}^{i})$가 높은 곳에서 $p_{z}(z)$가 낮으면 문제가 된다. $p_{z}(z)$에 따라 샘플된 데이터가 informative하지 않기 때문이다. 
-$p_{\theta}(x^{(i)}|z_{k}^{i})$가 논문을 포함한 VAE모델에서 recognition network라고 지칭한다는 것을 알고 있다면, “VAE harshly penalizes approximate posterior samples which are unlikely to explain data, even if the recognition network puts much of its probability mass on good explanations.”라는 문장을 여기서 이해할 수 있다. VAE는 $p_{\theta}(x^{(i)}|z_{k}^{i})$값이 높더라도 $p_{z}(z)$값이 낮다면 해당 샘플을 사용하지 못한다.  
+그림 4에서 붉은색 $f(z)$가 $p_{\theta}(x^{(i)}|z_{k}^{i})$를 나타낸다. 그림에서 처럼 $p_{\theta}(x^{(i)}|z_{k}^{i})$가 높은 곳에서 $p_{z}(z)$가 낮으면 문제가 된다. $p_{z}(z)$에 따라 샘플된 데이터가 informative하지 않기 때문이다. 
+$p_{\theta}(x^{(i)}|z_{k}^{i})$가 논문을 포함한 VAE모델에서 recognition network라고 지칭한다는 것을 알고 있다면, “VAE harshly penalizes approximate posterior samples which are unlikely to explain data, even if the recognition network puts much of its probability mass on good explanations.”라는 문장을 여기서 이해할 수 있다. VAE는 $p_{\theta}(x^{(i)}|z_{k}^{i})$값이 높더라도 $p_{z}(z)$값이 낮다면 해당 샘플을 사용하지 못한다. 앞서 보았듯이 likelihood evaluation이 0에 가까워지기 되기 때문이다.    
 
 이러한 경우에 Importance Sampling기법을 사용해서 $p_{\theta}(x^{(i)}|z_{k}^{i})$에 대해 informative한 q distribution을 새롭게 정의하고, q distribution을 따라 샘플링한 데이터로 $p_{z}(z)$에 대한 기댓값을 찾는다. 
 Importance sampling의 수식 유도 과정은 다음과 같다. 편의를 위해 discrete한 데이터 분포를 가정하고, $p_{\theta}(x^{(i)}|z_{k}^{i})$를 $f(z)$로 놓는다.
@@ -105,7 +105,7 @@ $$
  
 위에서 볼 수 있듯이 이제는 $z^{i}$를 $q(z)$에서 샘플링하면서 원래의 train objective값을 구할 수 있다. 따라서 원래의 train objective가 $$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z)$$이었다면, 다음과 같이 변경된다. $$\approx \sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^(i))}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) \quad with \quad z_{k}^{(i)} \sim q(z_{k}^{(i)})$$로 바뀌게 된다. 
  
-우리는 이러한 과정을 $f(z)$가 높은 곳에서 높은 값을 가지는 $q(z)$를 찾는 문제로 보았지만, 조금 다른 관점으로 $f(z) \times q(z)$가 높도록 $q(z)$를 설정하는 문제로도, $Var_{z \sim q}[\frac{p(z)}{q(z)}f(z)] < Var_{z~p}[f(z)]$가 되도록 하는 문제로도 볼 수 있다. 여기서 $\frac{p}{q}$로 $f(z)$를 reweight해주는 걸로 볼 수 있는데, 아래의 그림 5로 그럴 때 $p(z)$와 같아지는 것을 볼 수 있다. 또한 초록색 q확률을 따라 reweighted된 주황색 값을 뽑으면 그 variance가 매우 작음을 그림을 통해 확인 할 수 있다. 
+우리는 이러한 과정을 $f(z)$가 높은 곳에서 높은 값을 가지는 $q(z)$를 찾는 문제로 보았지만, 조금 다른 관점으로 $f(z) \times q(z)$가 높도록 $q(z)$를 설정하는 문제로도, $Var_{z \sim q}[\frac{p(z)}{q(z)}f(z)] < Var_{z~p}[f(z)]$가 되도록 하는 문제로도 볼 수 있다. 여기서 $\frac{p}{q}$로 $f(z)$를 reweight해주는 걸로 볼 수 있는데, 아래의 그림 5로 그럴 때 $p(z)$와 같아지는 것을 볼 수 있다. 다른 분포에서 뽑는 bias를 correct해주는 효과라고 이해할 수 있다. 또한 초록색 q확률을 따라 reweighted된 주황색 값을 뽑으면 그 variance가 매우 작음을 그림을 통해 확인 할 수 있다. 따라서 다른 sampling 방식들 (ex. rejection sampling)들과는 다르게 모든 샘플들을 사용할 수 있다. 
 
 ![Figure5](/assets/IWAE_img/Figure5.jpg) (그림 5 Solved Case)
 
@@ -189,21 +189,36 @@ Inactive units은 collapsed to the prior문제를 나타낸다. 다른 표현으
 
 IWAE는 위에서 보았듯이 prediction distribution을 더 spead-out하게 하는 objective function을 가지고 있어 generalize power가 강하기 때문에 active units이 더 많다고 볼 수 있다.
 
-![Figure8](/assets/IWAE_img/Figure8.jpg) (그림 8 테이블 2)
+![Figure8](/assets/IWAE_img/Figure8.jpg) (그림 8 테이블 2) { width=50% }
 
-테이블 2의 experiment1은 VAE objective로 training을 시작한 후 IWAE objective로 변경한 것이고, experiment 2는 IWAE objective로 시작한 후 VAE objective로 변경한 것이다. 
-실험 결과가 optimization 문제가 아닌 objective functions 으로 인해 나온 의도된 결과임을 보여주는 실험이다. 
+테이블 2의 experiment1은 VAE objective로 training을 시작한 후 IWAE objective로 변경한 것이고, experiment 2는 IWAE objective로 시작한 후 VAE objective로 변경한 것이다. 실험 결과가 saddle point나 local minimizer같은 문제로 대변되는 optimization 문제가 아닌 objective functions 으로 인해 나온 의도된 결과임을 보여주는 실험이다. 
 
 
 ## 8. Potential Short-Coming & Future Work
 
+IWAE는 의심의 여지없이 VAE의 발전된 방식이지만, 많은 문제점을 내포하고 있다. 가장 큰 문제점은 q분포를 정하는 방식과 sampling방식 자체의 한계일 것이다.
+q분포를 정하는 데 있어 편의를 위해 Gaussian혹은 Bernoulli분포를 사용하지만, 실제 분포와 그 차이가 클 수 있다. 분포의 형태도 다르지만 특히 Ammortized inference방식에서 오는 오차도 무시할 수 없다. 
 
+여기서는 해당 문제들을 해결하려고 노력한 두 가지 논문을 짧게 소개한다. 
 
+### Nowozin, Sebastian. "Debiasing evidence approximations: On importance-weighted autoencoders and jackknife variational inference." International conference on learning representations. 2018.
 
+해당 논문은 IWAE의 bound를 biased estimator라고 정의하고, 그 bias를 줄이는 데 Jacknife bias correction방식을 사용한다. 기존 논문의 가장 큰 한계점을 뽑으라면 importance sampling에서 발생하는 variance가 작다는 것을 mean absolute deviation (MAD)을 통해 low variance를 간접적으로만 증명한 것이라고 생각한다. 
 
-}
+![Figure9](/assets/IWAE_img/Figure9.jpg) (그림 9 Jacknife bias correction) { width=50% }
 
+Jacknife방식은 1954년 처음 소개된 방식으로 그 동작 방법이 매우 간단하다. 기존의 샘플링 방식은 n개의 샘플로 $\hat{t}$을 예측한다. 하지만, 다양한 갯수의 샘플로 예측한 값을 함께 사용하면 bias를 줄일 수 있다. 그림 9에서 볼 수 있듯이 n개만 사용하면 $t_{green point} - \hat{t_{n}}$의 bias가 존재하지만, $\hat{t_{n-1}}$의 값을 함꼐 사용하여 linear approximation을 진행하면 $t_{green point}  - \hat{t_{\inf}}$의 훨씬 작은 bias만이 존재하게 된다. 해당 논문은 이러한 방식을 통해 실제 bias값을 줄인 것 이외에도 이론적으로 IWAE의 bias와 variance를 연구한 것이 주요 contribution이다.
 
+### Yin, Mingzhang, and Mingyuan Zhou. "Semi-implicit variational inference." International Conference on Machine Learning. PMLR, 2018.
+
+두 번째 소개할 논문은 semi-implicit variational inference(SIVI)방식을 제시한 논문이다. (semi)implicit distribution이란 샘플을 추출할 수는 있지만 closed-form density가 없는 distribution을 의미한다. q가 parametize가 될 때 $q_{\phi}(z|\psi)$가 analytically tractable하고 $q_{\phi}(z|\psi)$와 $q_{\phi}(\psi)$가 reparameterize 가능하다면 다음 식과 같이 semi-implicit한 $q_{\phi}(z)$를 찾을 수 있다.
+
+$$q_{\phi}(z) = \int q_{\phi}(z|\psi)q_{\phi}(\psi)d\psi $$
+훨씬 더 flexible한 q분포를 사용할 수 있으므로 더 정확한 variational inference가 가능해진다. 
+
+![Figure10](/assets/IWAE_img/Figure10.jpg) (그림 10 Approximating target distribution with SIVI) { width=50% }
+
+그림 10을 보면 q분포가 기존의 Gaussian모양을 벗어나서 multi-modal한 모습과 매우 flexible한 모습을 보여주는 것을 볼 수 있다. 해당 방식은 VAE라는 큰 필드에서의 발전으로 graph neural network를 포함한 매우 다양한 분야에서 사용이 되고 있다. 
 
 
 
