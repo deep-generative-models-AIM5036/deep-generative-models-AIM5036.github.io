@@ -209,14 +209,14 @@ Initially, when we update the networks simultaneously, we do not consider the ma
 
 **References**
 
-[1] [https://arxiv.org/pdf/1701.00160.pdf](Original Paper)
+[1] [https://arxiv.org/pdf/1701.00160.pdf] (Original Paper)
 
-[2] [https://sites.google.com/view/berkeley-cs294-158-sp20/home](CS294)
+[2] [https://sites.google.com/view/berkeley-cs294-158-sp20/home] (CS294)
 
-[3] [https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2020/](Deep Learning for Computer Vision)
+[3] [https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2020/] (Deep Learning for Computer Vision)
 
-[4] [https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987](https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987)
+[4] [https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987] (https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987)
 
-[5] [https://jonathan-hui.medium.com/gan-whats-generative-adversarial-networks-and-its-application-f39ed278ef09](https://tech.kakaoenterprise.com/66)
+[5] [https://jonathan-hui.medium.com/gan-whats-generative-adversarial-networks-and-its-application-f39ed278ef09] (https://tech.kakaoenterprise.com/66)
 
 
