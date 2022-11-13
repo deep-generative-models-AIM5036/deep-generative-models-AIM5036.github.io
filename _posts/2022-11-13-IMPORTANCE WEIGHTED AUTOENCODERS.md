@@ -20,7 +20,7 @@ use_math: true
 IWAE의 핵심 아이디어를 보기 전에 백드라운드로 latent variable model (LVM)에 대해 알아보겠다.
 그림 1은 가장 심플한 LVM의 예시를 보여준다. 그림에서 x는 우리가 실제로 볼 수 있는 데이터 샘플이고, z는 우리가 볼 수 없지만 x를 생성하는데 사용되는 분포다. 
  
-![Figure1](/assets/IWAE_img/Figure1.jpeg) (그림 1 Latent Variable Model)
+![Figure1](/assets/IWAE_img/Figure1.jpg) (그림 1 Latent Variable Model)
 
 z는 하나의 known distribution으로 정할 수도 있고, 학습을 통해 배울 수도 있는데, VAE에서는 정해 놓는 방식을 사용한다. 대표적으로 데이터가 discrete하면 bernoulli, continuous하면 gaussian 분포를 사용한다.
 만일 z를 Bernoulli로 설정했다면, 아래와 같은 식을 통해 $p_{theta}(x|z)$를 구할 수 있다. 
