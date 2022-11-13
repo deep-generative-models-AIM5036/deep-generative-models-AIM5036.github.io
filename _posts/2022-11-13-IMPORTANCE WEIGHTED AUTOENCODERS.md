@@ -44,8 +44,11 @@ $$max_{\theta}\sum_{i}^{N}logp_{\theta}(x^(i)) = \sum_{i}^{N}log \sum_{z}^{K}p_{
 만일 K값이 한정되어 있다면, 우리는 exact한 training objective (식 4)를 얻을 수 있다. 예를 들어 $p_{theta}(x|z)$가 mixture of 3 gaussians이고 $p_{z}(z)$가 uniform distribution이라고 해보겠다.
 $$p_{theta}(x|z=k) = \frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{k}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{k})^{T}\sum_{k}^{-1}(x-\mu_{k}))$$ 이면서 $$p_{z}(z=A)=p_{z}(z=B)=p_{z}(z=C)$$이기 때문에 training objective는 다음과 같다. 
 
-$$max_{\theta}\sum_{i}logp_{\theta}(x^{(i)}) = 
-max_{\mu, \sigma}\sum_{i}log[ \frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{A}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{A})^{T}\sum_{A}^{-1}(x-\mu_{A})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{B}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{B})^{T}\sum_{B}^{-1}(x-\mu_{B})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{C}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{C})^{T}\sum_{C}^{-1}(x-\mu_{C}))]$$
+
+$$max_{\theta}\sum_{i}logp_{\theta}(x^{(i)}) =$$
+
+$$max_{\mu, \sigma}\sum_{i}log[ \frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{A}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{A})^{T}\sum_{A}^{-1}(x-\mu_{A})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{B}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{B})^{T}\sum_{B}^{-1}(x-\mu_{B})) +\frac{1}{3}\frac{1}{(2\pi)^{\frac{n}{2}} |\sum_{C}|^\frac{1}{2}} exp(-\frac{1}{2}(x-\mu_{C})^{T}\sum_{C}^{-1}(x-\mu_{C}))]$$
+
 
 그림 2에서 training 결과를 볼 수 있다. Epoch이 지남에 따라 3개의 gaussian 분포로 나뉘는 것을 볼 수 있다. 
 
@@ -61,7 +64,7 @@ $$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z) \approx \sum_{i}^{N}lo
 
 이것이 IWAE이전의 VAE모델들이 채택한 방식이다. 하지만 이와 같은 방식은 K값이 클수록 중요하지 않은 샘플들이 자주 추출되는 문제가 발생한다. 
 
-### 따라서 IWAE는 train objective에 $\frac{1}{K}\sum_{k=1}^{K}p_{\theta}(x^(i)|z_{k}^{(i)}$의 과정에서 중요하지 않은 샘플들이 뽑히는 문제를 다룬다
+### 따라서 IWAE는 train objective에 $\frac{1}{K}\sump_{\theta}(x^{(i)}|z_{k}^{(i)})$의 과정에서 중요하지 않은 샘플들이 뽑히는 문제를 다룬다
 
 예를들어 그림 3과 같이 데이터가 K개의 cluster들로 나뉘어 있고, $x^{(i)}$가 마지막 cluster에 있다고 가정한다. 그러면 prior distribution z에서 uniform sampling을 진행했을 때 $\frac{1}{K}$ term만이 유용할 것이다. 
 
@@ -87,12 +90,18 @@ Importance sampling의 수식 유도 과정은 다음과 같다. 편의를 위�
 
 ### Importance Sampling Formulation
 
-$$E_{z \sim pz(z)}[f(z)] 
-      = \sum_{z}p_{z}(z)f(z)
-      = \sum_{z}\frac{q(z)}{q(z)}p_{z}(z)f(z)
-      = \sum_{z \sim q(z)}\frac{p_{z}(z)}{q(z)}f(z)
-      = E_{z \sim q(z)}[\frac{p_{z}(z)}{q(z)}f(z)
-      \approx \frac{1}{K}\sum_{i=1}^{K}\frac{p_{z}(z^{(i)})}{q(z^{(i)})}f(z^{(i)}) \quad with \quad z^{(i)} \sim q(z) $$ 
+$$
+\begin{align}
+\begin{split}
+E_{z \sim pz(z)}[f(z)] \\
+      &= \sum_{z}p_{z}(z)f(z) \\
+      &= \sum_{z}\frac{q(z)}{q(z)}p_{z}(z)f(z) \\
+      &= \sum_{z \sim q(z)}\frac{p_{z}(z)}{q(z)}f(z) \\
+      &= E_{z \sim q(z)}[\frac{p_{z}(z)}{q(z)}f(z) \\
+      &\approx \frac{1}{K}\sum_{i=1}^{K}\frac{p_{z}(z^{(i)})}{q(z^{(i)})}f(z^{(i)}) \quad with \quad z^{(i)} \sim q(z) 
+\end{split}
+\end{align}
+$$
  
 위에서 볼 수 있듯이 이제는 $z^{i}$를 $q(z)$에서 샘플링하면서 원래의 train objective값을 구할 수 있다. 따라서 원래의 train objective가 $$\sum_{i}^{N}log \sum_{z}^{K}p_{z}(z)p_{\theta}(x^(i)|z)$$이었다면, 다음과 같이 변경된다. $$\approx \sum_{i}log\frac{1}{K}\sum_{k=1}^{K}\frac{p_{z}(z_{k}^(i))}{q(z_{k}^{(i)})}p_{\theta}(x^{(i)}|z_{k}^{(i)}) \quad with \quad z_{k}^{(i)} \sim q(z_{k}^{(i)})$$로 바뀌게 된다. 
  
@@ -104,9 +113,17 @@ $$E_{z \sim pz(z)}[f(z)]
 
 이제 문제는 위에서 밝힌 조건들을 만족하는 좋은 q(z)를 찾는 것으로 바뀐다. 결국 샘플 $x^{(i)}$가 주어졌을 때 어떤 z가 informative한지 z를 uniform이 아닌 z sampler 를 통해 선정하는 것으로 볼 수 있다. 물론 Bayes rule을 사용하면 $p_{\theta}(z|x^{(i)}) = \frac{p_{\theta}(x^{(i)}|z) p_{z}(z)}{p_{\theta}(x^{(i)})}$가 되지만, 분모의 normalizing constant를 얻을 수 없기 때문에 $q(z)$를 샘플링하기 쉬운 known distribution으로 설정하는 variational approach를 사용한다. 논문에서는 Gaussian으로 설정하였고, KL divergence를 사용하여 근사시켰다. 전개하면 다음과 같다.
 
-$$min_{q(z)}KL(q(z)||p_{\theta}(z|x^{(i)})) 
-  = min_{q(z)}E_{z \sim q(z)}log(\frac{q(z)}{p_{\theta}(z|x^{(i)})}) 
-  = min_{q(z)}E_{z \sim q(z)}log(\frac{q(z)}{p_{\theta}(x^{(i)}|z)p_{z}(z)/p_{\theta}(x^{(i)})}) = min_{q(z)}E_{z \sim q(z)}[logq(z)-logp_{z}(z)-logp_{\theta}(x^{(i)}|z)] + logp_{\theta}(x^{(i)})$$ 
+ 
+$$
+\begin{align}
+\begin{split}
+min_{q(z)}KL(q(z)||p_{\theta}(z|x^{(i)})) \\
+  &= min_{q(z)}E_{z \sim q(z)}log(\frac{q(z)}{p_{\theta}(z|x^{(i)})}) \\
+  &= min_{q(z)}E_{z \sim q(z)}log(\frac{q(z)}{p_{\theta}(x^{(i)}|z)p_{z}(z)/p_{\theta}(x^{(i)})}) \\
+  &= min_{q(z)}E_{z \sim q(z)}[logq(z)-logp_{z}(z)-logp_{\theta}(x^{(i)}|z)] + logp_{\theta}(x^{(i)})
+\end{split}
+\end{align}
+$$
 
 이와같은 새로운 objective를 얻을 수 있다. 각 term을 모두 계산하는 것은 가능하지만 각 데이터 $x^{(i)}$마다 q를 찾는 건 비효율 적이기 때문에 같은 inference problem을 줄이기 위한 방법으로 Ammortized Inference방식을 사용해 효율적인 계산을 사용한다. 즉, q분포를 $\phi$ 파라미터를 가지는 Neural Network로 표현하는 것이다. 
 결국 다음과 같은 $min_{\phi}\sum_{i}KL(q_{\phi}(z|x^{(i)})||p_{\theta}(z|x^{(i)}))$식으로 q를 찾아낸다. 
@@ -126,18 +143,22 @@ $$min_{q(z)}KL(q(z)||p_{\theta}(z|x^{(i)}))
 
 IWAE는 기존의 VAE방식의 발전된 방법론으로 알려져 있다. 둘의 직접적인 비교를 위해 VAE를 짧게 소개한다. 추가적인 설명은 이번 포스팅 이전에 있는 VAE와 SBAI(Stochastic Backpropagation and Approximate Inference in DGM) 포스팅을 통해 학습할 것을 추천한다.
 
-VAE는 generation process $p(x|\theta)$와 recognition model $q(h|x)$를 여러 non-linear hidden layer(h)를 통한 ancestral sampling으로 학습한다. 
-$$p(x|\theta) = \sum_{h^1,...,h^L}p(h^L|\theta)p(h^{L-1}|h^L,\theta)...p(x|h^1,\theta)$$와
-$$q(h|x) = q(h^1|x)q(h2|h1)...q(h^L|h^{L-1})$$로 나타낸다.
+VAE는 generation process $p(x|\theta)$와 recognition model $q(h|x)$를 여러 non-linear hidden layer(h)를 통한 ancestral sampling으로 학습한다. 각각 
+$$p(x|\theta) = \sum_{h^1,...,h^L}p(h^L|\theta)p(h^{L-1}|h^L,\theta)...p(x|h^1,\theta)$$
+$$q(h|x) = q(h^1|x)q(h2|h1)...q(h^L|h^{L-1})$$
+로 나타낸다.
 여기서 prior distribution과 conditional distributions $p(h^l|h^{l+1})$과 $q(h^l|h^{l-1})$은 모두 Normal Gaussian을 정의한다.
 
 이 정의에 따라 기존 VAE의 objective function은 ELBO라고 불리는 $$logp(x) \geq E_{q(h|x)}[log\frac{p(x,h)}{q(h|x)}]$$이다. 
 이때 IWAE와 똑같이 q를 parameterize해준다면 VAE의 gradient식은 아래와 같다.
-$$\nabla_{\theta}log\E_{h \sim q(h|x,\theta)}[\frac{p(x,h|\theta)}{q(h|x.\theta)}] = \E_{\epsilon^1,...,\epsilon^L} \sim N(o,I)[\nabla_{\theta}log \frac{p(x,h(\epsilon,x,\theta)|\theta)}{q(h(\epsilon,x,\theta)|x,\theta)}]$$
+$$\nabla_{\theta}logE_{h \sim q(h|x,\theta)}[\frac{p(x,h|\theta)}{q(h|x.\theta)}] = E_{\epsilon^1,...,\epsilon^L} \sim N(o,I)[\nabla_{\theta}log \frac{p(x,h(\epsilon,x,\theta)|\theta)}{q(h(\epsilon,x,\theta)|x,\theta)}]$$
 
 이에 반해 IWAE의 gradient는 다음과 같다. 
-$$\E_{\epsilon \sim N(0,I)}[\frac{1}{k}\sum_{i}^{K}\nabla_{\theta}log \frac{p(x,h(\epsilon_{i},x,\theta)|\theta)}{q(h(\epsilon_{i},x,\theta)|x,\theta)}]$$
-이는 importance weight $w(x,h,\theta) = \frac{p(x,h|\theta)}{q(h|x,\theta)}$로 두고, normalized importance weight $$\tilde{w_i}$를 $\frac{w_i}{\sum_{i=1}^kw_i}$$로 두면 $\sum_{i=1}^{k}\tilde{w_i}\nabla_{\theta}logw(x,h(\epsilon_i,x,\theta),theta)$ 
+$$E_{\epsilon \sim N(0,I)}[\frac{1}{k}\sum_{i}^{K}\nabla_{\theta}log \frac{p(x,h(\epsilon_{i},x,\theta)|\theta)}{q(h(\epsilon_{i},x,\theta)|x,\theta)}] = \sum_{i=1}^{k}\tilde{w_i}\nabla_{\theta}logw(x,h(\epsilon_i,x,\theta),theta)$$
+with importance weight 
+$$w(x,h,\theta) = \frac{p(x,h|\theta)}{q(h|x,\theta)}$$ 
+and normalized importance weight 
+$$\tilde{w_i}= w_i/\sum_{i=1}^{k}w_i$$
 
 VAE의 gradient식과 IWAE의 gradient식은 k=1로 두면 완전히 동일함을 볼 수 있다. 
 
@@ -145,13 +166,13 @@ VAE의 gradient식과 IWAE의 gradient식은 k=1로 두면 완전히 동일함�
 
 IWAE와 standard VAE의 objective에 두 가지 차이가 있음을 저자는 논문에서 밝히고 있다. 
 첫 번째로 IWAE의 objective는 다음과 같이 두개의 term으로 분해 될 수 있다.
-$$\nabla_{\theta}logw(x,h(\epsilon_i,x,\theta),theta) = \nabla_{\theta}logp(x,h(x,\epsilon_i,\theta)|\theta) - \nabla_{\theta}logq(h(x,\epsilon_i,\theta)|x,\theta)$$
+$$\nabla_{\theta}log w(x,h(\epsilon_i,x,\theta),theta) = \nabla_{\theta}log p(x,h(x,\epsilon_i,\theta)|\theta) - \nabla_{\theta}log q(h(x,\epsilon_i,\theta)|x,\theta)$$
 
 첫 term은 recognition network가 hidden representation에 adjust 함으로써 더 좋은 예측을 만들어 내는 것, 두 번째 term은 recognition network가 predictions들에 대해 더 spread-out distribution을 가지도록 하는 것이다. 이러한 objective를 통한 update는 importance weight로 곱해진 샘플들의 평균으로 일어난다. spead-out distribution에 대한 설명은 논문에 나와있지 않지만 "Tackling Over-pruning in Variational Autoencoders"논문에 따르면 VAE의 over-pruning 문제를 해결한 중요한 property이다. 이는 Experiment때 다시 한번 돌아오겠다.
 
 두 번째로 저자는 IWAE가 더 tigher한 lower bound를 가지고 있음을 증명하고 있다.  
-$$logp(x) \geq L_{k+1} \geq L_{K}$$에 대한 증명은 다음과 같다.
-$$L_k = \E_{h}[log\frac{1}{k}\sum_{i=1}^k\frac{p(x,h_i)}{q(h_i|x)}] \geq E_{h}[E_{I={i_1,...,i_m}}[log\frac{1}{m}\sum_{j=1}^m \frac{p(x,h_{ij})}{q(h_{ij}|x)}]] = L_m$$
+$$log p(x) \geq L_{k+1} \geq L_{K}$$에 대한 증명은 다음과 같다.
+$$L_k = E_{h}[log\frac{1}{k}\sum_{i=1}^k\frac{p(x,h_i)}{q(h_i|x)}] \geq E_{h}[E_{I={i_1,...,i_m}}[log\frac{1}{m}\sum_{j=1}^m \frac{p(x,h_{ij})}{q(h_{ij}|x)}]] = L_m$$
 해당 증명은 논문의 appendix에 더 상세히 적혀있음으로 본 논문을 참고하는 것을 추천한다.
 
 ## 7. Experiment
@@ -160,7 +181,7 @@ $$L_k = \E_{h}[log\frac{1}{k}\sum_{i=1}^k\frac{p(x,h_i)}{q(h_i|x)}] \geq E_{h}[E
 
 ![Figure6](/assets/IWAE_img/Figure6.jpg) (그림 6 Table 1)
 
-테이블 1은 IWAE와 VAE의 전반적인 결과를 보여준다. IWAE가 VAE보다 전반적으로 더 좋은 겨로가를 보여주며, K 수를 늘릴 때 IWAE는 확실히 NLL이 낮아지는 것을 볼 수 있다. 두 모델 전부 레이어 수를 2로 늘릴 때 더 좋은 결과를 보여준다.
+테이블 1은 IWAE와 VAE의 전반적인 결과를 보여준다. IWAE가 VAE보다 전반적으로 더 좋은 결과를 보여주며, K 수를 늘릴 때 IWAE는 확실히 NLL이 낮아지는 것을 볼 수 있다. 두 모델 전부 레이어 수를 2로 늘릴 때 더 좋은 결과를 보여준다.
 
 ![Figure7](/assets/IWAE_img/Figure7.jpg) (그림 7 Correlation between active units and KL)
 
