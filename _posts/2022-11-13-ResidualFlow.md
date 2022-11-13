@@ -298,7 +298,7 @@ Backpropagation을 진행할 때 메모리 뿐만 아니라 activation derivativ
 그러나 Swish 함수의 경우 일차 미분값이 $\vert \frac{d}{dz}Swish(z) \vert \lesssim 1.1$ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
 
 $$
-LipSwish(z) \coloneqq \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
+LipSwish(z) = \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
 $$
 
 이를 activation function으로 사용하였습니다. 이때 $\beta$ 값은 softplus를 통해 양수를 유지하도록 학습시켰습니다.
@@ -322,18 +322,18 @@ $$
 
 먼저 spectral norms에서는 다음의 두 가지 방법으로 립시츠 조건을 만족시킵니다.
 
-1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $|\phi '(z)| \leq 1$
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $\vert \phi '(z) \vert \leq 1$
 2. Weight matrices의 spectral norms으로 bound
 
 $$
 \Vert J_g(x) \Vert _2 = \Vert W_L \cdots W_z\phi ' (z_1) W_1 \phi ' (z_0)\Vert_2 \leq \Vert W_l \Vert_2 \cdots \Vert W_2 \Vert_2 \Vert \phi ' (z_1) \Vert_2 \Vert W_1 \Vert_2 \Vert \phi ' (z_0) \Vert_2 \leq \Vert W_l \Vert_2 \cdots \Vert W_2 \Vert_2 \Vert W_1 \Vert_2
 $$
 
-즉, $|\phi '(z)| \leq 1$을 만족시키는 $\phi$를 사용하며, 각 weight matrices의 spectral norm으로 결과값을 나눠주게 되면 함수 $g(x)$는 립시츠 조건을 만족하게 됩니다.
+즉, $\vert \phi '(z) \vert \leq 1$을 만족시키는 $\phi$를 사용하며, 각 weight matrices의 spectral norm으로 결과값을 나눠주게 되면 함수 $g(x)$는 립시츠 조건을 만족하게 됩니다.
 
 P-norms에서도 spectral norm과 마찬가지 방법을 사용하였으며, 각 weight를 2-norm이 아니라 p-norm을 통해 계산하였다는 차이점이 있습니다.
 
-1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $|\phi '(z)| \leq 1$
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $\vert \phi '(z)\vert  \leq 1$
 2. Weight matrices의 p-norms으로 bound
 
 $$
@@ -344,7 +344,7 @@ Residual Flow에서는 이 p 값 역시 trainable parameter로 정하여 학습�
 
 Mixed Matrix Norms에서는 각 matrix 값을 자신의 norm로 bound 해주지 않고, 옆의 matrix의 norm으로 교차하여 bound를 해주었습니다. $W_2$는 $\Vert W_1 \Vert$으로, $W_3$은 $\Vert W_2 \Vert$로, $W_L$은 $\Vert W_{L-1} \Vert$로, 다시 $W_1$은 $\Vert W_L \Vert$로 bound 해주어, 각 layer는 립시츠 조건을 만족시키지 못하지만, 전체 network $g(x)$를 보았을 때는 립시츠 조건을 만족시키게끔 하였습니다.
 
-1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $|\phi '(z)| \leq 1$
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $\vert \phi '(z)\vert  \leq 1$
 2. Weight matrices의 mixed matrix norms으로 bound
 
 $$
@@ -399,7 +399,7 @@ $$
 log p(x, y) = log p(x) + log p(y|x)
 $$
 
-여기에서 $log p(x)$는 log-likelihood를 의미하기 때문에 생성모델의 학습을, $log p(y|x)$는 주어진 데이터의 라벨 예측을 의미하기 때문에 분류기의 학습을 의미한다고 볼 수 있습니다. Hybrid modeling을 하는 경우, 주로 관심이 있는 쪽은 생성모델의 학습보다 분류기의 학습이기 때문에, $\lambda$라는 1보다 작은 양수의 hyperparameter를 도입하여 weighted maximum likelihood objective[^2]를 최종 objective function으로 사용하며, 이는 다음과 같습니다.
+여기에서 $log p(x)$는 log-likelihood를 의미하기 때문에 생성모델의 학습을, $log p(y \vert x)$는 주어진 데이터의 라벨 예측을 의미하기 때문에 분류기의 학습을 의미한다고 볼 수 있습니다. Hybrid modeling을 하는 경우, 주로 관심이 있는 쪽은 생성모델의 학습보다 분류기의 학습이기 때문에, $\lambda$라는 1보다 작은 양수의 hyperparameter를 도입하여 weighted maximum likelihood objective[^2]를 최종 objective function으로 사용하며, 이는 다음과 같습니다.
 
 $$
 \mathbb{E}_{(x, y) \thicksim p_{data}} \big[\lambda log p(x) + log p(y|x) \big]
