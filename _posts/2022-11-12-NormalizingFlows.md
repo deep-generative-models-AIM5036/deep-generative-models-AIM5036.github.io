@@ -110,8 +110,11 @@ If we have a random variable $z$ with a distribution $q(z)$, the result of apply
 $$q(z') = q(z) \left |\det\frac{\partial f^{-1}}{\partial z'} \right | = q(z) \left |\det\frac{\partial f}{\partial z} \right|^{-1}$$
 
 Where the last part can be obtained by applying the inverse function theorem and one property of Jacobian of invertible functions, as: 
+
 $$q(z) \left |\det\frac{\partial f^{-1}}{\partial z'} \right |$$ 
+
 $$= q(z) \left | \det \left ( \frac{\partial f}{\partial z} \right )^{-1} \right |$$
+
 $$= q(z) \left | \det \frac{\partial f}{\partial z} \right |^{-1}$$
 
 Taking *k* transformations applied to the random variable $z_0$ with distribution $q_0$, $q_k(z)$ is: 
@@ -123,8 +126,11 @@ $$\ln q_k(z_k) = \ln q_0(z_0) - \sum_ {k=1} ^K \ln \left | \det \frac{\partial f
 Where the second equation comes from: 
 
 $$\ln p(x) = \ln p_k(z_k) = \ln p_{k-1}(z_{k-1}) - \ln \left |\det \frac{\partial f_K}{\partial z_{K-1}} \right |$$
+
 $$= \ln p_{k-2}(z_{k-2}) - \ln \left | \det \frac{\partial f_{k-1}}{\partial z_{k-2}} \right | - \ln \left |\det \frac{\partial f_K}{\partial z_{K-1}} \right |$$
+
 $$= \cdots$$ 
+
 $$= \ln q_0(z_0) - \sum_ {k=1} ^K \ln \left | \det \frac{\partial f_K}{\partial z_{k-1}} \right |$$
 
 Applying this transformations means to apply a sequence of expansion or contractions on the initial density $q_0$. 
@@ -163,11 +169,13 @@ Since computing the determinant could be computationally expensive with $O(LD^3)
 Where the tranformation $f$ is defined as: 
 
 $$f(z) = z + uh(w^Tz + b)$$
+
 Where $u,w,b$ are the free parameters with $\mathbb{R}^D$ , $\mathbb{R}^D$ and $\mathbb{R}$ respectively. $h$ is the element-wise non-linearity 
 
 Taking this in consideration, the density $q_k(z)$ ends as:
 
 $$z_K = f_K \circ f_{K-1} \circ \cdots \circ f_1(z)$$
+
 $$\ln q_K (z_K) = \ln q_0(z) - \sum _{k=1} ^K \ln |1 + u_k^T\Psi _k(z_{k-1}) |$$
 
 Where the second term of the last equation is the determinant of the Jacobian directly. In planar flows, the contractions and expansions revolve around the perpendicular hyperplane $w^Tz+b=0$. A visual representation of the contraction and expansions can be found looking at the figure below. the first image on the left is the initial distribution. By applying a contraction along $y=1$, it changes to the upper image on the right, where the points are pulled to the given plane. Sequently applying an expansion around axis $x=1$, the points are pushed, resultying on the bottom figure on the left. 
@@ -191,7 +199,9 @@ For a further explanation of these transformations follow the [link](https://pie
 The free energy for flow-based models is defined as: 
 
 $$\mathcal{F}(x) = \mathbb{E}_{q_\phi(z|x)}\left[\log q_\phi(z|x)-\log p(x,z)\right]$$
+
 $$=\mathbb{E}_{q_0(z_0)}[\ln q_k(z_k)-\log p(x,z_k)]$$
+
 $$= \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
 
 This free energy is applied to the architecture presented in the figure below. Where the round boxes represent stochastic variable, also known as random variables; while the squared boxes represent the deterministic variables. This means while the random variables keep changing their values, the deterministic parts will give the same output to a same input. In the free energy equation above, paramaterizing the posterior distribution with a flow of length $K$ by $q_\phi(z\|x)\coloneqq q_k(z_k)$. As it can be noted the expecation is evaluated on $z_0$ since it already carries information from $x$ thanks to the encoder part previously applied. 
@@ -203,7 +213,9 @@ This free energy is applied to the architecture presented in the figure below. W
 The experiments were carried to evaluate the result of using Normalizing flows on deep latent gaussian models. The training was done with an annealed and simpler version of the equation of the free energy, obtaining: 
 
 $$z_k = f_k \circ f_{k-1} \circ \cdots \circ f_1(z)$$
+
 $$\mathcal{F}^{\Beta_t}(x) = \mathbb{E}_{q_0(z_0)}[\ln p_k(z_k) -\log p(x,z_k)]$$
+
 $$= \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \beta _t \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
 
 where $\beta \in [0,1]$ is an inverse temperature that follows a schedule $\beta _t=min(1,0.01+\frac{t}{10000})$, going from 0.01 to 1 after 10000 iterations. Applying this model with different number of $K$ flows, the results on the image below are obtained. Where non-gaussuans 2D distributions were aimed to be approximated. As it can be seen, with the addition of each $k$ numbers, the initial distributions keeps approximating to the original one, presented in the first column of the figure. 
