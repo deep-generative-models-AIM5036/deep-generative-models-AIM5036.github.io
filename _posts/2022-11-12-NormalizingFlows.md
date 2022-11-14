@@ -3,7 +3,7 @@ layout: post
 title:  "Variational Inference with Normalizing Flows"
 date:   2022-11-13
 author: Ortiz Ramos Vania Miriam
-categories: Flow models
+categories: "Flow models"
 tags:	Normalizing Flows 
 use_math: true
 ---
