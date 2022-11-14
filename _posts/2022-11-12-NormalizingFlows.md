@@ -28,11 +28,11 @@ Amortized variational inference is the application of Monte Carlo Gradient Estim
 $$\log p_\theta(x) = \log \int p_\theta(x|z)p(z)dz = \log \int \frac{q_\phi(z|x)}{q_\phi(z|x)}p_\theta(x|z)p(z)dz$$
 
 Where: 
-$p_\theta(x|z)$ is the likelihood function 
+$p_\theta(x\|z)$ is the likelihood function 
 $p(z)$ is the prior distribution over z 
-$q_\phi(z|x)$ is the approximate posterior distribution 
+$q_\phi(z\|x)$ is the approximate posterior distribution 
 
-By multiplying and dividing the first result by $q_\phi(z|x)$, and applying additional operations, it is tranformed to: 
+By multiplying and dividing the first result by $q_\phi(z\|x)$, and applying additional operations, it is tranformed to: 
 
 $$\geq -\mathbb{D}_{KL}[q_\phi(z|x)||p(z)] + \mathbb{E_q}[\log p_\theta(x|z)] = - \mathcal{F}(x)$$ 
 
@@ -136,7 +136,7 @@ These two concepts will be further explained after, with visual representations 
 
 ## Infinitesimal flow 
 
-In this case, it doesn't mean to apply an infinite number of flows but as "a partial differential equation describing how the initial density $q_0(z)$ evolves over 'time': $\frac{\partial}{\partial t}q_t(z) = \mathcal{T}_t|q_t(z)|$, where $\mathcal{T}$ describes the continuous-time dynamics"; according to the paper. These are divided in Langevin and Hamiltonian Flows. 
+In this case, it doesn't mean to apply an infinite number of flows but as "a partial differential equation describing how the initial density $q_0(z)$ evolves over 'time': $\frac{\partial}{\partial t}q_t(z) = \mathcal{T}_t\|q_t(z)\|$, where $\mathcal{T}$ describes the continuous-time dynamics"; according to the paper. These are divided in Langevin and Hamiltonian Flows. 
 
 **Langevin Flow**
 
@@ -182,7 +182,7 @@ $$f(z) = z + \beta h (\alpha,r)(z-z_0)$$
 
 $$\left| \det \frac{\partial f}{\partial z} \right| = [1+\beta h (\alpha,r)]^{d-1} [1+\beta h(\alpha,r)+\beta h'(\alpha,r)r]$$
 
-Where $h(\alpha,r) = \frac{1}{(\alpha + r)}$, $r=|z-z_0|$, and the parameters are $\lambda = \{ z_0 \in \mathbb{R}^D, \alpha \in \mathbb{R}^+, \beta \in \mathbb{R} \}$. For radial flows, the contractions and expansions are made around a reference point. Looking the image below, the upper image in the left is ithe initial distribution. By applying a contraction along the point $(0.75,0.75)$ the points are pulled towards the reference point as seen in the upper figure on the right. Sequently applying an expansion along the point $(0.85,0.85)$ the points are pushed through the new reference point as it can be seen on the bottom image on the left. Another emaple of a contraction and expansion is seen on the figure on the bottom right, being the first one an expansion and the second one a contraction. 
+Where $h(\alpha,r) = \frac{1}{(\alpha + r)}$, $r=\|z-z_0\|$, and the parameters are $\lambda = \{ z_0 \in \mathbb{R}^D, \alpha \in \mathbb{R}^+, \beta \in \mathbb{R} \}$. For radial flows, the contractions and expansions are made around a reference point. Looking the image below, the upper image in the left is ithe initial distribution. By applying a contraction along the point $(0.75,0.75)$ the points are pulled towards the reference point as seen in the upper figure on the right. Sequently applying an expansion along the point $(0.85,0.85)$ the points are pushed through the new reference point as it can be seen on the bottom image on the left. Another emaple of a contraction and expansion is seen on the figure on the bottom right, being the first one an expansion and the second one a contraction. 
 
 ![Imgur](https://i.imgur.com/Y4UXDWZ.png)
 
@@ -194,7 +194,7 @@ $$\mathcal{F}(x) = \mathbb{E}_{q_\phi(z|x)}\left[\log q_\phi(z|x)-\log p(x,z)\ri
 $$=\mathbb{E}_{q_0(z_0)}[\ln q_k(z_k)-\log p(x,z_k)]$$
 $$= \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
 
-This free energy is applied to the architecture presented in the figure below. Where the round boxes represent stochastic variable, also known as random variables; while the squared boxes represent the deterministic variables. This means while the random variables keep changing their values, the deterministic parts will give the same output to a same input. In the free energy equation above, paramaterizing the posterior distribution with a flow of length $K$ by $q_\phi(z|x)\coloneqq q_k(z_k)$. As it can be noted the expecation is evaluated on $z_0$ since it already carries information from $x$ thanks to the encoder part previously applied. 
+This free energy is applied to the architecture presented in the figure below. Where the round boxes represent stochastic variable, also known as random variables; while the squared boxes represent the deterministic variables. This means while the random variables keep changing their values, the deterministic parts will give the same output to a same input. In the free energy equation above, paramaterizing the posterior distribution with a flow of length $K$ by $q_\phi(z\|x)\coloneqq q_k(z_k)$. As it can be noted the expecation is evaluated on $z_0$ since it already carries information from $x$ thanks to the encoder part previously applied. 
 
 ![Imgur](https://i.imgur.com/NAqDJIo.png)
 
@@ -212,7 +212,7 @@ where $\beta \in [0,1]$ is an inverse temperature that follows a schedule $\beta
 
 ## MNIST experiment 
 
-Experiments were carried on the MNIST binarized dataset for digits from 0 to 9 with a size of 28*28 pixels. Looking at the results on the image, it can be noted, the free energy improves as the number of flows increases, and the KL-divergence between the approximate posterior $q(z|x)$ and the true posterior distribution $p(z|x)$ reduces as well. (First and second figure respectively)
+Experiments were carried on the MNIST binarized dataset for digits from 0 to 9 with a size of 28*28 pixels. Looking at the results on the image, it can be noted, the free energy improves as the number of flows increases, and the KL-divergence between the approximate posterior $q(z\|x)$ and the true posterior distribution $p(z\|x)$ reduces as well. (First and second figure respectively)
 
 ![Imgur](https://i.imgur.com/jMHymP7.png)
 
