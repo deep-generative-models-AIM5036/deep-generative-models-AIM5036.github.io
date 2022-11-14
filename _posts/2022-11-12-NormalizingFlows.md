@@ -163,7 +163,7 @@ Since computing the determinant could be computationally expensive with $O(LD^3)
 Where the tranformation $f$ is defined as: 
 
 $$f(z) = z + uh(w^Tz + b)$$
-Where $u,w,b$ are the free parameters with $\mathbb{R}^D$,$\mathbb{R}^D$ and $\mathbb{R} $ respectively. $h$ is the element-wise non-linearity 
+Where $u,w,b$ are the free parameters with $\mathbb{R}^D$ , $\mathbb{R}^D$ and $\mathbb{R}$ respectively. $h$ is the element-wise non-linearity 
 
 Taking this in consideration, the density $q_k(z)$ ends as:
 
