@@ -10,7 +10,7 @@ use_math: true
 
 This post contains a review of the paper [Variational Inference with Normalizing Flows](https://arxiv.org/abs/1505.05770). 
 
-This paper aims to solve one of the problems of Variationa Inference, i.e. choosing the approximate posterior distribution, since the approach porposed is able to recover the true posterior distribution and outperform other competing approaches. In a few words, what Normalizing Flows does is tranforming an simple initial density into a more complex density by using a sequence og invertible transformations named 'flows'. 
+This paper aims to solve one of the problems of Variationa Inference, i.e. choosing the approximate posterior distribution, since the approach proposed is able to recover the true posterior distribution and outperform other competing approaches. In a few words, what Normalizing Flows does is transforming a simple initial density into a more complex density by using a sequence of invertible transformations named 'flows'. 
 
 To further explain this approach, it will be divided in 4 points
 
@@ -28,8 +28,11 @@ Amortized variational inference is the application of Monte Carlo Gradient Estim
 $$\log p_\theta(x) = \log \int p_\theta(x|z)p(z)dz = \log \int \frac{q_\phi(z|x)}{q_\phi(z|x)}p_\theta(x|z)p(z)dz$$
 
 Where: 
+
 $p_\theta(x\|z)$ is the likelihood function 
-$p(z)$ is the prior distribution over z 
+
+$p(z)$ is the prior distribution over $z$ 
+
 $q_\phi(z\|x)$ is the approximate posterior distribution 
 
 By multiplying and dividing the first result by $q_\phi(z\|x)$, and applying additional operations, it is tranformed to: 
@@ -83,7 +86,7 @@ Given a prior $p_z(z)$ where $x=f(z)$ and $z=f^-1(x)$
 
 $$p_x(x) = p_z(f^{-1}(x)) \left| \det \left( \frac{\partial f^{-1}(x)}{\partial x} \right ) \right|$$
 
-where $p_x(x)$ is the unknown distribution. From the image below, it starts with a known distribution, easy to sample, that once passed through the function $f$ it will resemble the orginal unknown distribution. This is where the jacobian intervenes, as we are aiming to relate the inputs with the outputs of the function. Since this transformation was applied it should be normalized, that is done by using the determinant, due the definition presented beforehand. 
+where $p_x(x)$ is the unknown distribution. A visual explanation of this equation can be foung from the image below. It starts with a known distribution, easy to sample, that once passed through the function $f$ will resemble the orginal unknown distribution. This is where the jacobian intervenes, as we are aiming to relate the inputs with the outputs of the function. Plus, since this transformation was applied it should be normalized, which is done by using the determinant, due the definition presented beforehand. 
 
 ![Imgur](https://i.imgur.com/t5ZFi7c.png)
 
@@ -105,7 +108,7 @@ Described as a finite sequence of transformations. Given a function $f: \mathbb{
 
 $$g \circ f(z) = f^{-1} \circ f(z) = z$$
 
-If we have a random variable $z$ with a distribution $q(z)$, the result of applying $f$ is $z'=f(z)$ will have a distribution: 
+If we have a random variable $z$ with a distribution $q(z)$, the result of applying $f$ is $z'=f(z)$. To find the distribution $q(z')$ the change of variables theorem mentioned before is applied, obtaining: 
 
 $$q(z') = q(z) \left |\det\frac{\partial f^{-1}}{\partial z'} \right | = q(z) \left |\det\frac{\partial f}{\partial z} \right|^{-1}$$
 
@@ -117,7 +120,7 @@ $$= q(z) \left | \det \left ( \frac{\partial f}{\partial z} \right )^{-1} \right
 
 $$= q(z) \left | \det \frac{\partial f}{\partial z} \right |^{-1}$$
 
-Taking *k* transformations applied to the random variable $z_0$ with distribution $q_0$, $q_k(z)$ is: 
+But, since multiple *k* transformations will be applied to the random variable $z_0$ with distribution $q_0$, the output distribution $q_k(z)$ will be: 
 
 $$z_k = f_k \circ \cdots \circ f_2 \circ f_1(z_0) = x$$
 
@@ -133,16 +136,16 @@ $$= \cdots$$
 
 $$= \ln q_0(z_0) - \sum_ {k=1} ^K \ln \left | \det \frac{\partial f_K}{\partial z_{k-1}} \right |$$
 
-Applying this transformations means to apply a sequence of expansion or contractions on the initial density $q_0$. 
+Applying this transformations means to apply a sequence of expansions or contractions on the initial density $q_0$. Which are defined as: 
 
-- Expansion. The map $z' = f(z)$ **PULLS** the points $z$ away. Which means *decreasing* the density within the region, while *increasing* the density outside of the region. 
-- Contraction. The map $z' = f(z)$ **PUSHES** the points towards the interior of a region. Which involves *increasing* the density in the region, while *decreasing* the density outside the region.  
+- ***Expansion***. The map $z' = f(z)$ **PULLS** the points $z$ away. Which means *decreasing* the density within the region, while *increasing* the density outside of the region. 
+- ***Contraction***. The map $z' = f(z)$ **PUSHES** the points towards the interior of a region. Which involves *increasing* the density in the region, while *decreasing* the density outside the region.  
 
 These two concepts will be further explained after, with visual representations of both. 
 
 ## Infinitesimal flow 
 
-In this case, it doesn't mean to apply an infinite number of flows but as "a partial differential equation describing how the initial density $q_0(z)$ evolves over 'time': $\frac{\partial}{\partial t}q_t(z) = \mathcal{T}_t\|q_t(z)\|$, where $\mathcal{T}$ describes the continuous-time dynamics"; according to the paper. These are divided in Langevin and Hamiltonian Flows. 
+In this case, it doesn't mean to apply an infinite number of flows but as *"a partial differential equation describing how the initial density $q_0(z)$ evolves over 'time': $\frac{\partial}{\partial t}q_t(z) = \mathcal{T}_t\|q_t(z)\|$, where $\mathcal{T}$ describes the continuous-time dynamics"*; according to the paper. These are divided in Langevin and Hamiltonian Flows. 
 
 **Langevin Flow**
 
@@ -162,15 +165,15 @@ $$\mathcal{H} (z,\omega) = - \mathcal{L} (z) - \frac{1}{2} \omega^TM\omega$$
 
 ## Inference with Normalizing Flows 
 
-Since computing the determinant could be computationally expensive with $O(LD^3)$ and some tranformations might have numeraclly unstable inverse functions. Two types of invertible linear-time transformations are proposed: Planar and Radial 
+Since computing the determinant could be computationally expensive with $O(LD^3)$ and some tranformations might have numerically unstable inverse functions; two types of invertible linear-time transformations are proposed: *Planar* and *Radial.* 
 
 **Planar flows** 
 
-Where the tranformation $f$ is defined as: 
+Where the transformation $f$ is defined as: 
 
 $$f(z) = z + uh(w^Tz + b)$$
 
-Where $u,w,b$ are the free parameters with $\mathbb{R}^D$ , $\mathbb{R}^D$ and $\mathbb{R}$ respectively. $h$ is the element-wise non-linearity 
+Where $u,w,b$ are the free parameters with $\mathbb{R}^D$ , $\mathbb{R}^D$ and $\mathbb{R}$ respectively. And $h$ is the element-wise non-linearity 
 
 Taking this in consideration, the density $q_k(z)$ ends as:
 
@@ -178,7 +181,7 @@ $$z_K = f_K \circ f_{K-1} \circ \cdots \circ f_1(z)$$
 
 $$\ln q_K (z_K) = \ln q_0(z) - \sum _{k=1} ^K \ln |1 + u_k^T\Psi _k(z_{k-1}) |$$
 
-Where the second term of the last equation is the determinant of the Jacobian directly. In planar flows, the contractions and expansions revolve around the perpendicular hyperplane $w^Tz+b=0$. A visual representation of the contraction and expansions can be found looking at the figure below. the first image on the left is the initial distribution. By applying a contraction along $y=1$, it changes to the upper image on the right, where the points are pulled to the given plane. Sequently applying an expansion around axis $x=1$, the points are pushed, resultying on the bottom figure on the left. 
+Where the second term of the last equation is the determinant of the Jacobian calculated directly. In planar flows, the contractions and expansions revolve around the perpendicular hyperplane $w^Tz+b=0$. A visual representation of the contractions and expansions can be found looking at the figure below. the first image on the left is the initial distribution. By applying a contraction along $y=1$, it changes to the upper image on the right, where the points are pulled to the given plane. Sequently applying an expansion around axis $x=1$, the points are pushed, resultying on the bottom figure on the left. 
 
 ![Imgur](https://i.imgur.com/OIYNXmn.png)
 
@@ -190,7 +193,7 @@ $$f(z) = z + \beta h (\alpha,r)(z-z_0)$$
 
 $$\left| \det \frac{\partial f}{\partial z} \right| = [1+\beta h (\alpha,r)]^{d-1} [1+\beta h(\alpha,r)+\beta h'(\alpha,r)r]$$
 
-Where $h(\alpha,r) = \frac{1}{(\alpha + r)}$, $r=\|z-z_0\|$, and the parameters are $\lambda = \{ z_0 \in \mathbb{R}^D, \alpha \in \mathbb{R}^+, \beta \in \mathbb{R} \}$. For radial flows, the contractions and expansions are made around a reference point. Looking the image below, the upper image in the left is ithe initial distribution. By applying a contraction along the point $(0.75,0.75)$ the points are pulled towards the reference point as seen in the upper figure on the right. Sequently applying an expansion along the point $(0.85,0.85)$ the points are pushed through the new reference point as it can be seen on the bottom image on the left. Another emaple of a contraction and expansion is seen on the figure on the bottom right, being the first one an expansion and the second one a contraction. 
+Where $h(\alpha,r) = \frac{1}{(\alpha + r)}$, $r=\|z-z_0\|$, and the parameters are $\lambda = \{ z_0 \in \mathbb{R}^D, \alpha \in \mathbb{R}^+, \beta \in \mathbb{R} \}$. For radial flows, the contractions and expansions are made around a reference point. Looking the image below, the upper image in the left is ithe initial distribution. By applying a contraction along the point $(0.75,0.75)$ the points are pulled towards the reference point as seen in the upper figure on the right. Sequently applying an expansion along the point $(0.85,0.85)$ the points are pushed through the new reference point as it can be seen on the bottom image on the left. Another example of a contraction and expansion is seen on the figure on the bottom right, being the first one an expansion and the second one a contraction. 
 
 ![Imgur](https://i.imgur.com/Y4UXDWZ.png)
 
@@ -202,9 +205,9 @@ $$\mathcal{F}(x) = \mathbb{E}_{q_\phi(z|x)}\left[\log q_\phi(z|x)-\log p(x,z)\ri
 
 $$=\mathbb{E}_{q_0(z_0)}[\ln q_k(z_k)-\log p(x,z_k)]$$
 
-$$= \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
+$$\mathcal{F}(x) = \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
 
-This free energy is applied to the architecture presented in the figure below. Where the round boxes represent stochastic variable, also known as random variables; while the squared boxes represent the deterministic variables. This means while the random variables keep changing their values, the deterministic parts will give the same output to a same input. In the free energy equation above, paramaterizing the posterior distribution with a flow of length $K$ by $q_\phi(z\|x)\coloneqq q_k(z_k)$. As it can be noted the expecation is evaluated on $z_0$ since it already carries information from $x$ thanks to the encoder part previously applied. 
+This free energy is applied to the architecture presented in the figure below. Where the round boxes represent stochastic variable, also known as random variables; while the squared boxes represent the deterministic variables. This means, while the random variables keep changing their values, the deterministic parts will give the same output to a same input. In the free energy equation above, paramaterizing the posterior distribution $q_\phi(z\|x)$ with a flow of length $K$ by $q_k(z_k)$. As it can be noted the expectation is evaluated on $z_0$ instead of $x$, since it already carries information from it thanks to the encoder part previously applied, enclosing the global variables of the input images. 
 
 ![Imgur](https://i.imgur.com/NAqDJIo.png)
 
@@ -214,15 +217,15 @@ The experiments were carried to evaluate the result of using Normalizing flows o
 
 $$z_k = f_k \circ f_{k-1} \circ \cdots \circ f_1(z)$$
 
-$$\mathcal{F}^{\Beta_t}(x) = \mathbb{E}_{q_0(z_0)}[\ln p_k(z_k) -\log p(x,z_k)]$$
+$$\mathcal{F}^{\Beta _t}(x) = \mathbb{E}_{q_0(z_0)}[\ln p_k(z_k) -\log p(x,z_k)]$$
 
 $$= \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \beta _t \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
 
-where $\beta \in [0,1]$ is an inverse temperature that follows a schedule $\beta _t=min(1,0.01+\frac{t}{10000})$, going from 0.01 to 1 after 10000 iterations. Applying this model with different number of $K$ flows, the results on the image below are obtained. Where non-gaussuans 2D distributions were aimed to be approximated. As it can be seen, with the addition of each $k$ numbers, the initial distributions keeps approximating to the original one, presented in the first column of the figure. 
+where $\beta \in [0,1]$ is an inverse temperature that follows a schedule $\beta _t=min(1,0.01+\frac{t}{10000})$, going from 0.01 to 1 after 10000 iterations. Applying this model with different number of $K$ flows, the results on the image below are obtained. Where non-gaussians 2D distributions were aimed to be approximated. As it can be seen, with the addition of each $k$ layers, the initial distribution keeps approximating to the original one, presented in the first column of the figure. It can also be seen the overperformance over the NICE models considering the same gaussian distributions. 
 
 ![Imgur](https://i.imgur.com/WcFpwbA.png)
 
-## MNIST experiment 
+## MNIST
 
 Experiments were carried on the MNIST binarized dataset for digits from 0 to 9 with a size of 28*28 pixels. Looking at the results on the image, it can be noted, the free energy improves as the number of flows increases, and the KL-divergence between the approximate posterior $q(z\|x)$ and the true posterior distribution $p(z\|x)$ reduces as well. (First and second figure respectively)
 
