@@ -217,7 +217,7 @@ The experiments were carried to evaluate the result of using Normalizing flows o
 
 $$z_k = f_k \circ f_{k-1} \circ \cdots \circ f_1(z)$$
 
-$$\mathcal{F}^{\Beta _t}(x) = \mathbb{E}_{q_0(z_0)}[\ln p_k(z_k) -\log p(x,z_k)]$$
+$$\mathcal{F}^{\beta _t}(x) = \mathbb{E}_{q_0(z_0)}[\ln p_k(z_k) -\log p(x,z_k)]$$
 
 $$= \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \beta _t \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
 
