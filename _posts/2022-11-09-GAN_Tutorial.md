@@ -4,7 +4,7 @@ title:  "GAN Tutorial"
 date:   2022-11-12
 author: Kim JeongHyeon, Khan Osama
 categories: Generative Adversarial Networks
-tags: Gan
+tags: GAN
 use_math: True
 ---
 
@@ -51,16 +51,16 @@ Following are the steps to train a GAN model.
 5. Update both the discriminator network and the generator network. 
 For T steps of iterations, the training process will look something like
 
-<center>
+<p>
   <img src="/GAN_Tutorial_img/training_process.png" width="300" height="130"/>
-</center>
+</p>
 
 The following figure further clarify this procedure
 
-<figure>
+<p>
   <img src="/GAN_Tutorial_img/full_picture.png" />
-  <figcaption>Discriminator (left) and Generator (right) -- Figure taken from [1] </figcaption>
-</figure>
+  ** Discriminator (left) and Generator (right) -- Figure taken from [1] **
+</p>
 
 
 ## Optimal Discriminator 
