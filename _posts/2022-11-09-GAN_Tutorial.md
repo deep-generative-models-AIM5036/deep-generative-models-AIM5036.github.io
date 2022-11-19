@@ -20,7 +20,7 @@ In this post, we will go through every single question and try to answer them as
 
 # Internals of GANs
 
-<p style="text-align: justified">Generative models refer to any model that takes a training set consisting of samples drawn from a distribution p<sub>data</sub> and learns to represent an estimate of that distribution. Here p<sub>data</sub> describes the actual distribution that our training data comes from. A generative model aims to learn a distribution p<sub>model</sub>, such that this distribution is close to the actual data distribution as much as possible. Generative models are classified into two main categories; Those where we represent the p<sub>model</sub> with an explicit probability distribution and those where we do not have an explicit distribution but can sample from it. GAN belongs to the second one.</p>
+Generative models refer to any model that takes a training set consisting of samples drawn from a distribution p<sub>data</sub> and learns to represent an estimate of that distribution. Here p<sub>data</sub> describes the actual distribution that our training data comes from. A generative model aims to learn a distribution p<sub>model</sub>, such that this distribution is close to the actual data distribution as much as possible. Generative models are classified into two main categories; Those where we represent the p<sub>model</sub> with an explicit probability distribution and those where we do not have an explicit distribution but can sample from it. GAN belongs to the second one.
 
 
 
@@ -55,10 +55,11 @@ For T steps of iterations, the training process will look something like
   <img src="/GAN_Tutorial_img/training_process.png" />
 </p>
 
-The overall mechanism can be further seen in the following figure
+The following figure further clarify this procedure
 
 <p align="center">
   <img src="/GAN_Tutorial_img/full_picture.png" />
+  <figcaption>Discriminator (left) and Generator (right) > (Figure taken from [1])</figcaption>
 </p>
 
 
