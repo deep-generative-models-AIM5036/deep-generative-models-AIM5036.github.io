@@ -57,12 +57,10 @@ For T steps of iterations, the training process will look something like
 
 The following figure further clarify this procedure
 
-<center>
-  <img src="/GAN_Tutorial_img/full_picture.png"/>
-</center>
-<center>
-    `Discriminator (left) and Generator (right) -- Figure taken from [1]`
-</center>
+<figure>
+  <img src="/GAN_Tutorial_img/full_picture.png" />
+  <figcaption>Discriminator (left) and Generator (right) -- Figure taken from [1] </figcaption>
+</figure>
 
 
 ## Optimal Discriminator 
