@@ -59,7 +59,11 @@ The following figure further clarify this procedure
 
 <center>
   <img src="/GAN_Tutorial_img/full_picture.png"/>
-  `Discriminator (left) and Generator (right) (image taken from [1])`
+</center>
+<center>
+  <p>
+    `Discriminator (left) and Generator (right) (image taken from [1])`
+  </p>
 </center>
 
 
