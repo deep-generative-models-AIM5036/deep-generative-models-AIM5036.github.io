@@ -59,7 +59,7 @@ The following figure further clarify this procedure
 
 <p align="center">
   <img src="/GAN_Tutorial_img/full_picture.png" />
-  <figcaption>Discriminator (left) and Generator (right) > (Figure taken from [1])</figcaption>
+  > Discriminator (left) and Generator (right)  (Figure taken from [1])
 </p>
 
 
