@@ -6,6 +6,7 @@ author: Kim JeongHyeon, Khan Osama
 categories: Generative Adversarial Networks
 tags: GAN
 use_math: True
+published: True
 ---
 
 # Content
