@@ -52,14 +52,15 @@ Following are the steps to train a GAN model.
 For T steps of iterations, the training process will look something like
 
 <center>
-  <img src="/GAN_Tutorial_img/training_process.png" width="300" height="150"/>
+  <img src="/GAN_Tutorial_img/training_process.png" width="300" height="130"/>
 </center>
 
 The following figure further clarify this procedure
 
-<p align="center">
-  <img src="/GAN_Tutorial_img/full_picture.png" />
-</p>
+<center>
+  <img src="/GAN_Tutorial_img/full_picture.png"/>
+  `Discriminator (left) and Generator (right) (image taken from [1])
+</center>
 
 
 ## Optimal Discriminator 
