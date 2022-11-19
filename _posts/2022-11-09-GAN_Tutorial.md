@@ -58,10 +58,12 @@ For T steps of iterations, the training process will look something like
 
 The following figure further clarify this procedure
 
-<p>
-  <img src="/GAN_Tutorial_img/full_picture.png" />
-  <b> Discriminator (left) and Generator (right) -- Figure taken from [1] </b>
-</p>
+<center>
+  <p>
+    <img src="/GAN_Tutorial_img/full_picture.png" />
+    <b> Discriminator (left) and Generator (right) [1] </b>
+  </p>
+ </center>
 
 
 ## Optimal Discriminator 
@@ -75,6 +77,7 @@ Optimizing the above term from discriminator's prospective, guarantees to reach 
 The goal of the discriminator is to estimate this ratio. This is shown in the following figure
 <p align="center">
   <img src="/GAN_Tutorial_img/dis_vs_gen.png" width="600" height="400"/>
+  <b> Discriminator shows in dotted blue line. The goal of the discriminator is to estimate the ratio between two distribution -- Figure taken from [1] </b>
 </p>
 
 In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
@@ -86,6 +89,8 @@ In order for the generator to align the p<sub>model</sub> distribution with the 
 At the beginning of the training, the discriminator gets confident about the fake images quite quickly, which causes a vanishing gradient problem for the generator. A vanishing gradient means that there will be no update for the generator, even for the bad samples. To fix this problem, we can change the equation for the generator from `log(1-D(G(z)))` to `-log(G(z))`. Considering a sigmoid function at the end of the discriminator network, we can see that the gradient is equal to zero at the beginning of the training. Modifying the sign reverse this phenomenon and brings the vanishing gradient problem for the real data. However, this is okay for real images, as this gradient is not used for updating the generator.This is show below
 <p align="center">
   <img src="/GAN_Tutorial_img/non_saturating.png" />
+    <b> Solution to vanishing gradient [2] </b>
+
 </p>
 
 ## GANs and Maximum Likelihood Game
@@ -113,6 +118,8 @@ We can see that minimizing the main loss function of GANs, indeed, minimizes the
 
 <p align="center">
   <img src="/GAN_Tutorial_img/divergences.png" alt="factorio thumbnail"/>
+  <b> The choice of divergence defines the optimization behavior [2] </b>
+
 </p>
 
 The fact that GANs try to fit p<sub>model</sub> to a single mode rather than averaging over multiple modes might be an explanation for why GANs produce good-quality images. However, recent efforts have shown that high quality images can also be produced by GAN when doing maximum likelihood learning.
@@ -131,6 +138,8 @@ Smoothing the labels for the fake samples will generate unexpected behaviors.
 Batch Normalization creates a dependency between the samples in a batch. This results in generated images that are not independent of each other. The following figure shows this phenomenon
 <p align="center">
   <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail" width="500" height="500"/>
+  <b> Dependence between different images in a same batch [1] </b>
+
 </p>
 
 The generated images in the same batch (Two batches, top and down) are similar. Virtual batch normalization avoids this problem by sampling a reference batch before training and finding this batch's normalization parameters. In the subsequent training steps, these normalization parameters are used together with the current batch to recompute the normalization parameters and use them during the training process.
@@ -158,6 +167,7 @@ The nature of the GAN settings is such that the two networks compete with each o
 The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
 <p align="center">
   <img src="/GAN_Tutorial_img/oscillations.png" width="300" height="300"/>
+  <b> Optimization in game theory can result in sub-optimal structure [4]</b>
 </p>
 
 This clearly shows that some cost functions might not converge using gradient descent.
@@ -182,6 +192,7 @@ What we want the network to do is `minmax`; however, since we update the network
 
 <p align="center">
   <img src="/GAN_Tutorial_img/model_collapse.png" />
+  <b> Mode collapse in toy dataset -- [1] </b>
 </p>
 
 The generator visits one mode after another instead of learning to visit all different modes. The generator will identify some modes that the discriminator believes are highly likely and place all of its mass there, and then the discriminator will learn not to be fooled by going to only a single mode. Instead of the generator learning to use multiple modes, the generator will switch to a different mode, and this cycle goes on.
@@ -194,6 +205,7 @@ Initially, when we update the networks simultaneously, we do not consider the ma
 
 <p align="center">
   <img src="/GAN_Tutorial_img/mode_solved.png"  />
+  <b> Urolled GAN solved the problem of mode collapse [1] </b>
 </p>
 
 
