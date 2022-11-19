@@ -86,7 +86,7 @@ Optimizing the above term from discriminator's prospective, guarantees to reach 
 The goal of the discriminator is to estimate this ratio. This is shown in the following figure
 <p align="center">
   <img src="/GAN_Tutorial_img/dis_vs_gen.png" width="600" height="400"/><br>
-  <b> Discriminator shows in dotted blue line. The goal of the discriminator is to estimate the ratio between two distribution -- Figure taken from [1] </b>
+  <b> Discriminator shows in dotted blue line. The goal of the discriminator is to estimate the ratio between two distribution [1] </b>
 </p>
 
 In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
