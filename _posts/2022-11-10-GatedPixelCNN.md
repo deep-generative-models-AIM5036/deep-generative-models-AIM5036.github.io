@@ -184,6 +184,14 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 1. Language Modeling with Gated Convolutional Networks
 
 ---
+
+# Reference
+1. https://docs.google.com/presentation/d/1tYkGAnxPviU_HXpNMiSeaYtVKmWnMNMj956mLqXBB2Q/edit#slide=id.g1a9ca21d74_0_6839
+1. https://www.slideshare.net/suga93/conditional-image-generation-with-pixelcnn-decoders
+1. https://github.com/anantzoid/Conditional-PixelCNN-decoder
+1. https://towardsdatascience.com/pixelcnns-blind-spot-84e19a3797b9
+
 #### Reverse Footnote
 [^1]: Van Den Oord, Aäron, Nal Kalchbrenner, and Koray Kavukcuoglu. "Pixel recurrent neural networks." International conference on machine learning. PMLR, 2016.
 [^2]: linear interpolation
+
