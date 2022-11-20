@@ -3,8 +3,8 @@ layout: post
 title:  "GAN Tutorial"
 date:   2022-11-12
 author: Kim JeongHyeon, Khan Osama
-categories: Generative Adversarial Networks
-tags: GAN
+categories: GAN
+tags: Generative Adversarial Networks
 use_math: True
 published: True
 ---
