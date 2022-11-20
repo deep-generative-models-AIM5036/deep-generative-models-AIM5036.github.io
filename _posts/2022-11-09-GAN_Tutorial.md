@@ -27,7 +27,7 @@ Generative models refer to any model that takes a training set consisting of sam
 
 ## The GAN framework
 
-In GANs, there are two networks, the generators, and the discriminators. The generator's job is to generate a new sample from the latent vector, which is, in turn, sampled from some prior, and the discriminator's job is to learn to distinguish the fake image from the real image. Think of the generator as a counterfeiter, trying to make fake money, and the discriminator as police, trying to separate fake money from real one. To succeed in this game, the counterfeiter must learn to make money that is indistinguishable from real money. In other words, the generator model must learn to generate data from the same distribution as the data came.
+In GANs, there are two networks, the generators, and the discriminators. The generator's job is to generate a new sample from the latent vector, which is, in turn, sampled from some prior, and the discriminator's job is to learn to distinguish the fake image from the real image. Think of the generator as a counterfeiter, trying to make fake money, and the discriminator as police, trying to separate fake money from real one. To succeed in this game, the counterfeiter must learn to make money that is indistinguishable from real money. In other words, the generator model must learn to generate data from the distribution as the data originally came.
 The goal of the GAN is to optimize the following equation.
 
 <p align="center">
@@ -36,7 +36,7 @@ The goal of the GAN is to optimize the following equation.
   <b> Source: [3] </b>
 </p>
 
-`D(x)` represents the output from the discriminator, while `G(z)` represent the output from the generator. The first part tends to give a large negative number if the output of the discriminator for real data is not close to 1, while the second part gives a large negative number if the output of the discriminator for the fake data is not close to zero. By maximizing this term, the discriminator can successfully distinguish fake images from real ones. On the other hand, by minimizing this term, the generator can deceive the discriminator into considering the generated images as real ones. The generator can achieve this by making the output of `D(G(z))` close to 1 for fake images. This is shown below
+`D(x)` represents the output from the discriminator, while `G(z)` represents the output from the generator. The first part tends to give a large negative number if the output of the discriminator for real data is not close to 1, while the second part gives a large negative number if the output of the discriminator for the fake data is not close to zero. By maximizing this term, the discriminator can successfully distinguish fake images from real ones. On the other hand, by minimizing this term, the generator can deceive the discriminator into considering the generated images as real ones. The generator can achieve this by making the output of `D(G(z))` close to 1 for fake images. This is shown below
 
 <p align="center">
   <img src="/GAN_Tutorial_img/discriminator_vs_generator.png" />
@@ -57,7 +57,7 @@ Following are the steps to train a GAN model.
 For T steps of iterations, the training process will look something like
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/training_process.png" width="200" height="130"/>
+  <img src="/GAN_Tutorial_img/training_process.png" width="200" height="100"/>
   <br>
   <b> Source: [3] </b>
 </p>
@@ -75,7 +75,7 @@ The following figure further clarify this procedure
 
 ## Optimal Discriminator 
 
-Optimizing the above term from discriminator's prospective, guarantees to reach an optimal point, only when the generator learns the ratio between the p<sub>data</sub> and p<sub>model</sub>. We can write the loss function as 
+Optimizing the above term from discriminator's prospective, guarantees to reach an optimal point, only when the discriminator learns the ratio between the p<sub>data</sub> and p<sub>model</sub>. We can write the loss function as 
 
 <p align="center">
   <img src="/GAN_Tutorial_img/Derivative.png" />
@@ -86,19 +86,19 @@ Optimizing the above term from discriminator's prospective, guarantees to reach 
 The goal of the discriminator is to estimate this ratio. This is shown in the following figure
 <p align="center">
   <img src="/GAN_Tutorial_img/dis_vs_gen.png" width="600" height="400"/><br>
-  <b> Discriminator shows in dotted blue line. The goal of the discriminator is to estimate the ratio between two distribution - Source: [1] </b>
+  <b> Discriminator shown in dashed blue line. The goal of the discriminator is to estimate the ratio between two distribution - Source: [1] </b>
 </p>
 
-In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
+In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator distribution should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
 
 
 
 ## Non-Saturating Game
 
-At the beginning of the training, the discriminator gets confident about the fake images quite quickly, which causes a vanishing gradient problem for the generator. A vanishing gradient means that there will be no update for the generator, even for the bad samples. To fix this problem, we can change the equation for the generator from `log(1-D(G(z)))` to `-log(G(z))`. Considering a sigmoid function at the end of the discriminator network, we can see that the gradient is equal to zero at the beginning of the training. Modifying the sign reverse this phenomenon and brings the vanishing gradient problem for the real data. However, this is okay for real images, as this gradient is not used for updating the generator.This is show below
+At the beginning of the training, the discriminator gets confident about the fake images quite quickly, which causes a vanishing gradient problem for the generator. A vanishing gradient means that there will be no update for the generator, even for the bad samples. To fix this problem, we can change the equation for the generator from `log(1-D(G(z)))` to `-log(G(z))`. Considering a sigmoid function at the end of the discriminator network, we can see that the gradient is equal to zero at the beginning of the training. Modifying the sign reverse this phenomenon and brings the vanishing gradient problem for the real data. However, this is okay for real data, as this gradient is not used to update the generator. This is show below
 <p align="center">
   <img src="/GAN_Tutorial_img/non_saturating.png" /> <br>
-    <b> Solution to vanishing gradient - Source: [2] </b>
+    <b> The left figure shows the output of the sigmoid function and its gradient. The final layer of the discriminator is sigmoid function. The middle figure shows the default settings and the gradient under this default setting. Finally, the right most figure shows the solution to Solution to the vanishing gradient - Source: [2] </b>
 
 </p>
 
