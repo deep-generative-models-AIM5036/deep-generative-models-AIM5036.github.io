@@ -57,7 +57,7 @@ Following are the steps to train a GAN model.
 For T steps of iterations, the training process will look something like
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/training_process.png" width="200" height="100"/>
+  <img src="/GAN_Tutorial_img/training_process.png" width="100" height="100"/>
   <br>
   <b> Source: [3] </b>
 </p>
