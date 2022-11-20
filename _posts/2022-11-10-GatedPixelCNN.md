@@ -25,7 +25,7 @@ PixelRNN은 일반적으로 좋은 성능을 보여줍니다. 하지만, PixelCN
 # Gated PixelCNN
 저자들은 두 종류의 convolutional network stack을 결합하여 blind spot을 제거하였습니다.
 
-![stack](https://user-images.githubusercontent.com/60708119/200168243-1085adb4-34b1-4906-91c4-26ad22d510c0.png)
+<img src="https://user-images.githubusercontent.com/60708119/200168243-1085adb4-34b1-4906-91c4-26ad22d510c0.png" style="max-width: 50%">
 
 1. Vertical
   - 현재 픽셀 위에 있는 모든 행에 대한 정보를 가져옵니다.
@@ -35,7 +35,7 @@ PixelRNN은 일반적으로 좋은 성능을 보여줍니다. 하지만, PixelCN
 
 이를 통해, blind Spot을 없애고 PixelRNN과 같이 이전 모든 픽셀의 정보를 가져올 수 있습니다.
 
-![1_o4T2iVy6-YcXoxOF51-FEw](https://user-images.githubusercontent.com/60708119/200168422-662533b6-a580-4505-96c3-ebd78e5ca7df.png)
+<img src="https://user-images.githubusercontent.com/60708119/200168422-662533b6-a580-4505-96c3-ebd78e5ca7df.png" alt="1_o4T2iVy6-YcXoxOF51-FEw" style="max-width: 75%"> 
 
 ## Gated Activation
 
@@ -49,13 +49,14 @@ PixelCNN에도 Gated Activation을 사용하도록 디자인하였습니다.
 ## Single layer block in a Gated PixelCNN 
 ### Process 1: Calculate the vertical stack features maps
 
-![process1](https://user-images.githubusercontent.com/60708119/200169369-1e972f87-b12c-464e-b2dd-92755ca4cc00.png)
+<img src="https://user-images.githubusercontent.com/60708119/200169369-1e972f87-b12c-464e-b2dd-92755ca4cc00.png" alt="process1" style="max-width: 75%"> 
 
 Vertical stack의 입력은 vertical 마스크가 있는 3X3 합성곱 층에서 처리됩니다. 특성 맵의 결과는 gated activation unit을 통과하고 다음 vertical stack의 입력이 됩니다.
 
 ### Process 2: Feeding vertical maps into horizontal stack
 
-![process2](https://user-images.githubusercontent.com/60708119/200169417-e66d74bf-330c-4e18-a12d-91d5f5162d09.png)
+<img src="https://user-images.githubusercontent.com/60708119/200169417-e66d74bf-330c-4e18-a12d-91d5f5162d09.png" alt="process2" style="max-width: 75%">   
+
 
 Vertical stack 특성 맵은 1X1 합성곱 층에 의해 처리됩니다. 
 
@@ -63,19 +64,19 @@ Vertical stack 특성 맵은 1X1 합성곱 층에 의해 처리됩니다.
 
 이제, vertical과 horizontal stack의 정보를 결합하는 것이 필요합니다. Vertical stack은 horizontal layer의 입력 중 하나로도 사용됩니다. Vertical stack의 각 convolutional step의 중심은 analysed pixel에 해당됩니다. 따라서 그냥 vertical information을 추가하면 안됩니다. 이것은 future pixel의 정보가 vertical stack의 값을 예측하는데 사용될 수 있기 때문에 autoregressive model의 causality를 깨뜨립니다.
 
-![causality](https://user-images.githubusercontent.com/60708119/200169860-94cb73b3-32bb-4fc2-82f0-ffa9ffc386a2.png)   
+<img src="https://user-images.githubusercontent.com/60708119/200169860-94cb73b3-32bb-4fc2-82f0-ffa9ffc386a2.png" alt="causality" style="max-width: 50%">   
 
 따라서 vertical information을 horizontal stack에 전달하기 전에 padding과 cropping을 이용하여 이동시킵니다. 이미지를 zero-padding하고 이미지 하단을 자르면 vertical과 horizontal stack간의 causality가 유지되도록 할 수 있습니다.
 
 ### Process 3: Calculate horizontal feature maps
 
-![process3](https://user-images.githubusercontent.com/60708119/200169930-83637fc4-9fd1-4f18-94e6-acde25df3c07.png)  
+<img src="https://user-images.githubusercontent.com/60708119/200169930-83637fc4-9fd1-4f18-94e6-acde25df3c07.png" alt="process3" style="max-width: 75%">  
 
 Vertical stack에서 나온 특성 맵을 horizontal convolution layer의 결과와 더해줍니다. 특성 맵은 gated activation unit을 통과합니다. 이 출력을 모든 이전 픽셀의 정보를 고려하는 ideal receptive format을 갖습니다. 
 
 ### Process 4: Calculate the residual connection on the horizontal stack
 
-![process4](https://user-images.githubusercontent.com/60708119/200170159-5105fd14-2dd9-4c45-b739-b16038385954.png)  
+<img src="https://user-images.githubusercontent.com/60708119/200170159-5105fd14-2dd9-4c45-b739-b16038385954.png" alt="process4" style="max-width: 75%">  
 
 Residual connection은 이전 단계(processed by a 1X1 convolution)의 출력을 결합합니다. 신경망의 첫 번째 block에는 residual connection이 없고 이 단계를 건너뜁니다.
 
@@ -107,12 +108,13 @@ PixelCNN은 강력한 unconditional generative model이기 때문에 reconstruct
 ## Unconditional Modeling with Gated PixelCNN
 먼저, CIFAR-10 데이터 세트에 대해 Gated PixelCNN의 성능을 비교 분석하였습니다.
 
-![Table 1](https://user-images.githubusercontent.com/26114165/201047261-268a32a9-743b-471a-bc35-c75c01a182b6.png)
+
+<img src="https://user-images.githubusercontent.com/26114165/201047261-268a32a9-743b-471a-bc35-c75c01a182b6.png" alt="Table 1" style="max-width: 75%">
 *Table 1: CIFAR-10에 대해 여러 모델의 bits/dim(낮을수록 좋음) 성능, 괄호 안의 내용은 훈련할 때의 성능*
 
 Gated PixelCNN은 기존의 PixelCNN 보다 0.11 *bits/dim* 낮은 수치를 보여주며, 생성된 샘플의 시각적 품질에 상당한 영향을 주었습니다. 이는 PixelRNN과 거의 비슷한 수준의 성능을 보여주고 있습니다.
 
-![Table 2](https://user-images.githubusercontent.com/26114165/201047281-8db6ba45-261f-4a99-9241-bba0c54fc5d4.png)
+<img src="https://user-images.githubusercontent.com/26114165/201047281-8db6ba45-261f-4a99-9241-bba0c54fc5d4.png" alt="Table 2" style="max-width: 75%">
 *Table 2: ImageNet에 대해 여러 모델의 bits/dim(낮을수록 좋음) 성능, 괄호 안의 내용은 훈련할 때의 성능*
 
 그 다음에는 ImageNet 데이터 세트에 대해 Gated PixelCNN의 성능을 비교 분석하였습니다. 여기서 Gated PixelCNN은 PixelRNN보다 더 좋은 성능을 보여줍니다. 저자들은 Gated PixelCNN의 성능이 더 좋은 이유가 PixelRNN이 과소적합 되었기 때문이라고 말합니다. 이렇게 생각한 이유는 일반적으로 모델이 클수록 더 좋은 성능을 발휘하고 간단한 모델일수록 더 빠르게 학습되기 때문입니다.
@@ -187,8 +189,11 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 
 # Reference
 1. https://docs.google.com/presentation/d/1tYkGAnxPviU_HXpNMiSeaYtVKmWnMNMj956mLqXBB2Q/edit#slide=id.g1a9ca21d74_0_6839
+
 1. https://www.slideshare.net/suga93/conditional-image-generation-with-pixelcnn-decoders
+
 1. https://github.com/anantzoid/Conditional-PixelCNN-decoder
+
 1. https://towardsdatascience.com/pixelcnns-blind-spot-84e19a3797b9
 
 #### Reverse Footnote
