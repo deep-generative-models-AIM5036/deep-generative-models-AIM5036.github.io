@@ -16,7 +16,7 @@ This report summarizes the tutorial presented by Ian Goodfellow at NIPS in 2016.
 - How do GANs work?
 - What are some of the research frontiers in GANs?
 - What are some state-of-the-art image models that combine GANs with other methods?
-In this post, we will go through every single question and try to answer them as clearly as possible. To better grasp GANs, we modified the order of these questions.
+<br>In this post, we will go through every single question and try to answer them as clearly as possible. To better grasp GANs, we modified the order of these questions.
 
 
 # Internals of GANs
