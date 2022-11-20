@@ -30,7 +30,7 @@ $log p(X) = log p(f(X)) + log \vert det\frac{\partial z}{\partial x}\vert $
 [출처] Residual Flow [^1]
 
 또한 기존에 사용한 coupling block이나 ordinary differential equation 방법의 경우 강한 inductive bias를 야기하여 학습한 task이외의 task에는 적용하기 어렵다는 한계 역시 존재합니다.
-그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 $\colorbox{#FFFFB7}{\textbf{Residual Flow}}$ 모델입니다.   
+그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 Residual Flow 모델입니다.   
 
 ---
 
@@ -74,7 +74,7 @@ $$
 determinant의 log값을 trace로 변환할 수 있는 방법입니다. 
 
 $$
-    A = U \cdot D \cdot U^{-1}  &nbsp;    f(A) = U\cdot f(D) \cdot U^{-1} \\
+    A = U \cdot D \cdot U^{-1}  \qquad    f(A) = U\cdot f(D) \cdot U^{-1} \\
 $$
 
 $$
@@ -97,7 +97,7 @@ $$
 $$
     \begin{aligned}
         &=> det (exp (A)) = \prod_aexp(\lambda_a) = exp \sum_a\lambda_a = exp (tr(A)) \\
-        &=> det(J) = exp (tr(logJ)) &nbsp;  &nbsp; A = log J \\
+        &=> det(J) = exp (tr(logJ)) \qquad \qquad A = log J \\
         &=> log (det(J)) = tr(log J)
     \end{aligned}
 $$
@@ -110,7 +110,7 @@ $$
 $$
     \begin{aligned}
         log (1 + x) &= x - \frac{x^2}{2} + \frac{x^3}{3} - \frac{x^4}{4} + \cdots \\
-        &= \sum_{n=1}^{\infty}\frac{(-1)^{n+1}}{x}x^n &nbsp; &nbsp; &nbsp; for -1< x \leq 1
+        &= \sum_{n=1}^{\infty}\frac{(-1)^{n+1}}{x}x^n \qquad \qquad \qquad  for -1< x \leq 1
     \end{aligned}
 $$
 
