@@ -233,14 +233,14 @@ You can think of unrolled GANs as a way for generator to see in the future and f
 
 **References**
 
-[1] [https://arxiv.org/pdf/1701.00160.pdf] (Original Paper)
+[1] [ <a href="https://arxiv.org/pdf/1701.00160.pdf">Original Paper</a> ]
 
-[2] [https://sites.google.com/view/berkeley-cs294-158-sp20/home] (CS294)
+[2] [ <a href="https://sites.google.com/view/berkeley-cs294-158-sp20/home">CS294</a>] 
 
-[3] [https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2020/] (Deep Learning for Computer Vision)
+[3] [ <a href="https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2020"> Deep Learning for Computer Vision </a> ]
 
-[4] [https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987] (Training in GANs)
+[4] [ <a href="https://jonathan-hui.medium.com/gan-why-it-is-so-hard-to-train-generative-advisory-networks-819a86b3750b#4987"> Training in GANs </a>]
 
-[5] [https://jonathan-hui.medium.com/gan-whats-generative-adversarial-networks-and-its-application-f39ed278ef09] (GANs)
+[5] [ <a href="https://jonathan-hui.medium.com/gan-whats-generative-adversarial-networks-and-its-application-f39ed278ef09"> GANs </a>
 
 
