@@ -193,15 +193,15 @@ In reality, our data has multiple modes in the distribution, known as multi-moda
 
 Basically, we have two options to optimize the objective function for the GANs. One is 
 <p align="center">
-  <br>
-  <b> Source: [1] </b>
   <img src="/GAN_Tutorial_img/minmaxgenerator.png" width="100" height="80"/>
+    <br>
+  <b> Source: [1] </b>
 </p>
 while the other is 
 <p align="center">
-    <br>
-    <b> Source: [1] </b>
     <img src="/GAN_Tutorial_img/maxmingenerator.png" width="100" height="80"/>
+    <br>
+  <b> Source: [1] </b>
 </p>. 
 They are different, and optimizing them corresponds to optimizing two different functions. 
 
