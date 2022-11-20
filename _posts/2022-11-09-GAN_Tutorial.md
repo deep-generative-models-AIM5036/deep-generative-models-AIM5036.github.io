@@ -148,7 +148,7 @@ If the discriminator depends only on a small sets of features to identify the re
   <br>
   <b> Source: [3] </b>
 </p>
-Smoothing the labels for the fake samples will generate unexpected behaviors.
+Smoothing the labels for the fake samples will generate unexpected behaviors. 
 
 Batch Normalization (BN) creates a dependency between the samples in a batch when the size of the batch is quite small. This is problematic in GANs because when the size of the batch gets too small, the normalization constants in BN starts fluctuating. This will make the model dependent on these fluctuating constants rather than the input noise. The following figure shows this phenomenon
 <p align="center">
