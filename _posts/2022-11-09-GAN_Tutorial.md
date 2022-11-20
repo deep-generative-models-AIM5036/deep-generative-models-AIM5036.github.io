@@ -57,7 +57,7 @@ Following are the steps to train a GAN model.
 For T steps of iterations, the training process will look something like
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/training_process.png"  width="70" height="100"/>
+  <img src="/GAN_Tutorial_img/training_process.png" height="100"/>
   <br>
   <b> Source: [3] </b>
 </p>
@@ -193,13 +193,13 @@ In reality, our data has multiple modes in the distribution, known as multi-moda
 
 Basically, we have two options to optimize the objective function for the GANs. One is 
 <p align="center">
-  <img src="/GAN_Tutorial_img/minmaxgenerator.png" width="100" height="80"/>
+  <img src="/GAN_Tutorial_img/minmaxgenerator.png"/>
     <br>
   <b> Source: [1] </b>
 </p>
 while the other is 
 <p align="center">
-    <img src="/GAN_Tutorial_img/maxmingenerator.png" width="100" height="80"/>
+    <img src="/GAN_Tutorial_img/maxmingenerator.png"/>
     <br>
   <b> Source: [1] </b>
 </p>. 
