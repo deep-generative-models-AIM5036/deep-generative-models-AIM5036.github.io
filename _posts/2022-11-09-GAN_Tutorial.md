@@ -191,7 +191,7 @@ This clearly shows that some cost functions might not converge using gradient de
 
 In reality, our data has multiple modes in the distribution, known as multi-modal distributions. However, sometimes, the network can only consider some of these modes when generating images. This gives rise to the problem called model collapse. In model collapse, only a few modes of data are generated. 
 
-Basically, we have two options to optimize the objective function for the GANs. One is `min<sub>G</sub>max<sub>D</sub> V(G,D)` while the other is `max<sub>D</sub>min<sub>G</sub> V(G,D)`
+Basically, we have two options to optimize the objective function for the GANs. One is min<sub>G</sub>max<sub>D</sub> V(G,D) while the other is max<sub>D</sub>min<sub>G</sub> V(G,D)
 
 They are different, and optimizing them corresponds to optimizing two different functions. 
 
