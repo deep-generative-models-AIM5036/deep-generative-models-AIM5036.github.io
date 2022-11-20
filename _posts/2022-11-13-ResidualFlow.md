@@ -187,7 +187,7 @@ $$
 반대로 계산량을 줄이기 위해서 n의 값을 줄인다면 계산을 하지 않는 부분이 많아져 bias가 높아지게 되어 expressive와 bias사이의 trade-off가 발생하게 되는 것입니다.
 
 $$ 
-\sum_{k=1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)  = \textcolor{blue}{\sum_{k=1}^n (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)} + \textcolor{green}{\sum_{k=n+1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)}
+\sum_{k=1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)  = \color{blue}{\sum_{k=1}^n (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)} + \color{green}{\sum_{k=n+1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)}
 $$
 
 그래서 Residual Flow는 계산을 진행한 n을 미리 정하는 것이 아니라, 다음 계산을 계속 할지 그만둘지를 확률에 기반하여 선택하는 방법을 사용하였습니다. 
@@ -248,7 +248,7 @@ $$
 ##### 3.2 Memory-Efficient Backpropagation
 
 $$
-log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{\textcolor{blue}{\sum_{k=1}^{n}}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{\textcolor{red}{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
+log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{\color{blue}{\sum_{k=1}^{n}}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{\color{red}{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
 $$
 
 이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스(파란글씨)에서 n번의 계산을 해야하고, 두번째 박스(빨간글씨)에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
@@ -311,7 +311,7 @@ Backpropagation을 진행할 때 메모리 뿐만 아니라 activation derivativ
 그러나 Swish 함수의 경우 일차 미분값이 $\vert \frac{d}{dz}Swish(z)\vert  \lesssim 1.1$ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
 
 $$
-LipSwish(z) \coloneqq \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
+LipSwish(z) = \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
 $$
 
 이를 activation function으로 사용하였습니다. 이때 $\beta$ 값은 softplus를 통해 양수를 유지하도록 학습시켰습니다.
