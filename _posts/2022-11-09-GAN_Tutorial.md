@@ -181,7 +181,7 @@ The nature of the GAN settings is such that the two networks compete with each o
 
 The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
 <p align="center">
-  <img src="/GAN_Tutorial_img/oscillations.png" width="300" height="300"/><br>
+  <img src="/GAN_Tutorial_img/oscillations.png" width="200" height="300"/><br>
   <b> Optimization in game theory can result in sub-optimal structure - Source: [4]</b>
 </p>
 
@@ -195,13 +195,13 @@ Basically, we have two options to optimize the objective function for the GANs. 
 <p align="center">
   <br>
   <b> Source: [1] </b>
-  <img src="/GAN_Tutorial_img/minmaxgenerator.png" />
+  <img src="/GAN_Tutorial_img/minmaxgenerator.png" width="100" height="80"/>
 </p>
 while the other is 
 <p align="center">
     <br>
     <b> Source: [1] </b>
-    <img src="/GAN_Tutorial_img/maxmingenerator.png"/>
+    <img src="/GAN_Tutorial_img/maxmingenerator.png" width="100" height="80"/>
 </p>. 
 They are different, and optimizing them corresponds to optimizing two different functions. 
 
