@@ -253,7 +253,7 @@ $$
 
 이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스(파란글씨)에서 n번의 계산을 해야하고, 두번째 박스(빨간글씨)에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
 
-따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. $\mathbb{E}[\displaystyle\sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\frac{v^T[J_g(x)]^kv}{\mathbb{P}(N\geq k)}]$ 는 $log|det(I+J_g(x))|$를 추정한 값이므로 log determinant값을 backpropagation에 사용하는 것입니다. 
+따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. $\mathbb{E}[\displaystyle\sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\frac{v^T[J_g(x)]^kv}{\mathbb{P}(N\geq k)}]$ 는 $log \vert det(I+J_g(x))\vert$를 추정한 값이므로 log determinant값을 backpropagation에 사용하는 것입니다. 
 
 $$
 \begin{aligned}
@@ -306,7 +306,7 @@ Backpropagation을 진행할 때 메모리 뿐만 아니라 activation derivativ
 
 <img src="https://user-images.githubusercontent.com/76925973/200821177-8131b782-b746-445a-8b78-3295eba52e03.png"  width="400" >
 
-[출처] 
+[출처] Swish function [^6]
 
 그러나 Swish 함수의 경우 일차 미분값이 $\vert \frac{d}{dz}Swish(z)\vert  \lesssim 1.1$ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
 
