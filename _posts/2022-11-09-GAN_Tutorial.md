@@ -217,7 +217,7 @@ Initially, when we update the networks simultaneously, we do not consider the ma
 
 <p align="center">
   <img src="/GAN_Tutorial_img/mode_solved.png"  /><br>
-  <b> Urolled GAN solved the problem of mode collapse - Source [1] </b>
+  <b> Urolled GAN solved the problem of mode collapse in toy dataset - Source [1] </b>
 </p>
 
 You can think of unrolled GANs as a way for generator to see in the future and find out which direction the discriminator is taking it. This will help the generator not to focus on one discriminator only.
@@ -233,9 +233,9 @@ You can think of unrolled GANs as a way for generator to see in the future and f
 
 **References**
 
-[1] <a href="https://arxiv.org/pdf/1701.00160.pdf">Original Paper</a>
+[1] <a href="https://arxiv.org/pdf/1701.00160.pdf"> Original Paper </a>
 
-[2] <a href="https://sites.google.com/view/berkeley-cs294-158-sp20/home">CS294</a>
+[2] <a href="https://sites.google.com/view/berkeley-cs294-158-sp20/home"> CS294 </a>
 
 [3] <a href="https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2020"> Deep Learning for Computer Vision </a>
 
