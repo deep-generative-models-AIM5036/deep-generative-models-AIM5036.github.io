@@ -396,7 +396,7 @@ Residual Flow를 통해 생성된 이미지 샘플입니다. 왼쪽 이미지는
 
 CIFAR-10 데이터셋의 이미지 및 다른 모델을 통해 생성된 이미지와 함께 비교를 해보았습니다. 비록 PixelCNN이나 Variational Dequantized Flow++로 생성된 이미지들 보다 bits/dim은 오히려 안 좋은 결과를 보여주지만, 저자들은 log-likelihood가 이미지의 퀄리티와 정확하게 매치되는 것은 아니며, Residual Flow를 통해 생성된 이미지가 더 일관된 이미지를 잘 생성한다고 주장합니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/201392340-b1fe988b-fc04-4892-9cd9-08f3c16f4308.png"  width="200" >
+<img src="https://user-images.githubusercontent.com/76925973/201392340-b1fe988b-fc04-4892-9cd9-08f3c16f4308.png"   >
 
 [출처] Residual Flow [^1]
 
