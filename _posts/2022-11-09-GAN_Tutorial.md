@@ -33,7 +33,7 @@ The goal of the GAN is to optimize the following equation.
 <p align="center">
   <img src="/GAN_Tutorial_img/cost_function_equation.png" alt="factorio thumbnail"/>
   <br>
-  <b> Taken from [3] </b>
+  <b> Source: [3] </b>
 </p>
 
 `D(x)` represents the output from the discriminator, while `G(z)` represent the output from the generator. The first part tends to give a large negative number if the output of the discriminator for real data is not close to 1, while the second part gives a large negative number if the output of the discriminator for the fake data is not close to zero. By maximizing this term, the discriminator can successfully distinguish fake images from real ones. On the other hand, by minimizing this term, the generator can deceive the discriminator into considering the generated images as real ones. The generator can achieve this by making the output of `D(G(z))` close to 1 for fake images. This is shown below
@@ -41,7 +41,7 @@ The goal of the GAN is to optimize the following equation.
 <p align="center">
   <img src="/GAN_Tutorial_img/discriminator_vs_generator.png" />
   <br>
-  <b> Taken from [3] </b>
+  <b> Source: [3] </b>
 </p>
 
 
@@ -56,10 +56,10 @@ Following are the steps to train a GAN model.
 5. Update both the discriminator network and the generator network. 
 For T steps of iterations, the training process will look something like
 
-<p>
-  <img src="/GAN_Tutorial_img/training_process.png" width="300" height="130"/>
+<p align="center">
+  <img src="/GAN_Tutorial_img/training_process.png" width="200" height="130"/>
   <br>
-  <b> Taken from [3] </b>
+  <b> Source: [3] </b>
 </p>
 
 The following figure further clarify this procedure
@@ -68,7 +68,7 @@ The following figure further clarify this procedure
   <p>
     <img src="/GAN_Tutorial_img/full_picture.png" />
     <br>
-    <b> Discriminator (left) and Generator (right) [1] </b>
+    <b> Discriminator (left) and Generator (right) - Source: [1] </b>
   </p>
  </center>
 
@@ -80,13 +80,13 @@ Optimizing the above term from discriminator's prospective, guarantees to reach 
 <p align="center">
   <img src="/GAN_Tutorial_img/Derivative.png" />
   <br>
-  <b> Taken from [3] </b>
+  <b> Source: [3] </b>
 </p>
 
 The goal of the discriminator is to estimate this ratio. This is shown in the following figure
 <p align="center">
   <img src="/GAN_Tutorial_img/dis_vs_gen.png" width="600" height="400"/><br>
-  <b> Discriminator shows in dotted blue line. The goal of the discriminator is to estimate the ratio between two distribution [1] </b>
+  <b> Discriminator shows in dotted blue line. The goal of the discriminator is to estimate the ratio between two distribution - Source: [1] </b>
 </p>
 
 In order for the generator to align the p<sub>model</sub> distribution with the p<sub>data</sub>, the generator value should move towards the direction that increases the value of `D(G(z))`. This also shows that the discriminator and generator are in a cooperative rather than adversarial setting, as the discriminator finds the ratio between the distributions, and then guides the generator to climb up this ratio. 
@@ -98,7 +98,7 @@ In order for the generator to align the p<sub>model</sub> distribution with the 
 At the beginning of the training, the discriminator gets confident about the fake images quite quickly, which causes a vanishing gradient problem for the generator. A vanishing gradient means that there will be no update for the generator, even for the bad samples. To fix this problem, we can change the equation for the generator from `log(1-D(G(z)))` to `-log(G(z))`. Considering a sigmoid function at the end of the discriminator network, we can see that the gradient is equal to zero at the beginning of the training. Modifying the sign reverse this phenomenon and brings the vanishing gradient problem for the real data. However, this is okay for real images, as this gradient is not used for updating the generator.This is show below
 <p align="center">
   <img src="/GAN_Tutorial_img/non_saturating.png" /> <br>
-    <b> Solution to vanishing gradient [2] </b>
+    <b> Solution to vanishing gradient - Source: [2] </b>
 
 </p>
 
@@ -115,7 +115,7 @@ GAN minimizes the Jensen-Shannon divergence(JSD) between the p<sub>data</sub> an
 <p align="center">
   <img src="/GAN_Tutorial_img/jsd.png" alt="factorio thumbnail"/>
   <br>
-  <b> Taken from [3] </b>
+  <b> Source: [3] </b>
 </p>
 
 We can see that minimizing the main loss function of GANs, indeed, minimizes the JSD between the two distributions. Alternatively, we can also modify the generative models to minimize the Kullback–Leibler divergence (KL) between the two distributions. This would allow the GAN to do maximum likeliood learning. In order to do so, we need to change the loss function for the generator. Specifically, changing the loss function for the generator to the following loss function will allow the GAN to minimize the KL divergence.
@@ -123,7 +123,7 @@ We can see that minimizing the main loss function of GANs, indeed, minimizes the
 <p align="center">
   <img src="/GAN_Tutorial_img/new_cost_mle.png" alt="factorio thumbnail"/>
     <br>
-  <b> Taken from [3] </b>
+  <b> Source: [3] </b>
 </p>
 
 
@@ -131,7 +131,7 @@ We can see that minimizing the main loss function of GANs, indeed, minimizes the
 
 <p align="center">
   <img src="/GAN_Tutorial_img/divergences.png" alt="factorio thumbnail"/><br>
-  <b> The choice of divergence defines the optimization behavior [2] </b>
+  <b> The choice of divergence defines the optimization behavior - Source: [2] </b>
 
 </p>
 
@@ -146,14 +146,14 @@ If the discriminator depends only on a small sets of features to identify the re
 <p align="center">
   <img src="/GAN_Tutorial_img/loss_function.png" alt="factorio thumbnail"/>
   <br>
-  <b> Taken from [3] </b>
+  <b> Source: [3] </b>
 </p>
 Smoothing the labels for the fake samples will generate unexpected behaviors.
 
 Batch Normalization creates a dependency between the samples in a batch. This results in generated images that are not independent of each other. The following figure shows this phenomenon
 <p align="center">
   <img src="/GAN_Tutorial_img/batch_norm.png" alt="factorio thumbnail" width="500" height="500"/> <br>
-  <b> Dependence between different images in a same batch [1] </b>
+  <b> Dependence between different images in a same batch - Source:[1] </b>
 
 </p>
 
@@ -182,7 +182,7 @@ The nature of the GAN settings is such that the two networks compete with each o
 The nash equilibrium of this state reaches when `x=y=0`. The following figure shows the result of gradient descent on the above function. 
 <p align="center">
   <img src="/GAN_Tutorial_img/oscillations.png" width="300" height="300"/><br>
-  <b> Optimization in game theory can result in sub-optimal structure [4]</b>
+  <b> Optimization in game theory can result in sub-optimal structure - Source: [4]</b>
 </p>
 
 This clearly shows that some cost functions might not converge using gradient descent.
@@ -194,13 +194,13 @@ In reality, our data has multiple modes in the distribution, known as multi-moda
 Basically, we have two options to optimize the objective function for the GANs. One is 
 <p align="center">
   <br>
-  <b> Taken from [1] </b>
+  <b> Source: [1] </b>
   <img src="/GAN_Tutorial_img/minmaxgenerator.png" />
 </p>
 while the other is 
 <p align="center">
     <br>
-    <b> Taken from [1] </b>
+    <b> Source: [1] </b>
     <img src="/GAN_Tutorial_img/maxmingenerator.png"/>
 </p>. 
 They are different, and optimizing them corresponds to optimizing two different functions. 
@@ -211,7 +211,7 @@ What we want the network to do is `minmax`; however, since we update the network
 
 <p align="center">
   <img src="/GAN_Tutorial_img/model_collapse.png" /><br>
-  <b> Mode collapse in toy dataset -- [1] </b>
+  <b> Mode collapse in toy dataset - Source: [1] </b>
 </p>
 
 The generator visits one mode after another instead of learning to visit all different modes. The generator will identify some modes that the discriminator believes are highly likely and place all of its mass there, and then the discriminator will learn not to be fooled by going to only a single mode. Instead of the generator learning to use multiple modes, the generator will switch to a different mode, and this cycle goes on.
@@ -224,7 +224,7 @@ Initially, when we update the networks simultaneously, we do not consider the ma
 
 <p align="center">
   <img src="/GAN_Tutorial_img/mode_solved.png"  /><br>
-  <b> Urolled GAN solved the problem of mode collapse [1] </b>
+  <b> Urolled GAN solved the problem of mode collapse - Source [1] </b>
 </p>
 
 
