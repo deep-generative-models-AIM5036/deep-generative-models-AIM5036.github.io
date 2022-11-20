@@ -6,7 +6,6 @@ author: Kim JeongHyeon, Khan Osama
 categories: GAN
 tags: Generative Adversarial Networks
 use_math: True
-published: True
 ---
 
 # Content
@@ -57,7 +56,7 @@ Following are the steps to train a GAN model.
 For T steps of iterations, the training process will look something like
 
 <p align="center">
-  <img src="/GAN_Tutorial_img/training_process.png" height="100"/>
+  <img src="/GAN_Tutorial_img/training_process.png" />
   <br>
   <b> Source: [3] </b>
 </p>
