@@ -22,7 +22,7 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 이 예시로 흔히 보신 것은 -1~1 사이에 점을 무수히 많이 찍어서, 원 범위 안에 있는 점의 개수를 구한 뒤, 원주율을 근사하는 것이 있을 것 같습니다.
 실제로 적절한 무작위 생성이 있다면 시행 횟수가 늘어남에 따라 실제 원주율 값에 근사하는 것을 보실 수 있습니다.
 
-<p align="center" width="100%">
+<p align="center" width="50%">
     <img width="65%" src="/assets/MCMCandVI/monte_carlo.png">
 </p>
 
@@ -30,7 +30,7 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향이 가도록 구성된 체인입니다.
 간단한 예시를 들자면, 어제 비가 왔을 때 오늘 비가 올 확률과 오지 않을 확률이 있고 - 어제 비가 오지 않았을 때 오늘 비가 올 확률과 오지 않을 확률이 제시된 상황을 생각해보시면 됩니다.
 
-<p align="center" width="100%">
+<p align="center" width="40%">
     <img width="65%" src="/assets/MCMCandVI/markov_chain.png">
 </p>
 
@@ -80,8 +80,5 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 ## MCMC and Auxiliary Variables
 논문 내용의 시작은 VI에서 시작합니다.
 VI에서 얻어온 식 (1)과 (2) 두개를 바탕으로,
-$\begin{align}
-\log {p(x)} &\geq \log{p(x)} - D_{KL}(q_\theta(z|x)||p(z|x)) \\
-            &= \Bbb{E}_{q_\theta(z|x)}[\log{p(x,z)}-\log{q_\theta(z|x)}]=\mathcal{L}.
-\end{align}$
+$\begin{align}\log {p(x)} &\geq \log{p(x)} - D_{KL}(q_\theta(z|x)||p(z|x)) \\ &= \Bbb{E}_{q_\theta(z|x)}[\log{p(x,z)}-\log{q_\theta(z|x)}]=\mathcal{L}.\end{align}$
 ㅇㅇ
