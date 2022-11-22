@@ -24,7 +24,7 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 
 <figure style="width:50%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/monte_carlo.png">
-	<figcaption><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처](https://post.naver.com/viewer/postView.nhn?memberNo=11439725&volumeNo=7401749)</p></figcaption>
+	<figcaption><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처: 네이버 블로그](https://post.naver.com/viewer/postView.nhn?memberNo=11439725&volumeNo=7401749)</p></figcaption>
 </figure>
 
 
@@ -32,7 +32,10 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향이 가도록 구성된 체인입니다.
 간단한 예시를 들자면, 어제 비가 왔을 때 오늘 비가 올 확률과 오지 않을 확률이 있고 - 어제 비가 오지 않았을 때 오늘 비가 올 확률과 오지 않을 확률이 제시된 상황을 생각해보시면 됩니다.
 
-<img style="width:40%; margin-left:auto; margin-right:auto; display:block;" src="/assets/MCMCandVI/markov_chain.png">
+<figure style="width:40%; margin-left:auto; margin-right:auto; display:block;">
+	<img src="/assets/MCMCandVI/markov_chain.png">
+	<figcaption><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처: wikipedia](https://en.wikipedia.org/wiki/Markov_chain)</p></figcaption>
+</figure>
 
 #### Monte Carlo + Markov Chain
 둘을 결합한 Markov Chain Monte Carlo는, Markov Chain에서의 확률을 바탕으로 실제로 무작위 샘플링을 통해 시뮬레이션하는 Monte Carlo식으로 하는 것입니다.
@@ -79,13 +82,23 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 
 ## MCMC and Auxiliary Variables
 논문 내용의 시작은 VI에서 시작합니다.
-VI에서 얻어온 식 (1)과 (2) 두개를 바탕으로,
+VI에서 얻어온 아래 식 (1)과 (2) 두 개를 바탕으로 시작합니다.
 
 $$\begin{align}
 \log {p(x)} &\geq \log{p(x)} - D_{KL}(q_\theta(z|x)||p(z|x)) \\ 
 &= \Bbb{E}_{q_\theta(z|x)}[\log{p(x,z)}-\log{q_\theta(z|x)}]=\mathcal{L}.
 \end{align}$$
 
-ㅇㅇ
+이제 여기에 $y=z_0, z_1, ..., z_{t-1}$ 인 auxiliary random variable $y$를 도입합니다.
+그렇다면 $q(z|x)=q(z_0|x)\prod_{t=1}^{T}q(z_t|z_{t-1},x)$임을 볼 수 있습니다.
 
-$W$ ㅇㅇ
+위 식을 식 (2)에 대입한다면,
+\begin{align}
+\mathcal{L}_{\text{aux}} \\
+&= \Bbb{E}_{q(y, z_T|x)}[\log[p(x,z_T)r(y|x,z_T)]-\log{q(y,z_T|x)}] \nonumber \\ 
+&= \mathcal{L} - \Bbb{E}_{q(z_T|x)}\{D_{KL}[q(y|z_T,x)||r(y|z_T,x))]\} \nonumber \\
+&\leq \mathcal{L} \leq \log[p(x)] \nonumber 
+\end{align}
+식을 얻을 수 있습니다.
+이 식에서는 markov chain을 거쳐서 연쇄적으로 $z$를 $z_0$에서 $z_{t-1}$로 가는 과정을 auxiliary variable의 도입으로 보충해준 식이라 보시면 됩니다.
+즉, 이 과정 전체에 대해서 $z$ 자리에 $z_T$값을 넣을 수 없기 때문에 보조 변수를 도입해서 그 사이의 상관관계를 설명할 수 있는 새로운 분포를 넣어준 것입니다.
