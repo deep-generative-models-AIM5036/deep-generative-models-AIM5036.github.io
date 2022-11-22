@@ -23,10 +23,12 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 실제로 적절한 무작위 생성이 있다면 시행 횟수가 늘어남에 따라 실제 원주율 값에 근사하는 것을 보실 수 있습니다.
 
 <p align="center" width="100%">
-<div style="width:50%;">
-<img src="/assets/MCMCandVI/monte_carlo.png">
+<div style="width:50%">
+<img style="margin-left:auto; margin-right:auto; display:block;" src="/assets/MCMCandVI/monte_carlo.png">
 </div>
 </p>
+
+<img style="width:50%; margin-left:auto; margin-right:auto; display:block;" src="/assets/MCMCandVI/monte_carlo.png">
 
 
 #### Markov Chain
