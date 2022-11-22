@@ -80,5 +80,12 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 ## MCMC and Auxiliary Variables
 논문 내용의 시작은 VI에서 시작합니다.
 VI에서 얻어온 식 (1)과 (2) 두개를 바탕으로,
-$\begin{align}\log {p(x)} &\geq \log{p(x)} - D_{KL}(q_\theta(z|x)||p(z|x)) \\ &= \Bbb{E}_{q_\theta(z|x)}[\log{p(x,z)}-\log{q_\theta(z|x)}]=\mathcal{L}.\end{align}$
+
+$$\begin{align}
+\log {p(x)} &\geq \log{p(x)} - D_{KL}(q_\theta(z|x)||p(z|x)) \\ 
+&= \Bbb{E}_{q_\theta(z|x)}[\log{p(x,z)}-\log{q_\theta(z|x)}]=\mathcal{L}.
+\end{align}$$
+
 ㅇㅇ
+
+$W$ ㅇㅇ
