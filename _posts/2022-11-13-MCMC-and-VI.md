@@ -121,7 +121,9 @@ $$\begin{align}
 
 를 얻을 수 있습니다.
 
-앞서 설명드렸듯 $r$이 markov rule를 따르는 상황에서 정리한 식 (4)에서, $$\sum_{t=1}^{T}\log[r_t(z_{t-1}|x,z_t)/q_t(z_t|x,z_{t-1})]$$ 부분을 확인하면 $r_t$가 $q_t$의 inverse model임을 볼 수 있습니다.
+앞서 설명드렸듯 $r$이 markov rule를 따르는 상황에서 정리한 식 (4)에서, $$
+\sum_{t=1}^{T}\log[r_t(z_{t-1}|x,z_t)/q_t(z_t|x,z_{t-1})]
+$$ 부분을 확인하면 $r_t$가 $q_t$의 inverse model임을 볼 수 있습니다.
 
 이 식 (4)를 활용하면 논문에 제시된 Algorithm 1인 MCMC 단계별 하한값을 구할 수 있게 됩니다.
 
