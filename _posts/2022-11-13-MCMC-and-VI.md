@@ -22,7 +22,6 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 이 예시로 흔히 보신 것은 -1~1 사이에 점을 무수히 많이 찍어서, 원 범위 안에 있는 점의 개수를 구한 뒤, 원주율을 근사하는 것이 있을 것 같습니다.
 실제로 적절한 무작위 생성이 있다면 시행 횟수가 늘어남에 따라 실제 원주율 값에 근사하는 것을 보실 수 있습니다.
 
-<<<<<<< HEAD
 <figure style="width:50%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/monte_carlo.png">
 	<figcaption style="text-align:center;"><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처: 네이버 블로그](https://post.naver.com/viewer/postView.nhn?memberNo=11439725&volumeNo=7401749)</p></figcaption>
@@ -79,7 +78,6 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 
 이러한 MCMC의 단점을 해결하는 것은 더 좋은 Markov Chain을 구성하는 것, 즉 더 나은 샘플링 기법을 고안하는 것입니다.
 이를 위해서는 본 논문에 제시된 Gibbs Sampling, Over-relaxation 등을 포함하여 Hamiltonian MC(HMC) 등의 많은 기법이 연구되고 있으며 Jiaming Song (2017) A-NICE-MC: Adversarial Training for MCMC 과 같은 관련 논문도 제시되고 있습니다.
-<<<<<<< HEAD
 
 
 ## MCMC and Auxiliary Variables
@@ -136,7 +134,8 @@ q_t(z_t|x,z_{t-1})]$
 
 이 알고리즘은 unbised, 즉 모델의 평균과 실제의 차이인 bias가 0인, 평균 자체는 정확한 값을 얻어낸다고 합니다. 따라서 평균은 같은 점을 활용해서 여기에  $z_t=g_\theta(u_t,x)$의 reparameterization trick를 적용하면 다음 Algorithm 2를 진행할 수 있게 됩니다.
 
-<figure style="width:80%; margin-left:auto; margin-right:auto; display:block;">
+
+<figure style="width:70%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/algo2.png">
 	<figcaption style="text-align:center;"><p markdown="1">논문 내 Algorithm 2</p></figcaption>
 </figure>
@@ -154,7 +153,8 @@ q_t(z_t|x,z_{t-1})]$
 이 때 $\alpha=0$인 경우 이 방법이 깁스 샘플링과 완전히 동일해집니다.
 
 논문에서는 추정하기로는 실험치인 $\alpha=-0.76$을 활용했을 때 over-relaxation method가 깁스 샘플링에 비해 상당히 빠르게 수렴하는 형태를 보여주었다고 합니다.
-<figure style="width:70%; margin-left:auto; margin-right:auto; display:block;">
+
+<figure style="width:75%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/fig1.png">
 	<figcaption style="text-align:center;"><p markdown="1">논문 내 Figure 1</p></figcaption>
 </figure>
@@ -186,13 +186,13 @@ MCMC 중에서 Hamiltonian MC가 널리 사용되고 있음에 착안해서, MCM
 그래서 이를 바탕으로 HVI 알고리즘을 만들었고, 그 내용은 아래와 같습니다.
 
 <figure style="width:70%; margin-left:auto; margin-right:auto; display:block;">
-	<img src="/assets/MCMCandVI/fig1.png">
+	<img src="/assets/MCMCandVI/algo3.png">
 	<figcaption style="text-align:center;"><p markdown="1">논문 내 Algorithm 3</p></figcaption>
 </figure>
 
 ## Experiment
 
-<figure style="width:70%; margin-left:auto; margin-right:auto; display:block;">
+<figure style="width:50%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/exp.png">
 	<figcaption style="text-align:center;"><p markdown="1">논문 내 성능 비교</p></figcaption>
 </figure>
