@@ -22,7 +22,7 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 이 예시로 흔히 보신 것은 -1~1 사이에 점을 무수히 많이 찍어서, 원 범위 안에 있는 점의 개수를 구한 뒤, 원주율을 근사하는 것이 있을 것 같습니다.
 실제로 적절한 무작위 생성이 있다면 시행 횟수가 늘어남에 따라 실제 원주율 값에 근사하는 것을 보실 수 있습니다.
 
-<div style="width:50%" align="center"><img src="/assets/MCMCandVI/monte_carlo.png"></div>
+<div style="text-align:center; width:50%;" align="center"><img src="/assets/MCMCandVI/monte_carlo.png"></div>
 
 
 #### Markov Chain
