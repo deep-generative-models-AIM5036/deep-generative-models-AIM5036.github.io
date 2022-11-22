@@ -24,8 +24,7 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 
 <figure>
 	<img style="width:50%; margin-left:auto; margin-right:auto; display:block;" src="/assets/MCMCandVI/monte_carlo.png">
-	<figcaption><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처](https://post.naver.com/viewer/postView.nhn?memberNo=11439725&volumeNo=7401749)
-	</p></figcaption>
+	<figcaption>Monte Carlo 방법으로 원주율 추측, <a href="https://post.naver.com/viewer/postView.nhn?memberNo=11439725&volumeNo=7401749">[출처]</a></figcaption>
 </figure>
 
 
