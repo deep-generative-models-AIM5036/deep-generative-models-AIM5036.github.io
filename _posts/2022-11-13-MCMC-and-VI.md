@@ -22,14 +22,14 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 이 예시로 흔히 보신 것은 -1~1 사이에 점을 무수히 많이 찍어서, 원 범위 안에 있는 점의 개수를 구한 뒤, 원주율을 근사하는 것이 있을 것 같습니다.
 실제로 적절한 무작위 생성이 있다면 시행 횟수가 늘어남에 따라 실제 원주율 값에 근사하는 것을 보실 수 있습니다.
 
-<div style="width:50%; text-align:center;"><img src="/assets/MCMCandVI/monte_carlo.png"></div>
+<div style="width:50%" align="center"><img src="/assets/MCMCandVI/monte_carlo.png"></div>
 
 
 #### Markov Chain
 Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향이 가도록 구성된 체인입니다.
 간단한 예시를 들자면, 어제 비가 왔을 때 오늘 비가 올 확률과 오지 않을 확률이 있고 - 어제 비가 오지 않았을 때 오늘 비가 올 확률과 오지 않을 확률이 제시된 상황을 생각해보시면 됩니다.
 
-<div style="width:40%; text-align:center;"><img src="/assets/MCMCandVI/markov_chain.png"></div>
+<div style="width:40%" align="center"><img src="/assets/MCMCandVI/markov_chain.png"></div>
 
 #### Monte Carlo + Markov Chain
 둘을 결합한 Markov Chain Monte Carlo는, Markov Chain에서의 확률을 바탕으로 실제로 무작위 샘플링을 통해 시뮬레이션하는 Monte Carlo식으로 하는 것입니다.
