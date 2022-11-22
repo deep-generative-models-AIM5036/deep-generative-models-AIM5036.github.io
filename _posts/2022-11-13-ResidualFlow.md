@@ -3,7 +3,7 @@ layout: post
 title:  "Residual Flows for Invertible Generative Modeling"
 date:   2022-11-13
 author: 이민영, 이주엽
-categories: Flow
+categories: Flow Models
 use_math: true
 ---
 
@@ -19,10 +19,15 @@ use_math: true
 ### 1. Introduction
 Flow-based Generative model은 latent variable $z$를 역변환하여(invertible transformation) 데이터 $x$의 분포를 학습하는 생성모델 방법 중 하나입니다. 
 역변환을 할 때 사용되는 개념이 change of variable로 뒤에서 한번 더 설명드리겠지만, 데이터 $x$의 확률을 
-$log p(X) = log p(f(X)) + log |det\frac{\partial z}{\partial x}|$
+$log p(X) = log p(f(X)) + log \vert det\frac{\partial z}{\partial x}\vert $
 의 형태로 계산합니다. 이때 필요한 조건은 $Z = f(X)$를 만족하는 $f(X)$가 invertible해야 한다는 것입니다.   
 
-역변환을 계산하는 과정에서는 함수 f(X)에 대한 자코비안(Jacobian)을 계산하게 되는데, 기존 flow-based model에서는 계산을 쉽게 하기 위해 자코비안 행렬이 sparse하거나 삼각행렬과 같은 특수한 모양이 나오도록 하였습니다. 그러나, 자코비안이 sparse하거나 특정 모양을 따르게 되면 효율적으로 계산을 할 수는 있지만, 그런 조건을 만족시키는 함수 $f(X)$를 설계하는 것이 어렵고 비용이 많이 발생한다는 단점이 있습니다.   
+역변환을 계산하는 과정에서는 함수 f(X)에 대한 자코비안(Jacobian)을 계산하게 되는데, 기존 flow-based model에서는 계산을 쉽게 하기 위해 아래 그림과 같이 자코비안 행렬이 sparse하거나 삼각행렬과 같은 특수한 모양이 나오도록 하였습니다. 그러나, 자코비안이 sparse하거나 특정 모양을 따르게 되면 효율적으로 계산을 할 수는 있지만, 그런 조건을 만족시키는 함수 $f(X)$를 설계하는 것이 어렵고 비용이 많이 발생한다는 단점이 있습니다.   
+
+
+<img src="https://user-images.githubusercontent.com/76925973/202884711-1c7405df-d57b-4274-a417-be9bb467ffd9.png"  width="400" >
+
+[출처] Residual Flow [^1]
 
 또한 기존에 사용한 coupling block이나 ordinary differential equation 방법의 경우 강한 inductive bias를 야기하여 학습한 task이외의 task에는 적용하기 어렵다는 한계 역시 존재합니다.
 그래서 이런 기존의 flow-based model이 가진 단점을 해결하고자 한 것이 Residual Flow 모델입니다.   
@@ -33,20 +38,20 @@ $log p(X) = log p(f(X)) + log |det\frac{\partial z}{\partial x}|$
 Residual Flow 모델을 알아보기에 앞서 이해하는데 도움이 될 몇가지 개념들을 간단히 소개하도록 하겠습니다.   
 
 ##### 2.1. Change of Variable
-random variable X와 Z가 $X \~ p(x)$,  $Z \~ p(z)$ 의 분포를 따른다고 할때
+random variable X와 Z가 $X \thicksim p(x)$,  $Z \thicksim p(z)$ 의 분포를 따른다고 할때
 $X = f(Z)$이면 $Z = f^{-1}(X)$가 되어 다음과 같이 변환할 수 있습니다.
 
 $$
 \begin{align}
-    p(x) &= p(z)|\frac{dz}{dx}| \\
-    &= p(f(x))det|\frac{df(x)}{dx}|
+    p(x) &= p(z)\vert \frac{dz}{dx}\vert  \\
+    &= p(f(x))det\vert \frac{df(x)}{dx}\vert 
 \end{align}
 $$
 
 이를 이용하여 데이터에 대한 log density인 $log p(x)$는 다음과 같이 표현됩니다.
 
 $$
-log p(x) = log p(f(x)) + log |det\frac{df(x)}{dx}|
+log p(x) = log p(f(x)) + log \vert det\frac{df(x)}{dx}\vert 
 $$
 
 이러한 change of variable은 flow-based model의 핵심으로 이때 $f(x)$는 invertible한 함수여야 합니다.   
@@ -60,7 +65,7 @@ change of variable을 통해 flow-based generative model은 ELBO를 통해 간�
 립시츠 조건은 어떤 함수 내 임의의 두 점사이의 거리가 일정 비 이상이 되지 않도록 하는 조건으로 다음 식과 같이 나타낼 수 있고, 식에서 두 점 사이의 거리의 비를 제한한 상수 k를 립시츠 상수(Lipschitz constant)라고 합니다.
 
 $$
-\frac{|f(x_1)-f(x_2)|}{|x_1 - x_2|} \leq k
+\frac{\vert f(x_1)-f(x_2)\vert }{\vert x_1 - x_2\vert } \leq k
 $$
 
 
@@ -131,7 +136,7 @@ $$
         &= tr(A \cdot E(zz^T)) \\
         &= E[tr(Azz^T)] \\
         &= E[z^TAz] \\ 
-        z ~ Gaussian
+        z \thicksim Gaussian
     \end{aligned}
 $$
 
@@ -145,13 +150,15 @@ $$
 
 ##### 2.8 Invertible Residual Network (i-ResNet)
 
-i-ResNet[^1]은 image classification에서 사용되는 Residual Netowrk를 invertible하게 만들 수 있는 방법을 제안한 모델입니다.
+i-ResNet[^2]은 image classification에서 사용되는 Residual Netowrk를 invertible하게 만들 수 있는 방법을 제안한 모델입니다.
 Residual Network의 경우 $f(x) = x + g(x)$의 형태로 네트워크가 구성되어 있는데, 
-$g(x)$ 함수에 임의의 두 점에 대해 그 거리의 비가 1보다 작거나 같아야 한다는 unity Lipschitz constraint를 주어 inverible하게 만들었습니다. 
+$g(x)$ 함수에 임의의 두 점에 대해 그 거리의 비가 1보다 작거나 같아야 한다는 unity Lipschitz constraint를 주어 invertible하게 만들었습니다. 
+
+바나흐 고정점 정리에 의하면 두 점 사이의 거리가 1보다 작다는 조건을 만족하는 함수에 대해서 각 점들은 서로 다른 고정된 한 값을 같게 됩니다. 즉 일대일 대응을 만족하는 함수가 되기 때문에 립시츠 조건을 만족하게 되면 invertible할 수 있게 되는 것입니다.
 
 $$
     \begin{aligned}
-        log(p(x)) &= log(p(f(x)) + log(|det(J_F(x))|) \\
+        log(p(x)) &= log(p(f(x)) + log(\vert det(J_F(x))\vert ) \\
         &= log(p(f(x))) + tr(log(J_F(x)))    \because (2.3 Log det(J) = tr(log J))   \\
         &= log(p(f(x))) + tr(log(I + J_g(x))))  \because (ResNet) \\
         &= log(p(f(x))) + tr(\sum_{k=1}^\infty \frac{(-1)^{k+1}}{k}[J_g(x)]^k) \because (2.4 Newton-Mercator series) \\
@@ -176,11 +183,11 @@ $$
 식에서 박스가 쳐진 부분은 무한급수의 형태로 계산하기가 어렵다는 한계가 있었습니다.
 그래서 이를 해결하고자 기존의 방법들은 $n$번째까지만 계산하여 무한 급수의 값을 추정하는 방법을 사용하였습니다.
 그러나 이때 $n+1$번째이후로의 계산되는 부분이 bias값이 되어 biased estimator를 사용할 수 밖에 없었습니다.
-아래 식에서 우항 첫번째 부분은 급수를 추정하기 위해 사용되는 1부터 n번째까지의 합이고, 우항의 두번째 부분은 계산을 생략한 n+1번째부터의 합을 의미하는데, 여기서 추정값의 표현력을 높이기 위해서는 n의 값을 키워 더 많은 값을 계산할 수 있지만 n이 커질수록 계산량이 늘어나게 됩니다.
+아래 식에서 파란색 부분이 급수를 추정하기 위해 사용되는 1부터 n번째까지의 합이고, 초록색 부분은 계산을 생략한 n+1번째부터의 합을 의미하는데, 여기서 추정값의 표현력을 높이기 위해서는 n의 값을 키워 더 많은 값을 계산할 수 있지만 n이 커질수록 계산량이 늘어나게 됩니다.
 반대로 계산량을 줄이기 위해서 n의 값을 줄인다면 계산을 하지 않는 부분이 많아져 bias가 높아지게 되어 expressive와 bias사이의 trade-off가 발생하게 되는 것입니다.
 
 $$ 
-\sum_{k=1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)  = {\sum_{k=1}^n (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)} + {\sum_{k=n+1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)}
+\sum_{k=1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)  = \color{blue}{\sum_{k=1}^n (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)} + \color{green}{\sum_{k=n+1}^\infty (\frac{(-1)^{k+1}}{k}[J_g(x)]^k)}
 $$
 
 그래서 Residual Flow는 계산을 진행한 n을 미리 정하는 것이 아니라, 다음 계산을 계속 할지 그만둘지를 확률에 기반하여 선택하는 방법을 사용하였습니다. 
@@ -233,18 +240,20 @@ $$
 
 그 결과가 아래에 있는 그림을 통해 확인할 수 있는데, 기존 i-ResNet에서 사용한 방식과 같이 계산할 횟수 n을 일정하게 정한 뒤 절삭하여 계산한 값으로 $log p(x)$를 추정한 결과가 빨간색 그래프이고, residual flow가 제안한 방법으로 $log p(x)$를 추정한 결과가 파란색 그래프로 나타나 있습니다. 그림을 보면 추정된 값 자체의 bits/dim은 기존의 방법인 빨간색이 더 적은 수치를 기록하여 더 좋은 결과를 보인다고 생각할 수도 있지만, 실제 $log p(x)$값을 나타내는 실선과 비교하였을 때 빨간색 그래프는 추정값과 실제값이 서로 맞지 않는, 즉 biased estimator인 것을 확인할 수 있는 반면, 파란색 그래프를 보면 실제 $log p(x)$의 값과 추정된 값이 서로 일치하는 것을 보았을 때 unbiased estimator로 추정을 하였음을 확인할 수 있습니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/200765508-1f58a9ee-e744-460d-92cc-38b1e77b283c.png"  width="400" height="250">
+<img src="https://user-images.githubusercontent.com/76925973/200765508-1f58a9ee-e744-460d-92cc-38b1e77b283c.png"  width="400" >
+
+[출처] Residual Flow [^1]
 
 
 ##### 3.2 Memory-Efficient Backpropagation
 
 $$
-log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{\sum_{k=1}^{n}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
+log(p(x)) = log(p(f(x))) + \mathbb{E}[\boxed{\color{blue}{\sum_{k=1}^{n}}}\frac{(-1)^{k+1}}{k}\frac{v^T[\boxed{\color{red}{J_g(x)}}]^kv}{\mathbb{P}(N\geq k)}]  \cdots (3.2.1)
 $$
 
-이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스에서 n번의 계산을 해야하고, 두번째 박스에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
+이와 같이 $log p(x)$를 추정한 unbaised estimator를 이용하여 모델을 학습시킬 때 backpropagation과정에서 메모리를 효율적으로 관리하는 것 역시 중요합니다. 위 식에서 첫번째 박스(파란글씨)에서 n번의 계산을 해야하고, 두번째 박스(빨간글씨)에서 m개의 residual block을 계산해야하기 때문에 위의 식을 그대로 backpropagation에 이용하며 $O(n\cdot m)$ 메모리가 필요하게 됩니다.
 
-따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. $\mathbb{E}[\displaystyle\sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\frac{v^T[J_g(x)]^kv}{\mathbb{P}(N\geq k)}]$ 는 $log|det(I+J_g(x))|$를 추정한 값이므로 log determinant값을 backpropagation에 사용하는 것입니다. 
+따라서 본 논문에서는 메모리를 효율적으로 사용하기 위해서 $log p(x)$의 추정값을 그대로 backpropagation에서 사용하는 것이 아니라 unbiased log-determinatnt gradient estimator를 이용하였습니다. $\mathbb{E}[\displaystyle\sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\frac{v^T[J_g(x)]^kv}{\mathbb{P}(N\geq k)}]$ 는 $log \vert det(I+J_g(x))\vert$를 추정한 값이므로 log determinant값을 backpropagation에 사용하는 것입니다. 
 
 $$
 \begin{aligned}
@@ -260,7 +269,7 @@ $$
 \end{aligned}
 $$
 
-위 식은 log determinant를 미분하는 과정을 보여주는 식으로 (a)는 log값을 미분하는 chain rule을 적용한 것이고, (b)는 determinant 미분을 적용한 식 입니다. (c)는 $(I-f)^{-1} = \displaystyle\sum_{k=0}^{\infty}f^k $ 를 만족한다는 Neumann series를 적용한 것이며, (d)는 Russian Roullete estimator를 (e)는 Skilling-Hutchinson trace estimator를 적용한 결과를 나타낸 것입니다.
+위 식은 log determinant를 미분하는 과정을 보여주는 식으로 (a)는 log값을 미분하는 chain rule을 적용한 것이고, (b)는 determinant 미분을 적용한 식 입니다. (c)는 $(I-f)^{-1} = \displaystyle \sum_{k=0}^{\infty} f^k$ 를 만족한다는 Neumann series를 적용한 것이며, (d)는 Russian Roullete estimator를 (e)는 Skilling-Hutchinson trace estimator를 적용한 결과를 나타낸 것입니다.
 
 이를 통해 최종적으로 log determinant 값을
 
@@ -280,7 +289,9 @@ $$
 
 Loss를 미분할때 log determinant의 미분을 사용한다면 위 (3.2.3) 식과 같이 Loss를 log determinant 값으로 미분하는 scalar부분과 log determinant를 미분하는 vector 부분으로 분리할 수 있는데, 이때 log determinant는 forward에서 계산을 하는 과정이므로 backward에서 다시 계산할 필요가 없다는 점에서 메모리를 줄일 수 있다는 것입니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/200817001-b285bac3-5a93-4697-a090-67a6c2408460.png"  width="400" height="250">
+<img src="https://user-images.githubusercontent.com/76925973/200817001-b285bac3-5a93-4697-a090-67a6c2408460.png"  width="400" >
+
+[출처] Residual Flow [^1]
 
 위 그림을 보면 파란색은 backpropagation을 그대로 진행한 경우를 나타내고 초록색은 unbiased log determinant gradient estimator (3.2.2)식을 이용한 경우, 빨간색은 backward-in-forward (3.2.3)을 이용한 경우이며, 보라색은 두가지 방법을 모두 사용한 경우의 메모리 사용량을 나타냅니다. 이를 통해 두가지 방법을 모두 사용하여 backpropagation을 계산하는 경우 메모리를 훨씬 효율적으로 사용할 수 있음을 확인할 수 있었고 본 논문에서도 역시 두가지 모두를 사용하여 메모리를 효율적으로 사용하고자 하였습니다.
 
@@ -288,14 +299,16 @@ Loss를 미분할때 log determinant의 미분을 사용한다면 위 (3.2.3) �
 ##### 3.3 LipSwish Activation Function
 Backpropagation을 진행할 때 메모리 뿐만 아니라 activation derivative saturation 문제 역시 발생할 수 있습니다. Jacobian을 계산하는 과정에서 일차 미분을 진행하게 되고 gradient를 계산하는 과정에서 이차 미분이 진행되는데, 이때 일차 미분값이 상수가 되면 이차 미분 값이 0이 되면서 gradient vanishing 문제가 발생하는 것입니다. 그래서 논문에서는 립시츠 조건을 만족시키면서 gradient vanishing 문제가 발생하지 않도록 하기 위한 activation function의 두가지 조건을 제시하였습니다.  
 
-- 일차 미분 값이 $\vert \phi'(z) \vert \leq 1 \text{ } \forall z$   를 만족해야 한다.
+- 일차 미분 값이 $\vert \phi'(z)\vert  \leq 1 \text{ } \forall z$   를 만족해야 한다.
 - $\vert \phi'(z) \vert$ 가 1과 가까운 점에서의 이차 미분 값이 0이 되어 vanish되서는 안된다.
 
 대부분의 activation function이 첫번째 조건은 만족시키지만 두번째 조건을 만족시키기 어려워 본 논문에서는 두번째 조건을 만족시킬 수 있는 Swish function을 사용했다고 합니다. Swish activaton function은 $f(x) = x \cdot \sigma(\beta x)$ 로 밑의 그림 중 파란색으로 그려진 함수입니다. 그림을 통해서 알 수 있듯이 ReLU의 경우 미분값이 일정해지는 구간이 발생하여 이차 미분 시 gradient vanishing 문제를 야기하지만 Swish 함수의 경우 그렇지 않아 두번째 조건을 만족할 수 있습니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/200821177-8131b782-b746-445a-8b78-3295eba52e03.png"  width="400" height="200">
+<img src="https://user-images.githubusercontent.com/76925973/200821177-8131b782-b746-445a-8b78-3295eba52e03.png"  width="400" >
 
-그러나 Swish 함수의 경우 일차 미분값이 $\vert \frac{d}{dz}Swish(z) \vert \lesssim 1.1$ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
+[출처] Swish function [^6]
+
+그러나 Swish 함수의 경우 일차 미분값이 $\vert \frac{d}{dz}Swish(z)\vert  \lesssim 1.1$ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
 
 $$
 LipSwish(z) = \frac{Swish(z)}{1.1} = \frac{z \cdot \sigma(\beta z)} {1.1}
@@ -303,14 +316,18 @@ $$
 
 이를 activation function으로 사용하였습니다. 이때 $\beta$ 값은 softplus를 통해 양수를 유지하도록 학습시켰습니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/200821897-be1bf86c-4666-4cd6-9ade-2001592f339f.png"  width="500" height="120">
+<img src="https://user-images.githubusercontent.com/76925973/200821897-be1bf86c-4666-4cd6-9ade-2001592f339f.png"  width="500" >
+
+[출처] Residual Flow [^1]
 
 ---
 
 ### 4. Experiment
 
 ##### 4.1 Mixed Matrix Norm
-립시츠 조건을 만족시키기 위해서는 $|g(x)'| \leq 1$이라는 조건을 만족시켜야 합니다. i-ResNet에서는 이 조건을 만족시키기 위해 Spectral Norms를 사용했는데, Residual Flow에서는 그에 더해 P-Norms과 Mixed Matrix Norms를 추가로 사용하였습니다.
+립시츠 조건을 만족시키기 위해서는 $\vert g(x)' \vert \leq 1$ 이라는 조건을 만족시켜야 합니다. 기존에는 립시츠 조건을 만족시키기 위해서 그 상한선을 0.9로 주어졌는데, 기존 모델과는 달리 Reisdul Flow는 unbiased estimator를 사용하기 때문에 기존의 bias로 인한 안정성 문제를 해결하였기 때문에 더 높은 값을 상한선으로 두어도 립시츠 조건을 만족시키기에 충분했고, 본 논문에서는 0.98을 상한선으로 사용하였습니다.
+
+i-ResNet에서는  조건을 만족시키기 위해 Spectral Norms를 사용했는데, Residual Flow에서는 그에 더해 P-Norms과 Mixed Matrix Norms를 추가로 사용하였습니다.
 
 심층신경망을 사용하는 $g(x)$는 다음과 같이 나타낼 수 있습니다.
 
@@ -322,18 +339,18 @@ $$
 
 먼저 spectral norms에서는 다음의 두 가지 방법으로 립시츠 조건을 만족시킵니다.
 
-1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $\vert \phi '(z) \vert \leq 1$
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $\vert \phi '(z)\vert  \leq 1$
 2. Weight matrices의 spectral norms으로 bound
 
 $$
 \Vert J_g(x) \Vert _2 = \Vert W_L \cdots W_z\phi ' (z_1) W_1 \phi ' (z_0)\Vert_2 \leq \Vert W_l \Vert_2 \cdots \Vert W_2 \Vert_2 \Vert \phi ' (z_1) \Vert_2 \Vert W_1 \Vert_2 \Vert \phi ' (z_0) \Vert_2 \leq \Vert W_l \Vert_2 \cdots \Vert W_2 \Vert_2 \Vert W_1 \Vert_2
 $$
 
-즉, $\vert \phi '(z) \vert \leq 1$을 만족시키는 $\phi$를 사용하며, 각 weight matrices의 spectral norm으로 결과값을 나눠주게 되면 함수 $g(x)$는 립시츠 조건을 만족하게 됩니다.
+즉, $\vert \phi'(z) \vert \leq 1$ 을 만족시키는 $\phi$ 를 사용하며, 각 weight matrices의 spectral norm으로 결과값을 나눠주게 되면 함수 $g(x)$는 립시츠 조건을 만족하게 됩니다.
 
 P-norms에서도 spectral norm과 마찬가지 방법을 사용하였으며, 각 weight를 2-norm이 아니라 p-norm을 통해 계산하였다는 차이점이 있습니다.
 
-1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $\vert \phi '(z)\vert  \leq 1$
+1. 립시츠 조건을 만족시키는 activation function의 선정, 즉 $\vert \phi '(z)\vert \leq 1$
 2. Weight matrices의 p-norms으로 bound
 
 $$
@@ -357,21 +374,32 @@ Residual Flow에서는 학습된 p으로 mixed matrix norms를 사용하여 0.00
 
 Residual Flow를 다른 flow-based model과 성능을 비교해본 결과 입니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/201391954-32ff92a5-65c8-4c3d-a1c5-7e02ec4a16c3.png"  width="400" height="130">
+<img src="https://user-images.githubusercontent.com/76925973/201391954-32ff92a5-65c8-4c3d-a1c5-7e02ec4a16c3.png"  width="400" >
+
+[출처] Residual Flow [^1]
 
 bits/dim을 비교하였을 때, Residual Flow가 다른 모델들에 비해 MNIST, CIFAR-10, ImageNet32, ImageNet64, CelebA-HQ256의 다섯 가지 데이터셋에 대해 더 좋은 성능을 내는 것을 실험을 통해 확인할 수 있었습니다.
 
 ##### 4.3 Sample Quality
 
-<img src="https://user-images.githubusercontent.com/76925973/201392100-6c6ba9c4-147c-477d-abc1-94af3f249404.png"  width="700" height="100">
+다음은 생성된 이미지의 quality를 비교한 결과입니다. temperature annealing을 사용하면 분포의 차이를 극대화 시킬 수 있어서 더 sharp한 이미지를 얻을 수 있지만, 이는 entropy를 희생하는 것이기 때문에 생성된 이미지의 다양성을 감소시켜 본 논문의 저자들은 좋지 않다고 판단해 사용하지 않았습니다.
+
+<img src="https://user-images.githubusercontent.com/76925973/201392100-6c6ba9c4-147c-477d-abc1-94af3f249404.png"  width="700" >
+
+[출처] Residual Flow [^1]
 
 Residual Flow를 통해 생성된 이미지 샘플입니다. 왼쪽 이미지는 CelebA-HQ256 데이터셋에 있는 실제 이미지이며, 오른쪽 이미지는 Residual Flow를 통해 생성된 이미지 입니다.
 
 <img src="https://user-images.githubusercontent.com/76925973/201392242-f4824450-ba49-436e-9927-262a7c071379.png"  width="700">
 
+[출처] Residual Flow [^1]
+
 CIFAR-10 데이터셋의 이미지 및 다른 모델을 통해 생성된 이미지와 함께 비교를 해보았습니다. 비록 PixelCNN이나 Variational Dequantized Flow++로 생성된 이미지들 보다 bits/dim은 오히려 안 좋은 결과를 보여주지만, 저자들은 log-likelihood가 이미지의 퀄리티와 정확하게 매치되는 것은 아니며, Residual Flow를 통해 생성된 이미지가 더 일관된 이미지를 잘 생성한다고 주장합니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/201392340-b1fe988b-fc04-4892-9cd9-08f3c16f4308.png"  width="200" height="200">
+<img src="https://user-images.githubusercontent.com/117256746/202886256-b976daf9-d93e-4e2e-9a2a-26b9c32ecbb2.png"  >
+
+
+[출처] Residual Flow [^1]
 
 FID 값을 통해 생성된 이미지를 비교해 보았을 때, DCGAN이나 WGAN-GP와 같은 GAN 기반의 모델들 보다는 떨어지지만, 다른 flow-based model이나 autoregressive model보다 더 좋은 성능을 보이는 것을 확인할 수 있습니다.
 
@@ -387,6 +415,8 @@ Residual Flow 모델의 특징을 살펴보면 다음과 같습니다.
 
 <img src="https://user-images.githubusercontent.com/76925973/201392495-7ab8faa3-58dc-49b7-8053-07baa7cd8484.png"  width="700" >
 
+[출처] Residual Flow [^1]
+
 왼쪽의 그래프를 보면 LipSwhish를 사용했을때 bits/dim이 더 낮아 성능이 좋은 것을 확인할 수 있습니다. 오르쪽의 그래프는 두 가지에 대해 보여주고 있습니다. 첫 번째와 두 번째 행을 보면, 동일하게 ELU를 activation function으로 사용하였을 때 i-ResNet과 Residual Flow의 성능 차이를 보이고 있는데, Residual Flow가 unbiased estimator이기 때문에 더 좋은 성능을 보이는 것을 확인할 수 있습니다. 또한 두 번째와 세 번째 행을 보면, 같은 Residual FLow 모델에 activation function을 ELU와 LipSwish로 변경하며 실험을 진행하였는데, LipSwish를 사용한 모델이 더 성능이 좋은 것을 확인할 수 있습니다.
 
 ##### 4.5 Hybrid Modeling
@@ -396,20 +426,22 @@ Residual Flow 모델의 특징을 살펴보면 다음과 같습니다.
 주어진 데이터 $x$와 데이터의 라벨 $y$에 대한 확률은 다음과 같이 나타낼 수 있습니다.
 
 $$
-log p(x, y) = log p(x) + log p(y|x)
+log p(x, y) = log p(x) + log p(y \vert x)
 $$
 
-여기에서 $log p(x)$는 log-likelihood를 의미하기 때문에 생성모델의 학습을, $log p(y \vert x)$는 주어진 데이터의 라벨 예측을 의미하기 때문에 분류기의 학습을 의미한다고 볼 수 있습니다. Hybrid modeling을 하는 경우, 주로 관심이 있는 쪽은 생성모델의 학습보다 분류기의 학습이기 때문에, $\lambda$라는 1보다 작은 양수의 hyperparameter를 도입하여 weighted maximum likelihood objective[^2]를 최종 objective function으로 사용하며, 이는 다음과 같습니다.
+여기에서 $log p(x)$는 log-likelihood를 의미하기 때문에 생성모델의 학습을, $log p(y \vert x)$는 주어진 데이터의 라벨 예측을 의미하기 때문에 분류기의 학습을 의미한다고 볼 수 있습니다. Hybrid modeling을 하는 경우, 주로 관심이 있는 쪽은 생성모델의 학습보다 분류기의 학습이기 때문에, $\lambda$라는 1보다 작은 양수의 hyperparameter를 도입하여 weighted maximum likelihood objective[^3]를 최종 objective function으로 사용하며, 이는 다음과 같습니다.
 
 $$
-\mathbb{E}_{(x, y) \thicksim p_{data}} \big[\lambda log p(x) + log p(y|x) \big]
+\mathbb{E}_{(x, y) \thicksim p_{data}} \big[\lambda log p(x) + log p(y \vert x) \big]
 $$
 
 각 모델의 inference 과정 후에 Multi-layer Perceptron을 통해 분류를 진행하였으며, 그 결과는 다음과 같습니다.
 
 <img src="https://user-images.githubusercontent.com/76925973/201392697-b9823a21-ac7e-4a46-a70d-063a304fd782.png"  width="500" >
 
-$\lambda = 0$일 때는 분류기의 학습만을 진행한 것이며, $\lambda = 1$일 때는 생성모델과 분류기의 중요도를 동일하게 생각한 것 입니다. RealNVP(Coupling) 및 Glow(+ 1 X 1 Conv)와 성능을 비교한 결과 분류기의 학습만을 진행 ($\lambda = 0$)했을 때는 Glow의 성능이 조금 더 높았지만, 다른 경우에 대해서는 모두 Residual Flow가 가장 좋은 것을 확인할 수 있습니다.
+[출처] Residual Flow [^1]
+
+$\lambda = 0$일 때는 분류기의 학습만을 진행한 것이며, $\lambda = 1$일 때는 생성모델과 분류기의 중요도를 동일하게 생각한 것 입니다. RealNVP(Coupling) 및 Glow(+ 1 X 1 Conv)와 성능을 비교한 결과 분류기의 학습만을 진행 ( $\lambda = 0$ )했을 때는 Glow의 성능이 조금 더 높았지만, 다른 경우에 대해서는 모두 Residual Flow가 가장 좋은 것을 확인할 수 있습니다.
 
 ---
 ### 5. Conclusion & Application
@@ -429,24 +461,29 @@ Residual Flow의 장점은 다음과 같습니다.
 
 Residual Flow가 사용된 예시입니다.
 
-- Graph Residual Flow for Molecular Graph Generation[^3]에서는 Residual Flow를 기반으로 분자구조 그래프의 생성모델을 구축하였습니다.
+- Graph Residual Flow for Molecular Graph Generation[^4]에서는 Residual Flow를 기반으로 분자구조 그래프의 생성모델을 구축하였습니다.
 
-    <img src="https://user-images.githubusercontent.com/76925973/201393817-904a50c5-747e-4ecf-9946-c7e3d08ebc16.png"  width="600" >
+<img src="https://user-images.githubusercontent.com/76925973/201393817-904a50c5-747e-4ecf-9946-c7e3d08ebc16.png"  width="600" >
 
-- Hybrid Models for Open Set Recognition2[^4]에서는 Residual Flow의 inference를 통해 out-of-distribution detection을 진행하였습니다. 이는 데이터의 분포를 알아야 하기 때문에 flow-based model을 사용하기에 아주 적합하며, 기존의 다른 flow-based model과 달리 Residual Flow는 unbiased estimator를 구축하였기에 Residual Flow가 가장 적합하게 사용된 사례 중 하나로 꼽을 수 있습니다.
+[출처] Graph Residual Flow for Molecular Graph Generation[^4]
+
+- Hybrid Models for Open Set Recognition2[^5]에서는 Residual Flow의 inference를 통해 out-of-distribution detection을 진행하였습니다. 이는 데이터의 분포를 알아야 하기 때문에 flow-based model을 사용하기에 아주 적합하며, 기존의 다른 flow-based model과 달리 Residual Flow는 unbiased estimator를 구축하였기에 Residual Flow가 가장 적합하게 사용된 사례 중 하나로 꼽을 수 있습니다.
     
-    $$
-    pred(x) = \begin{cases}
-   k + 1 & log p(x) < \tau \\
-   argmax_{j \in \set{1, \cdots, k}} p(y_j | x) &\text{otherwise } 
+$$
+pred(x) = \begin{cases}
+k + 1 & log p(x) < \tau \\
+argmax_{j \in \set{1, \cdots, k}} p(y_j \vert x) &\text{otherwise } 
 \end{cases}
-    $$
+$$
 
-    <img src="https://user-images.githubusercontent.com/76925973/201393919-600f8123-0d4a-455c-8411-72b4a9a3f5da.png"  width="600">
+<img src="https://user-images.githubusercontent.com/76925973/201393919-600f8123-0d4a-455c-8411-72b4a9a3f5da.png"  width="600">
 
- 
+[출처] Hybrid Models for Open Set Recognition2[^5]
 
-[^1]: Behrmann, J., Grathwohl, W., Chen, R. T., Duvenaud, D., & Jacobsen, J. H. (2019, May). Invertible residual networks. In International Conference on Machine Learning (pp. 573-582). PMLR.
-[^2]: Nalisnick, E., Matsukawa, A., Teh, Y. W., Gorur, D., & Lakshminarayanan, B. (2019, May). Hybrid models with deep and invertible features. In International Conference on Machine Learning (pp. 4723-4732). PMLR.
-[^3]:Honda, S., Akita, H., Ishiguro, K., Nakanishi, T., & Oono, K. (2019). Graph residual flow for molecular graph generation. arXiv preprint arXiv:1909.13521.
-[^4]:Zhang, H., Li, A., Guo, J., & Guo, Y. (2020, August). Hybrid models for open set recognition. In European Conference on Computer Vision (pp. 102-117). Springer, Cham.
+
+[^1]: Chen, R. T., Behrmann, J., Duvenaud, D. K., & Jacobsen, J. H. (2019). Residual flows for invertible generative modeling. Advances in Neural Information Processing Systems, 32.
+[^2]: Behrmann, J., Grathwohl, W., Chen, R. T., Duvenaud, D., & Jacobsen, J. H. (2019, May). Invertible residual networks. In International Conference on Machine Learning (pp. 573-582). PMLR.
+[^3]: Nalisnick, E., Matsukawa, A., Teh, Y. W., Gorur, D., & Lakshminarayanan, B. (2019, May). Hybrid models with deep and invertible features. In International Conference on Machine Learning (pp. 4723-4732). PMLR.
+[^4]:Honda, S., Akita, H., Ishiguro, K., Nakanishi, T., & Oono, K. (2019). Graph residual flow for molecular graph generation. arXiv preprint arXiv:1909.13521.
+[^5]:Zhang, H., Li, A., Guo, J., & Guo, Y. (2020, August). Hybrid models for open set recognition. In European Conference on Computer Vision (pp. 102-117). Springer, Cham.
+[^6]: https://velog.io/@iissaacc/Swish-function
