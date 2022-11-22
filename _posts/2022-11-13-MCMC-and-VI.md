@@ -93,12 +93,14 @@ $$\begin{align}
 그렇다면 $q(z|x)=q(z_0|x)\prod_{t=1}^{T}q(z_t|z_{t-1},x)$임을 볼 수 있습니다.
 
 위 식을 식 (2)에 대입한다면,
-\begin{align}
+
+$$\begin{align}
 \mathcal{L}_{\text{aux}} \\
 &= \Bbb{E}_{q(y, z_T|x)}[\log[p(x,z_T)r(y|x,z_T)]-\log{q(y,z_T|x)}] \nonumber \\ 
 &= \mathcal{L} - \Bbb{E}_{q(z_T|x)}\{D_{KL}[q(y|z_T,x)||r(y|z_T,x))]\} \nonumber \\
 &\leq \mathcal{L} \leq \log[p(x)] \nonumber 
-\end{align}
+\end{align}$$
+
 식을 얻을 수 있습니다.
 이 식에서는 markov chain을 거쳐서 연쇄적으로 $z$를 $z_0$에서 $z_{t-1}$로 가는 과정을 auxiliary variable의 도입으로 보충해준 식이라 보시면 됩니다.
 즉, 이 과정 전체에 대해서 $z$ 자리에 $z_T$값을 넣을 수 없기 때문에 보조 변수를 도입해서 그 사이의 상관관계를 설명할 수 있는 새로운 분포를 넣어준 것입니다.
