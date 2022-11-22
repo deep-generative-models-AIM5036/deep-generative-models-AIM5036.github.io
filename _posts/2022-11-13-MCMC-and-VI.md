@@ -24,7 +24,7 @@ Variational Inference는 강의 내용에서도, 다른 논문의 포스팅에�
 
 <figure style="width:50%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/monte_carlo.png">
-	<figcaption><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처: 네이버 블로그](https://post.naver.com/viewer/postView.nhn?memberNo=11439725&volumeNo=7401749)</p></figcaption>
+	<figcaption style="text-align:center;"><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처: 네이버 블로그](https://post.naver.com/viewer/postView.nhn?memberNo=11439725&volumeNo=7401749)</p></figcaption>
 </figure>
 
 
@@ -34,7 +34,7 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 
 <figure style="width:40%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/markov_chain.png">
-	<figcaption><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처: wikipedia](https://en.wikipedia.org/wiki/Markov_chain)</p></figcaption>
+	<figcaption style="text-align:center;"><p markdown="1">Monte Carlo 방법으로 원주율 추측, [출처: wikipedia](https://en.wikipedia.org/wiki/Markov_chain)</p></figcaption>
 </figure>
 
 #### Monte Carlo + Markov Chain
@@ -127,7 +127,7 @@ $$\begin{align}
 
 <figure style="width:70%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/algo1.png">
-	<figcaption><p markdown="1">논문 내 Algorithm 1</p></figcaption>
+	<figcaption style="text-align:center;"><p markdown="1">논문 내 Algorithm 1</p></figcaption>
 </figure>
 
 
