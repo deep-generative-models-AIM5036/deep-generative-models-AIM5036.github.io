@@ -102,5 +102,32 @@ $$\begin{align}
 \end{align}$$
 
 식을 얻을 수 있습니다.
+이 때 $r(y|x,z_T)$가 임의로 정한 auxiliary inference distribution이며, markov chain을 따르도록 구성했으므로 $q_\theta(z|x)$가 $q(y,z_T|x)$가 됩니다.
 이 식에서는 markov chain을 거쳐서 연쇄적으로 $z$를 $z_0$에서 $z_{t-1}$로 가는 과정을 auxiliary variable의 도입으로 보충해준 식이라 보시면 됩니다.
-즉, 이 과정 전체에 대해서 $z$ 자리에 $z_T$값을 넣을 수 없기 때문에 보조 변수를 도입해서 그 사이의 상관관계를 설명할 수 있는 새로운 분포를 넣어준 것입니다.
+즉, 이 과정 전체에 대해서 $z$ 자리에 $z_T$값을 바로 넣을 수 없기 때문에 보조 변수를 도입해서 그 사이의 상관관계를 설명할 수 있는 새로운 분포를 넣어준 것입니다.
+
+이 상황에서 $r$이 $q$를 그대로 묘사하는 것이 최적인 상황일 것입니다.
+그러나 $q$가 intractable할 가능성이 있으므로 $r~q$가 되도록, 그러면서도 최대한 expressive하게끔 $r$을 자유롭게 택합니다.
+그러면 $q$가 markov rule을 따르는 상황이므로, $r$ 역시도 markov rule을 따르는 것으로 만들면 적절할 것입니다.
+
+위 내용을 바탕으로 variational lower bound를 구하게 되면
+
+$$\begin{align}
+\log{p(x)} &\geq \Bbb{E}_q[\log{p(x,z_T)}-\log{q(z_0,...,z_T|x)} \\
+&+\log{r(z_0,...,z_{t-1}|x, z_T)]} \nonumber \\
+&= \Bbb{E}_{q}[\log[p(x,z_T)/q(z_0|x)] \nonumber \\
+&+ \sum_{t=1}^{T}\log[r_t(z_{t-1}|x,z_t)/q_t(z_t|x,z_{t-1})] \nonumber 
+\end{align}$$
+
+를 얻을 수 있습니다.
+
+앞서 설명드렸듯 $r$이 markov rule를 따르는 상황에서 정리한 식 (4)에서, $\sum_{t=1}^{T}\log[r_t(z_{t-1}|x,z_t)/q_t(z_t|x,z_{t-1})]$ 부분을 확인하면 $r_t$가 $q_t$의 inverse model임을 볼 수 있습니다.
+
+이 식 (4)를 활용하면 논문에 제시된 Algorithm 1인 MCMC 단계별 하한값을 구할 수 있게 됩니다.
+
+<figure style="width:70%; margin-left:auto; margin-right:auto; display:block;">
+	<img src="/assets/MCMCandVI/algo1.png">
+	<figcaption><p markdown="1">논문 내 Algorithm 1</p></figcaption>
+</figure>
+
+
