@@ -134,6 +134,7 @@ q_t(z_t|x,z_{t-1})]$
 
 이 알고리즘은 unbised, 즉 모델의 평균과 실제의 차이인 bias가 0인, 평균 자체는 정확한 값을 얻어낸다고 합니다. 따라서 평균은 같은 점을 활용해서 여기에  $z_t=g_\theta(u_t,x)$의 reparameterization trick를 적용하면 다음 Algorithm 2를 진행할 수 있게 됩니다.
 
+
 <figure style="width:70%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/algo2.png">
 	<figcaption style="text-align:center;"><p markdown="1">논문 내 Algorithm 2</p></figcaption>
@@ -152,6 +153,7 @@ q_t(z_t|x,z_{t-1})]$
 이 때 $\alpha=0$인 경우 이 방법이 깁스 샘플링과 완전히 동일해집니다.
 
 논문에서는 추정하기로는 실험치인 $\alpha=-0.76$을 활용했을 때 over-relaxation method가 깁스 샘플링에 비해 상당히 빠르게 수렴하는 형태를 보여주었다고 합니다.
+
 <figure style="width:75%; margin-left:auto; margin-right:auto; display:block;">
 	<img src="/assets/MCMCandVI/fig1.png">
 	<figcaption style="text-align:center;"><p markdown="1">논문 내 Figure 1</p></figcaption>
