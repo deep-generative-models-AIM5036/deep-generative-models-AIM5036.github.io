@@ -3,7 +3,8 @@ layout: post
 title:  "Residual Flows for Invertible Generative Modeling"
 date:   2022-11-13
 author: 이민영, 이주엽
-categories: "Flow Models"
+categories: ["Flow Models"]
+tags: ["Flow Models"]
 use_math: true
 ---
 
