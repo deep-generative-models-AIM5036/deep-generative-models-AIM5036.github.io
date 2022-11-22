@@ -75,3 +75,13 @@ Markov Chain은 이전의 상태만을 바탕으로 현재의 상태에 영향�
 
 이러한 MCMC의 단점을 해결하는 것은 더 좋은 Markov Chain을 구성하는 것, 즉 더 나은 샘플링 기법을 고안하는 것입니다.
 이를 위해서는 본 논문에 제시된 Gibbs Sampling, Over-relaxation 등을 포함하여 Hamiltonian MC(HMC) 등의 많은 기법이 연구되고 있으며 Jiaming Song (2017) A-NICE-MC: Adversarial Training for MCMC 과 같은 관련 논문도 제시되고 있습니다.
+
+
+## MCMC and Auxiliary Variables
+논문 내용의 시작은 VI에서 시작합니다.
+VI에서 얻어온 식 (1)과 (2) 두개를 바탕으로,
+$\begin{align}
+\log {p(x)} &\geq \log{p(x)} - D_{KL}(q_\theta(z|x)||p(z|x)) \\
+            &= \Bbb{E}_{q_\theta(z|x)}[\log{p(x,z)}-\log{q_\theta(z|x)}]=\mathcal{L}.
+\end{align}$
+ㅇㅇ
