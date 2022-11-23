@@ -3,7 +3,7 @@ layout: post
 title:  "Markov Chain Monte Carlo and Variational Inference: Bridging the Gap."
 date:   2022-11-13
 author: Sungmin Kang
-categories: Latent-Variable
+categories: ["LVM"]
 tags: VI latent-variable MCMC
 use_math: true
 ---
