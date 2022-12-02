@@ -27,6 +27,7 @@ $log p(X) = log p(f(X)) + log \vert det\frac{\partial z}{\partial x}\vert $
 
 
 <img src="https://user-images.githubusercontent.com/76925973/202884711-1c7405df-d57b-4274-a417-be9bb467ffd9.png"  width="400" >
+<img src="https://user-images.githubusercontent.com/117256746/205273638-c0d5c36e-e367-40b8-88a6-8acc34177f15.png"  width="400" >
 
 [출처] Residual Flow [^1]
 
