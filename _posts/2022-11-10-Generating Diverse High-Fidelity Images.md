@@ -19,7 +19,7 @@ Deep Generative model은 최근 크게 발전하여 다양한 분야에서 현�
 해당 논문이 발표 된 2019년도에는 생성모델 중 가장 각광 받는 모델 중 하나로 GAN을 꼽았을 것이다. GAN과 같은 adversarial 모델은 빠르게 발전하여, 높은 퀄리티와 해상도를 갖는 데이터를 생성할 수 있는 Larger scale GAN 모델이 다수 공개 되며 타 모델들과도 비견되는 state-of-the-art 성능을 보였다. 하지만, 본 논문의 저자들은 GAN의 단점들을 조명하며 이에 반해 negative log-likelihood(NLL) 기반으로 작동하는 likelihood based model의 장점을 강조한다.
 
 GAN 단점
-- 실제 이미지의 분포를 담지 못한다.
+- 한 레이블에 대한 다수의 이미지가 갖고 있는 실제 분포를 담지 못한다.
 - 성능에 대한 평가가 어렵고 실존하지 않는다.
 - Overfitting을 평가하기 위한 test set에 대한 일반화가 존재하지 않는다.
 
@@ -35,11 +35,16 @@ VQ-VAE2에 대해 설명하기 전, 몇 가지를 사전에 알아두고 가야 
 - Vector quantization을 통해 VQ-VAE는 분산으로 생기는 문제들을 억제
 - Posterior Collapse 없음
 - Encoder, decoder, codebook 구조
+  - Codebook이란 위 그림에서 embedding space에 나타난 부분을 뜻하며, 본 그림에서는 embedding vector가 K개 있다는 것을 표현한다.
+  - Encoder에서 산출된 output은 embedding space에서 가장 가까운 embedding vector를 찾게 되며 해당 방식이 기존 VAE와 유사하다 여겨 저자들은 이 방식에 VQ-VAE라는 이름을 붙였다. 
+
+- 하지만, 궁극적으로 VQ-VAE는 이미지 생성에 있어 고화질의 이미지는 reasonable한 속도와 좋은 품질을 유지한채 생성하지는 못한다는 단점이 있다.
 
 ### **PixelSnail**
 ![PixelSnail1](/assets/VQVAE2_img/PixelSnail1.jpg)
 ![PixelSnail2](/assets/VQVAE2_img/PixelSnail2.jpg)
 **Attention block**을 이용하여 autoregressive model에 self attention을 구현
+
 - 과거의 정보에 접촉을 하는 병목구간이 해소
 - 모든 conditionals을 모든 context를 참조할 수 있게 만듦
 - 모든 spatial location에서 feature vector에 대해 하나의 key-value lookup을 적용
