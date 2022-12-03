@@ -38,7 +38,7 @@ VQ-VAE2에 대해 설명하기 전, 몇 가지를 사전에 알아두고 가야 
   - Codebook이란 위 그림에서 embedding space에 나타난 부분을 뜻하며, 본 그림에서는 embedding vector가 K개 있다는 것을 표현한다.
   - Encoder에서 산출된 output은 embedding space에서 가장 가까운 embedding vector를 찾게 되며 해당 방식이 기존 VAE와 유사하다 여겨 저자들은 이 방식에 VQ-VAE라는 이름을 붙였다. 
 
-- 하지만, 궁극적으로 VQ-VAE는 이미지 생성에 있어 고화질의 이미지는 reasonable한 속도와 좋은 품질을 유지한채 생성하지는 못한다는 단점이 있다.
+- 궁극적으로 VQ-VAE는 이미지 생성에 있어 고화질의 이미지는 reasonable한 속도와 좋은 품질을 유지한채 생성하지는 못한다는 단점이 있다.
 
 ### **PixelSnail**
 ![PixelSnail1](/assets/VQVAE2_img/PixelSnail1.jpg)
@@ -60,13 +60,13 @@ VQ-VAE2에 대해 설명하기 전, 몇 가지를 사전에 알아두고 가야 
 
 ![VQVAE2_1](/assets/VQVAE2_img/VQVAE2_1.jpg)
 
-VQ-VAE-2는 VQ-VAE의 기조를 유지한 채 큰 이미지들을 만들기 위해 hierarchical한 구조를 이용한다. 각 계층 마다의 prior는 각 층에서 존재하는 상관 관계들을 포착하도록 만들어져있다. 본 논문에서는 2-layered hierarchy를 적용했을 때의 그림을 보여주는데, 이 경우 top latent는 global information을 갖고있고 bottom latent는 local detail을 담고 있다. Algorhim 1의 3에서 볼 수 있듯 bottom latent는 top latent에 의거하는데 이는 top latent code가 세부적인 특징까지 모두 모델링하려고 하는 현상을 방지하며, 각 계층이 개별적으로 픽셀에 대해 조건화 될 수 있어 decoder의 재구성 오류를 감소시킨다.
+VQ-VAE-2는 VQ-VAE의 기조를 유지한 채 높은 해상도의 이미지들을 생성하기 위해 hierarchical한 구조를 이용한다. 각 계층 마다의 prior는 각 층에서 존재하는 상관 관계들을 포착하도록 만들어져있다. 본 논문에서는 2-layered hierarchy를 적용했을 때의 그림을 보여주는데, 이 경우 top latent는 global information을 갖고있고 bottom latent는 local detail을 담고 있다. VQ-VAE-2의 구조상 N-layered hierarchy가 가능하며 computation을 더 활용해 고해상도의 이미지를 생성할 수 있지만, 본 논문에서는 N=2,3만 보여주는데 이는 저자들이 reasonable 시간 동안 고해상도의 이미지를 생성 할 수 있느냐에 초점을 두고 있기 때문이다.  Algorithm 1의 3에서 볼 수 있듯 bottom latent는 top latent에 의거하는데 이는 top latent code가 세부적인 특징까지 모두 모델링하려고 하는 현상을 방지하며, 각 계층이 개별적으로 픽셀에 대해 조건화 될 수 있어 decoder의 재구성 오류를 감소시킨다.
 
 ![VQVAE2_2](/assets/VQVAE2_img/VQVAE2_2.jpg)
 
-본 논문에서는 이미지를 더 압축하고 위의 과정에서 학습한 모델에서 샘플을 추출할 수 있도록 latent code에 대한 prior를 학습한다. 훈련 데이터에서 신경망을 사용하여 prior distribution을 fit하는 행위는 latent variable model의 성능을 크게 향상시킬 뿐만 아니라 marginal posterior와 prior 사이의 격차를 감소시키기 때문에 생성 모델에서는 관행이라고도 볼 수 있다. VQ-VAE-2에서 prior는 PixelCNN과 같은 강력한 autoregressive 신경망을 사용하여 만들어진다. Top latent map는 PixelSnail에서 본 것과 같이 multi-headed self-attention layer를 사용하는 데, 이는 top latent map의 경우 전역적인 정보를 담고 있어 이미지에서 멀리 떨어져 있는 pixel들의 상관 관계를 포착하기 위해 더 큰 수용영역(receptive field)을 사용하는 것이 유리하기 때문이다. 반면, bottom latent map의 경우는 지역적인 정보를 담고 있으며, 더 많은 수의 pixel 정보를 담고 있다. 이 경우 top level prior와 같이 self-attention layer를 사용하는 것은 메모리 제약에 걸려 비효율적이고, 어려워진다. 따라서 bottom level prior는 top level prior에서 비롯된 정보를 바탕으로 large conditioning stack을 사용하며 양호한 결과를 도출한다.
+본 논문에서는 이미지를 더 압축하고 위의 과정에서 학습한 모델에서 샘플을 추출할 수 있도록 latent code에 대한 prior를 학습한다. 훈련 데이터에서 신경망을 사용하여 prior distribution을 fit하는 행위는 latent variable model의 성능을 크게 향상시킬 뿐만 아니라 marginal posterior와 prior 사이의 격차를 감소시키기 때문에 생성 모델에서는 관행이라고도 볼 수 있다. VQ-VAE-2에서 prior는 PixelCNN과 같은 강력한 autoregressive 신경망을 사용하여 만들어진다. Top latent map는 PixelSnail에서 본 것과 같이 multi-headed self-attention layer를 사용하는 데, 이는 top latent map의 경우 전역적인 정보를 담고 있어 이미지에서 멀리 떨어져 있는 pixel들의 상관 관계를 포착하기 위해 더 큰 수용영역(receptive field)을 사용하는 것이 유리하기 때문이다. 반면, bottom latent map의 경우는 지엽적인 정보를 담고 있으며, 더 많은 수의 pixel 에 대한 정확한 정보를 담고 있다. 이 경우 top level prior와 같이 self-attention layer를 사용하는 것은 메모리 제약에 걸려 비효율적이고, 어려워진다. 따라서 bottom level prior는 top level prior에서 비롯된 정보를 바탕으로 large conditioning stack을 사용하며 양호한 결과를 도출한다.
 
-Maximum likelihood 모델들은 모든 학습 데이터 분포를 모델링하는 것이 강제되는데, 이는 해당 모델들의 목표가 데이터와 모델 분포 사이의 forward KL-divergence라고 할 수 있기 때문이다. 데이터 분포의 모든 mode를 적용하는 것은 굉장히 바람직하지만, 현재 데이터에 있는 모든 mode를 fit해야하기 때문에 GAN과 같은 adversarial 모델들에 비해서 굉장히 난이도가 높은 작업이다. 따라서, 본 논문에서 저자들은 샘플이 실제 데이터 manifold에 가까울수록 pre-trained classifier에 의해 올바른 class label로 분류될 가능성이 높다는 직관에 기반하여 샘플의 다양성과 품질을 trade-off하는 방법을 제안한다.
+Maximum likelihood 모델들은 모든 학습 데이터 분포를 모델링하는 것이 강제되는데, 이는 해당 모델들의 목표가 데이터와 모델 분포 사이의 forward KL-divergence라고 할 수 있기 때문이다. 데이터 분포의 모든 mode를 적용하는 것은 굉장히 바람직하지만, 현재 데이터에 있는 모든 mode를 fit해야하기 때문에 GAN과 같은 adversarial 모델들에 비해서 굉장히 난이도가 높은 작업이다. 따라서, 본 논문에서 저자들은 샘플이 실제 데이터 manifold에 가까울수록 pre-trained classifier에 의해 올바른 class label로 분류될 가능성이 높다는 직관에 기반하여 생성되는 샘플의 다양성과 품질을 trade-off하는 방법을 제안한다.
 
 -------------
 
