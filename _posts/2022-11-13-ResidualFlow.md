@@ -648,7 +648,7 @@ Residual Flow가 사용된 예시입니다.
 $$
 pred(x) = \begin{cases}
 k + 1 & log p(x) < \tau \\
-argmax_{j \in (1, \cdots, k) p(y_j \vert x) &\text{otherwise } 
+argmax_{j \in 1, \cdots, k} p(y_j \vert x) &\text{otherwise } 
 \end{cases}
 $$
 
