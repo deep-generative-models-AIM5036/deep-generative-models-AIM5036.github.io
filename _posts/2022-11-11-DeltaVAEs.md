@@ -3,7 +3,7 @@ layout: post
 title:  "Preventing Posterior Collapse With Delta-VAEs"
 date:   2022-11-11
 author: Taemin Kim
-categories: LVM
+categories: ["LVM"]
 tags: VAE, Posterior Collapse, Delta-VAEs 
 use_math: true
 ---

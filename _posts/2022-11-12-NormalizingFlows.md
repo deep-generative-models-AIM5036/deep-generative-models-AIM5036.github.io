@@ -3,7 +3,7 @@ layout: post
 title:  "Variational Inference with Normalizing Flows"
 date:   2022-11-13
 author: Ortiz Ramos Vania Miriam
-categories: Flow
+categories: ["Flow Models"]
 tags:	Normalizing Flows 
 use_math: true
 ---
@@ -90,6 +90,12 @@ where $p_x(x)$ is the unknown distribution. A visual explanation of this equatio
 
 ![Imgur](https://i.imgur.com/t5ZFi7c.png)
 
+## Simulated annealing 
+
+Anneaing is a methalurgic process adapted to ML areas, denominated as simulated annealing. The process involves to reduce the temperature from a high value to a low one to strengthen its properties. In machine learning approaches the high temperature represents randomness, so starting from a random search the temperature will be reduced until a point with little randomness (low temperature) which enables the optimization process. At the beginning of the experiment, since the value will be high, the changes accepted will be more flexible, and whiile the it continues, the value will keep reducing, constraining the changes allowed. 
+
+For a more detailed description of the annealing process, visit [here](https://macromoltek.medium.com/machine-learning-and-simulated-annealing-588b2e70d0cc)
+
 # 2. Proposed Model 
 
 Normalizing flows aims to help on choosing the ideal family of variational distributions, giving one that is flexible enough to contain the true posterior as one solution, instead of just approximating to it. Following the paper 
@@ -120,7 +126,7 @@ $$= q(z) \left | \det \left ( \frac{\partial f}{\partial z} \right )^{-1} \right
 
 $$= q(z) \left | \det \frac{\partial f}{\partial z} \right |^{-1}$$
 
-But, since multiple *k* transformations will be applied to the random variable $z_0$ with distribution $q_0$, the output distribution $q_k(z)$ will be: 
+But, since multiple *k* transformations (each one representing a layer) will be applied to the random variable $z_0$ with distribution $q_0$, the output distribution $q_k(z)$ will be: 
 
 $$z_k = f_k \circ \cdots \circ f_2 \circ f_1(z_0) = x$$
 
@@ -165,7 +171,7 @@ $$\mathcal{H} (z,\omega) = - \mathcal{L} (z) - \frac{1}{2} \omega^TM\omega$$
 
 ## Inference with Normalizing Flows 
 
-Since computing the determinant could be computationally expensive with $O(LD^3)$ and some tranformations might have numerically unstable inverse functions; two types of invertible linear-time transformations are proposed: *Planar* and *Radial.* 
+Since computing the determinant could be computationally expensive with $O(LD^3)$ and some tranformations might have numerically unstable inverse functions; two types of invertible linear-time transformations are proposed: *Planar* and *Radial.* These is the main contribution of this paper, since the following functions will guarantee the detemrinand and the jacobian can be calculated and the inverse will be stable.  
 
 **Planar flows** 
 
@@ -207,13 +213,13 @@ $$=\mathbb{E}_{q_0(z_0)}[\ln q_k(z_k)-\log p(x,z_k)]$$
 
 $$\mathcal{F}(x) = \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
 
-This free energy is applied to the architecture presented in the figure below. Where the round boxes represent stochastic variable, also known as random variables; while the squared boxes represent the deterministic variables. This means, while the random variables keep changing their values, the deterministic parts will give the same output to a same input. In the free energy equation above, paramaterizing the posterior distribution $q_\phi(z\|x)$ with a flow of length $K$ by $q_k(z_k)$. As it can be noted the expectation is evaluated on $z_0$ instead of $x$, since it already carries information from it thanks to the encoder part previously applied, enclosing the global variables of the input images. 
+This free energy is applied to the architecture presented in the figure below. Where the round boxes represent stochastic variable, also known as random variables; while the squared boxes represent the deterministic variables. This means, while the random variables keep changing their values, the deterministic parts will give the same output to a same input. In the free energy equation above, paramaterizing the posterior distribution $q_\phi(z\|x)$ with a flow of length $K$ by $q_k(z_k)$. As it can be noted the expectation is evaluated on $z_0$ instead of $x$, since it already carries information from it thanks to the encoder part previously applied, enclosing the global variables of the input images, also because $z_0$ is the initial distribution to sample from, which will be passed through the K multiple transformations. As a result, the Normalizing Flow in the figure below is aiming to model the latent space given by the encoder. 
 
 ![Imgur](https://i.imgur.com/NAqDJIo.png)
 
 # 3. Experiments and Results 
 
-The experiments were carried to evaluate the result of using Normalizing flows on deep latent gaussian models. The training was done with an annealed and simpler version of the equation of the free energy, obtaining: 
+The experiments were carried to evaluate the result of using Normalizing flows on deep latent gaussian models. The training was done with an annealed and simpler version of the equation of the free energy, obtaining the equation below.
 
 $$z_k = f_k \circ f_{k-1} \circ \cdots \circ f_1(z)$$
 
@@ -221,7 +227,7 @@ $$\mathcal{F}^{\beta _t}(x) = \mathbb{E}_{q_0(z_0)}[\ln p_k(z_k) -\log p(x,z_k)]
 
 $$= \mathbb{E}_{q_0(z_0)}[\ln q_0(z_0)] - \beta _t \mathbb{E}_{q_0(z_0)}[\log p(x,z_k)] - \mathbb{E}_{q_0(z_0)}\left [ \sum _{k=1}^K \ln|1+u_k^T\Psi _k(z_{k-1})| \right]$$
 
-where $\beta \in [0,1]$ is an inverse temperature that follows a schedule $\beta _t=min(1,0.01+\frac{t}{10000})$, going from 0.01 to 1 after 10000 iterations. Applying this model with different number of $K$ flows, the results on the image below are obtained. Where non-gaussians 2D distributions were aimed to be approximated. As it can be seen, with the addition of each $k$ layers, the initial distribution keeps approximating to the original one, presented in the first column of the figure. It can also be seen the overperformance over the NICE models considering the same gaussian distributions. 
+where $\beta \in [0,1]$ is an inverse temperature that follows a schedule $\beta _t=min(1,0.01+\frac{t}{10000})$, going from 0.01 to 1 after 10000 iterations. Meaning the $\beta$ value will be reduced throughout the time to constrain the solutions until it reaches a global minimum. Applying this model with different number of $K$ flows, the results on the image below are obtained, where non-gaussians 2D distributions were aimed to be approximated. As it can be seen, with the addition of each $k$ layers, the initial distribution keeps approximating to the original one, presented in the first column of the figure. It can also be seen the overperformance over the NICE models considering the same gaussian distributions. 
 
 ![Imgur](https://i.imgur.com/WcFpwbA.png)
 
@@ -233,6 +239,6 @@ Experiments were carried on the MNIST binarized dataset for digits from 0 to 9 w
 
 # Aditional remarks 
 
-One of the biggest advantages of Normalizing Flows compared with Variational Autoencoders relies in the loss being minimized. Variational Autoencoder maximize the lower bound of the log-likelihood (ELBO) which means it only approximates to the model. On the other hand, Normalizing Flows minimize the exact negative likelihood which is flexible enough to contain the true posterior as one solution. This can be further visualized on the image below. Additionally, normalizing flows converge faster than VAE and GAN approaches. 
+One of the biggest advantages of Normalizing Flows compared with Variational Autoencoders relies in the loss being minimized. Variational Autoencoder maximize the lower bound of the log-likelihood (ELBO) which means it only approximates to the model. On the other hand, Normalizing Flows minimize the exact negative likelihood which is flexible enough to contain the true posterior as one solution. This can be further visualized on the image below. Additionally, normalizing flows converge faster than VAE and GAN approaches. One of the reasons for this is VAE and GAN require two train two networks while in the Normalizing flows only one network is trained while the second one is obtained through the inverse of the transformations. 
 
 ![Imgur](https://i.imgur.com/GKIaPSq.png)

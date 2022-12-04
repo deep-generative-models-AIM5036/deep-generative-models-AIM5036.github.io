@@ -3,7 +3,7 @@ layout: post
 title:  "GAN Tutorial"
 date:   2022-11-12
 author: Kim JeongHyeon, Khan Osama
-categories: GAN
+categories: "GAN"
 tags: Generative Adversarial Networks
 use_math: True
 ---
@@ -94,7 +94,7 @@ In order for the generator to align the p<sub>model</sub> distribution with the 
 
 ## Non-Saturating Game
 
-At the beginning of the training, the discriminator gets confident about the fake images quite quickly, which causes a vanishing gradient problem for the generator. A vanishing gradient means that there will be no update for the generator, even for the bad samples. To fix this problem, we can change the equation for the generator from `log(1-D(G(z)))` to `-log(G(z))`. Considering a sigmoid function at the end of the discriminator network, we can see that the gradient is equal to zero at the beginning of the training. Modifying the sign reverse this phenomenon and brings the vanishing gradient problem for the real data. However, this is okay for real data, as this gradient is not used to update the generator. This is show below
+At the beginning of the training, the discriminator gets confident about the fake images quite quickly, which causes a vanishing gradient problem for the generator. A vanishing gradient means that there will be no update for the generator, even for the bad samples. To fix this problem, we can change the equation for the generator from `log(1-D(G(z)))` to `-log(D(G(z)))`. Considering a sigmoid function at the end of the discriminator network, we can see that the gradient is equal to zero at the beginning of the training. Modifying the sign reverse this phenomenon and brings the vanishing gradient problem for the real data. However, this is okay for real data, as this gradient is not used to update the generator. This is show below
 <p align="center">
   <img src="/GAN_Tutorial_img/non_saturating.png" /> <br>
     <b> The left figure shows the output of the sigmoid function and its gradient. The final layer of the discriminator is sigmoid function. The middle figure shows the default settings and the gradient under this default setting. Finally, the right most figure shows the solution to the vanishing gradient - Source: [2] </b>
