@@ -80,6 +80,50 @@ Vertical stack에서 나온 특성 맵을 horizontal convolution layer의 결과
 
 Residual connection은 이전 단계(processed by a 1X1 convolution)의 출력을 결합합니다. 신경망의 첫 번째 block에는 residual connection이 없고 이 단계를 건너뜁니다.
 
+다음은 vertical stack과 horizontal stack의 계산에 대한 코드입니다.
+
+```
+def get_weights(shape, name, horizontal, mask_mode='noblind', mask=None):
+    weights_initializer = tf.contrib.layers.xavier_initializer()
+    W = tf.get_variable(name, shape, tf.float32, weights_initializer)
+
+    '''
+        Use of masking to hide subsequent pixel values 
+    '''
+    if mask:
+        filter_mid_y = shape[0]//2
+        filter_mid_x = shape[1]//2
+        mask_filter = np.ones(shape, dtype=np.float32)
+        if mask_mode == 'noblind':
+            if horizontal:
+                # All rows after center must be zero
+                mask_filter[filter_mid_y+1:, :, :, :] = 0.0
+                # All columns after center in center row must be zero
+                mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.0
+            else:
+                if mask == 'a':
+                    # In the first layer, can ONLY access pixels above it
+                    mask_filter[filter_mid_y:, :, :, :] = 0.0
+                else:
+                    # In the second layer, can access pixels above or even with it.
+                    # Reason being that the pixels to the right or left of the current pixel
+                    #  only have a receptive field of the layer above the current layer and up.
+                    mask_filter[filter_mid_y+1:, :, :, :] = 0.0
+
+            if mask == 'a':
+                # Center must be zero in first layer
+                mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.0
+        else:
+            mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.
+            mask_filter[filter_mid_y+1:, :, :, :] = 0.
+
+            if mask == 'a':
+                mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.
+                
+        W *= mask_filter 
+    return 
+```
+
 ## Conditional PixelCNN
 
 $$p(\mathrm{x|h})=\prod_{i=1}^{n^2}p(x_i|x_1, \space \dots,x_{i-1}, \mathrm{h})$$
@@ -199,4 +243,3 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 #### Reverse Footnote
 [^1]: Van Den Oord, Aäron, Nal Kalchbrenner, and Koray Kavukcuoglu. "Pixel recurrent neural networks." International conference on machine learning. PMLR, 2016.
 [^2]: linear interpolation
-
