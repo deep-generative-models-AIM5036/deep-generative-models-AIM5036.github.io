@@ -26,7 +26,6 @@ $log p(X) = log p(f(X)) + log \vert det\frac{\partial z}{\partial x}\vert $
 역변환을 계산하는 과정에서는 함수 f(X)에 대한 자코비안(Jacobian)을 계산하게 되는데, 기존 flow-based model에서는 계산을 쉽게 하기 위해 아래 그림과 같이 자코비안 행렬이 sparse하거나 삼각행렬과 같은 특수한 모양이 나오도록 하였습니다. 그러나, 자코비안이 sparse하거나 특정 모양을 따르게 되면 효율적으로 계산을 할 수는 있지만, 그런 조건을 만족시키는 함수 $f(X)$를 설계하는 것이 어렵고 비용이 많이 발생한다는 단점이 있습니다.   
 
 
-<img src="https://user-images.githubusercontent.com/76925973/202884711-1c7405df-d57b-4274-a417-be9bb467ffd9.png"  width="400" >
 <img src="https://user-images.githubusercontent.com/117256746/205273638-c0d5c36e-e367-40b8-88a6-8acc34177f15.png"  width="400" >
 
 [출처] Residual Flow [^1]
@@ -156,7 +155,7 @@ i-ResNet[^2]은 image classification에서 사용되는 Residual Netowrk를 inve
 Residual Network의 경우 $f(x) = x + g(x)$의 형태로 네트워크가 구성되어 있는데, 
 $g(x)$ 함수에 임의의 두 점에 대해 그 거리의 비가 1보다 작거나 같아야 한다는 unity Lipschitz constraint를 주어 invertible하게 만들었습니다. 
 
-바나흐 고정점 정리에 의하면 두 점 사이의 거리가 1보다 작다는 조건을 만족하는 함수에 대해서 각 점들은 서로 다른 고정된 한 값을 같게 됩니다. 즉 일대일 대응을 만족하는 함수가 되기 때문에 립시츠 조건을 만족하게 되면 invertible할 수 있게 되는 것입니다.
+바나흐 고정점 정리에 의하면 두 점 사이의 거리가 1보다 작다는 조건을 만족하는 함수는 유일한 고정점 한 개 갖게 됩니다. 이는 역함수 정리에서 함수가 열린 집합임을 증명하기 위해 필요한 조건으로 바나흐 고정점 정리가 만족한다면, 역함수 조건에 의해 단사함수와 열맂 집합 조건을 만족하게 되어 일대일 대응을 만족하는 함수가 되기 때문에 립시츠 조건을 만족하게 되면 invertible한 함수를 만들 수 있게 됩니다. [바나흐 고정점 정리](https://kty890309.tistory.com/15)와 [역함수 정리](https://ko.wikipedia.org/wiki/%EC%97%AD%ED%95%A8%EC%88%98_%EC%A0%95%EB%A6%AC)는 링크를 통해 자세한 내용을 참고하시기 바랍니다. 
 
 $$
     \begin{aligned}
@@ -238,7 +237,86 @@ $$
 $$
 
 
-이 때 립시츠 조건에 의해서 $J_g(x)^k$ 가 우하향 exponential 함수의 그래프를 따르게 되어 빠른 수렴이 가능합니다. 계산을 진행할 횟수인 $n$에 따라서 $log p(x)$의 추정값이 달라질 수 있기 때문에 $n$을 샘플링하는 $P(N)$에 따라 추정값의 variance가 높아질 수 있는데,  $J_g(x)^k$ 가 빠르게 수렴하면 $n$에 따른 variance 값 역시 무시할 수 있는 수준이 됩니다. 따라서 추정값의 variance를 줄이기 위해 $P(N)$을 tuning할 필요가 없게 되고, 본 논문에서는 $Geom(0.5)$로 고정하여 사용하였습니다.
+이 때 립시츠 조건에 의해서 $J_g(x)^k$ 가 우하향 exponential 함수의 그래프를 따르게 되어 빠른 수렴이 가능합니다. 계산을 진행할 횟수인 $n$에 따라서 $log p(x)$의 추정값이 달라질 수 있기 때문에 $n$을 샘플링하는 $P(N)$에 따라 추정값의 variance가 높아질 수 있는데,  $J_g(x)^k$ 가 빠르게 수렴하면 $n$에 따른 variance 값 역시 무시할 수 있는 수준이 됩니다. 따라서 추정값의 variance를 줄이기 위해 $P(N)$을 tuning할 필요가 없게 되고, 본 논문에서는 $Geom(0.5)$로 고정하여 사용하였습니다. 이를 통해 아래 코드와 같이 샘플링을 통해 계산한 n을 구하고 geometric 분포의 확률을 계산한 값을 사용하여 power series estimator를 계산할 수 있습니다.
+
+```python
+def _logdetgrad(self, x):
+    """Returns g(x) and logdet|d(x+g(x))/dx|."""
+
+    with torch.enable_grad():
+        if (self.brute_force or not self.training) and (x.ndimension() == 2 and x.shape[1] == 2):
+            ###########################################
+            # Brute-force compute Jacobian determinant.
+            ###########################################
+            x = x.requires_grad_(True)
+            g = self.nnet(x)
+            # Brute-force logdet only available for 2D.
+            jac = batch_jacobian(g, x)
+            batch_dets = (jac[:, 0, 0] + 1) * (jac[:, 1, 1] + 1) - jac[:, 0, 1] * jac[:, 1, 0]
+            return g, torch.log(torch.abs(batch_dets)).view(-1, 1)
+
+        geom_p = torch.sigmoid(self.geom_p).item()
+        sample_fn = lambda m: geometric_sample(geom_p, m)
+        rcdf_fn = lambda k, offset: geometric_1mcdf(geom_p, k, offset)
+
+        if self.training:
+            # Unbiased estimation.
+            lamb = self.lamb.item()
+            n_samples = sample_fn(self.n_samples)
+            n_power_series = max(n_samples) + self.n_exact_terms
+            coeff_fn = lambda k: 1 / rcdf_fn(k, self.n_exact_terms) * sum(n_samples >= k - self.n_exact_terms) / len(n_samples)
+
+
+        ####################################
+        # Power series with trace estimator.
+        ####################################
+        vareps = torch.randn_like(x)
+
+        # neumann estimator.
+        estimator_fn = neumann_logdet_estimator
+
+        # Do backprop-in-forward to save memory.
+        g, logdetgrad = mem_eff_wrapper(estimator_fn, self.nnet, x, n_power_series, vareps, coeff_fn, self.training)
+
+        return g, logdetgrad.view(-1, 1)
+
+
+def batch_jacobian(g, x):
+    jac = []
+    for d in range(g.shape[1]):
+        jac.append(torch.autograd.grad(torch.sum(g[:, d]), x, create_graph=True)[0].view(x.shape[0], 1, x.shape[1]))
+    return torch.cat(jac, 1)
+
+
+def batch_trace(M):
+    return M.view(M.shape[0], -1)[:, ::M.shape[1] + 1].sum(1)
+    
+######################## 
+Geometric distribution 
+########################    
+def geometric_sample(p, n_samples):
+    return np.random.geometric(p, n_samples)
+
+def geometric_1mcdf(p, k, offset):
+    if k <= offset:
+        return 1.
+    else:
+        k = k - offset
+    """P(n >= k)"""
+    return (1 - p)**max(k - 1, 0)
+
+# neumann estimator
+def neumann_logdet_estimator(g, x, n_power_series, vareps, coeff_fn, training):
+    vjp = vareps
+    neumann_vjp = vareps
+    with torch.no_grad():
+        for k in range(1, n_power_series + 1):
+            vjp = torch.autograd.grad(g, x, vjp, retain_graph=True)[0]
+            neumann_vjp = neumann_vjp + (-1)**k * coeff_fn(k) * vjp
+    vjp_jac = torch.autograd.grad(g, x, neumann_vjp, create_graph=training)[0]
+    logdetgrad = torch.sum(vjp_jac.view(x.shape[0], -1) * vareps.view(x.shape[0], -1), 1)
+    return logdetgrad
+```
 
 그 결과가 아래에 있는 그림을 통해 확인할 수 있는데, 기존 i-ResNet에서 사용한 방식과 같이 계산할 횟수 n을 일정하게 정한 뒤 절삭하여 계산한 값으로 $log p(x)$를 추정한 결과가 빨간색 그래프이고, residual flow가 제안한 방법으로 $log p(x)$를 추정한 결과가 파란색 그래프로 나타나 있습니다. 그림을 보면 추정된 값 자체의 bits/dim은 기존의 방법인 빨간색이 더 적은 수치를 기록하여 더 좋은 결과를 보인다고 생각할 수도 있지만, 실제 $log p(x)$값을 나타내는 실선과 비교하였을 때 빨간색 그래프는 추정값과 실제값이 서로 맞지 않는, 즉 biased estimator인 것을 확인할 수 있는 반면, 파란색 그래프를 보면 실제 $log p(x)$의 값과 추정된 값이 서로 일치하는 것을 보았을 때 unbiased estimator로 추정을 하였음을 확인할 수 있습니다.
 
@@ -295,7 +373,61 @@ Loss를 미분할때 log determinant의 미분을 사용한다면 위 (3.2.3) �
 
 [출처] Residual Flow [^1]
 
-위 그림을 보면 파란색은 backpropagation을 그대로 진행한 경우를 나타내고 초록색은 unbiased log determinant gradient estimator (3.2.2)식을 이용한 경우, 빨간색은 backward-in-forward (3.2.3)을 이용한 경우이며, 보라색은 두가지 방법을 모두 사용한 경우의 메모리 사용량을 나타냅니다. 이를 통해 두가지 방법을 모두 사용하여 backpropagation을 계산하는 경우 메모리를 훨씬 효율적으로 사용할 수 있음을 확인할 수 있었고 본 논문에서도 역시 두가지 모두를 사용하여 메모리를 효율적으로 사용하고자 하였습니다.
+위 그림을 보면 파란색은 backpropagation을 그대로 진행한 경우를 나타내고 초록색은 unbiased log determinant gradient estimator (3.2.2)식을 이용한 경우, 빨간색은 backward-in-forward (3.2.3)을 이용한 경우이며, 보라색은 두가지 방법을 모두 사용한 경우의 메모리 사용량을 나타냅니다. 이를 통해 두가지 방법을 모두 사용하여 backpropagation을 계산하는 경우 메모리를 훨씬 효율적으로 사용할 수 있음을 확인할 수 있었고 본 논문에서도 역시 두가지 모두를 사용하여 메모리를 효율적으로 사용하고자 하였습니다. 아래 코드는 이를 구현한 것으로 backward과정에서 forward때 계산한 logdetgrad를 이용하여 memory efficient한 계산이 가능하도록 구현하였습니다.
+
+```python
+class MemoryEfficientLogDetEstimator(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx, estimator_fn, gnet, x, n_power_series, vareps, coeff_fn, training, *g_params):
+        ctx.training = training
+        with torch.enable_grad():
+            x = x.detach().requires_grad_(True)
+            g = gnet(x)
+            ctx.g = g
+            ctx.x = x
+            logdetgrad = estimator_fn(g, x, n_power_series, vareps, coeff_fn, training)
+
+            if training:
+                grad_x, *grad_params = torch.autograd.grad(
+                    logdetgrad.sum(), (x,) + g_params, retain_graph=True, allow_unused=True
+                )
+                if grad_x is None:
+                    grad_x = torch.zeros_like(x)
+                ctx.save_for_backward(grad_x, *g_params, *grad_params)
+
+        return safe_detach(g), safe_detach(logdetgrad)
+
+    @staticmethod
+    def backward(ctx, grad_g, grad_logdetgrad):
+        training = ctx.training
+        if not training:
+            raise ValueError('Provide training=True if using backward.')
+
+        with torch.enable_grad():
+            grad_x, *params_and_grad = ctx.saved_tensors
+            g, x = ctx.g, ctx.x
+
+            # Precomputed gradients.
+            g_params = params_and_grad[:len(params_and_grad) // 2]
+            grad_params = params_and_grad[len(params_and_grad) // 2:]
+
+            dg_x, *dg_params = torch.autograd.grad(g, [x] + g_params, grad_g, allow_unused=True)
+
+        # Update based on gradient from logdetgrad.
+        dL = grad_logdetgrad[0].detach()
+        with torch.no_grad():
+            grad_x.mul_(dL)
+            grad_params = tuple([g.mul_(dL) if g is not None else None for g in grad_params])
+
+        # Update based on gradient from g.
+        with torch.no_grad():
+            grad_x.add_(dg_x)
+            grad_params = tuple([dg.add_(djac) if djac is not None else dg for dg, djac in zip(dg_params, grad_params)])
+
+        return (None, None, grad_x, None, None, None, None) + grad_params
+
+```
 
 
 ##### 3.3 LipSwish Activation Function
@@ -306,9 +438,8 @@ Backpropagation을 진행할 때 메모리 뿐만 아니라 activation derivativ
 
 대부분의 activation function이 첫번째 조건은 만족시키지만 두번째 조건을 만족시키기 어려워 본 논문에서는 두번째 조건을 만족시킬 수 있는 Swish function을 사용했다고 합니다. Swish activaton function은 $f(x) = x \cdot \sigma(\beta x)$ 로 밑의 그림 중 파란색으로 그려진 함수입니다. 그림을 통해서 알 수 있듯이 ReLU의 경우 미분값이 일정해지는 구간이 발생하여 이차 미분 시 gradient vanishing 문제를 야기하지만 Swish 함수의 경우 그렇지 않아 두번째 조건을 만족할 수 있습니다.
 
-<img src="https://user-images.githubusercontent.com/76925973/200821177-8131b782-b746-445a-8b78-3295eba52e03.png"  width="400" >
+<img src="https://user-images.githubusercontent.com/117256746/205494382-ba0da1bd-4ae8-49ff-ba54-4b7dde895a73.png"  width="400" >
 
-[출처] Swish function [^6]
 
 그러나 Swish 함수의 경우 일차 미분값이 $\vert \frac{d}{dz}Swish(z)\vert  \lesssim 1.1$ 으로 첫번째 조건을 만족하지 않습니다. 그래서 본 논문은 Swish 함수를 1.1로 나누어 주어 첫번째 조건 역시 만족할 수 있는 LipSwish 함수를 만들었습니다.
 
@@ -370,7 +501,50 @@ $$
 \Vert J_g(x) \Vert _{\color{red}{p}} = \Vert W_L \cdots W_z\phi ' (z_1) W_1 \phi ' (z_0)\Vert_{\color{red}{p}} \leq \Vert W_l \Vert_{\color{red}{p_{L-1} \rightarrow p_{L}}} \cdots \Vert W_2 \Vert_{\color{red}{p_{1} \rightarrow p_{2}}}  \Vert W_1 \Vert_{\color{red}{p_{1} \rightarrow p}}
 $$
 
-Residual Flow에서는 학습된 p으로 mixed matrix norms를 사용하여 0.003 bits/dim의 성능 개선을 보였습니다.
+Residual Flow에서는 학습된 p으로 mixed matrix norms를 사용하여 0.003 bits/dim의 성능 개선을 보였고 아래와 같이 구현할 수 있습니다.
+
+```python
+def normalize_v(v, domain, out=None):
+    if not torch.is_tensor(domain) and domain == 2:
+        v = F.normalize(v, p=2, dim=0, out=out)
+    elif domain == 1:
+        v = projmax_(v)
+    else:
+        vabs = torch.abs(v)
+        vph = v / vabs
+        vph[torch.isnan(vph)] = 1
+        vabs = vabs / torch.max(vabs)
+        vabs = vabs**(1 / (domain - 1))
+        v = vph * vabs / vector_norm(vabs, domain)
+    return v
+
+
+def normalize_u(u, codomain, out=None):
+    if not torch.is_tensor(codomain) and codomain == 2:
+        u = F.normalize(u, p=2, dim=0, out=out)
+    elif codomain == float('inf'):
+        u = projmax_(u)
+    else:
+        uabs = torch.abs(u)
+        uph = u / uabs
+        uph[torch.isnan(uph)] = 1
+        uabs = uabs / torch.max(uabs)
+        uabs = uabs**(codomain - 1)
+        if codomain == 1:
+            u = uph * uabs / vector_norm(uabs, float('inf'))
+        else:
+            u = uph * uabs / vector_norm(uabs, codomain / (codomain - 1))
+    return u
+
+def compute_one_iter():
+    domain, codomain = compute_domain_codomain()
+    u = u.detach()
+    v = v.detach()
+    weight = weight.detach()
+    u = normalize_u(torch.mv(weight, v), codomain)
+    v = normalize_v(torch.mv(weight.t(), u), domain)
+    return torch.dot(u, torch.mv(weight, v))
+```
 
 ##### 4.2 Density & Generative Modeling
 
@@ -474,7 +648,7 @@ Residual Flow가 사용된 예시입니다.
 $$
 pred(x) = \begin{cases}
 k + 1 & log p(x) < \tau \\
-argmax_{j \in \set{1, \cdots, k}} p(y_j \vert x) &\text{otherwise } 
+argmax_{j \in (1, \cdots, k) p(y_j \vert x) &\text{otherwise } 
 \end{cases}
 $$
 
@@ -488,4 +662,3 @@ $$
 [^3]: Nalisnick, E., Matsukawa, A., Teh, Y. W., Gorur, D., & Lakshminarayanan, B. (2019, May). Hybrid models with deep and invertible features. In International Conference on Machine Learning (pp. 4723-4732). PMLR.
 [^4]:Honda, S., Akita, H., Ishiguro, K., Nakanishi, T., & Oono, K. (2019). Graph residual flow for molecular graph generation. arXiv preprint arXiv:1909.13521.
 [^5]:Zhang, H., Li, A., Guo, J., & Guo, Y. (2020, August). Hybrid models for open set recognition. In European Conference on Computer Vision (pp. 102-117). Springer, Cham.
-[^6]: https://velog.io/@iissaacc/Swish-function
