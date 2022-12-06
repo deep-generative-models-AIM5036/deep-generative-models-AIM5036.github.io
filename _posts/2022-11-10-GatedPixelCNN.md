@@ -12,9 +12,14 @@ img_path: "/assets/img/posts/2022-11-02-GatedPixelCNN"
 
 > Van den Oord, Aaron, et al. "Conditional image generation with pixelcnn decoders." Advances in neural information processing systems 29 (2016).
 
+
 # Introduction
+
 이 논문은 기존의 PixelRNN과 PixelCNN을 제시한 논문[^1]을 발전시켰습니다.
-해당 논문에서는 두 가지 형태의 PixelRNN\(Row LSTM, Diagonal BiLSTM\)과 PixelCNN을 제시합니다. 각 모델에 대한 자세한 내용은 해당 논문을 참조하시길 바랍니다. 여기서는 각 모델을 장단점을 바탕으로 어떻게 향상시켰는지에 대해 설명하겠습니다.
+해당 논문에서는 두 가지 형태의 PixelRNN\(Row LSTM, Diagonal BiLSTM\)과 PixelCNN을 제시합니다.
+
+### Background
+PixelRNN은 Row LSTM, Diagonal Bi-LSTM, PixelCNN 모델을 제안하고 있습니다. 기본적으로, $i$번째 픽셀을 (1 ~ $i−1$)번째 픽셀을 이용하여 추론합니다. 즉, Auto regressive propety를 만족하며 이미지를 생성합니다. 
 
 PixelRNN은 일반적으로 좋은 성능을 보여줍니다. 하지만, PixelCNN에 비해 학습이 느리다는 단점을 가지고 있습니다. 이는 PixelCNN이 병렬화가 가능하다는 장점 때문에 더 빠르게 학습킬 수 있습니다. 하지만, PixelCNN의 경우 blind spot이 존재한다는 단점이 있습니다. 이 때문에 PixelRNN에 비해 성능이 떨어지는 문제를 가지고 있습니다.
 
