@@ -217,7 +217,7 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 이러한 문제를 해결하기 위해 PixelCNN++, PixelVAE 등이 이후에 제안되었습니다.
 
 ## Future Work
-### **Improvements**
+### Improvements
 1. `PixelVAE`: A Latent Variable Model for Natural Images
 : PixelCNN과 VAE를 결합한 모델입니다.
 
