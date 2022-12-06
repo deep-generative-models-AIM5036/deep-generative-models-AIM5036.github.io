@@ -207,7 +207,7 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 1. Conditional PixelCNN은 클래스에 대한 조건이 주어졌을 때 해당 클래스에 대응되는 다양하고 현실적인 이미지를 이미지를 생성할 수 있습니다.
 1. PixelCNN은 오토인코더에서 강력한 디코더로써 사용될 수 있습니다.
 
-# Limitation
+## Limitation
 - 하지만, 이러한 PixelCNN도 여전히 많은 한계를 가지고 있습니다.
 
 1. PixelRNN을 압도할 만큼의 성능은 보여주지 못하고 있습니다.
@@ -216,13 +216,14 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 
 이러한 문제를 해결하기 위해 PixelCNN++, PixelVAE 등이 이후에 제안되었습니다.
 
-# Future Work
-## Improvements
+## Future Work
+### **Improvements**
 1. `PixelVAE`: A Latent Variable Model for Natural Images
 : PixelCNN과 VAE를 결합한 모델입니다.
 
 1. `PixelCNN++`
 
+<<<<<<< HEAD
 
 ## Applications
 1. WaveNet: A Generative Model for Raw Audio
@@ -231,6 +232,12 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 
 1. Genrating Interpertable Images with Controllable Structure
 
+=======
+### **Applications**
+1. WaveNet: A Generative Model for Raw Audio
+1. Video Pixel Networks
+1. Genrating Interpertable Images with Controllable Structure
+>>>>>>> d62fc22e2d0ad90204d8f6009fef9b65bc1c77ca
 1. Language Modeling with Gated Convolutional Networks
 
 ---
