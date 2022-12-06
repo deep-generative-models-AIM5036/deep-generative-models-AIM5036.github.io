@@ -223,7 +223,6 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 
 1. `PixelCNN++`
 
-<<<<<<< HEAD
 
 ## Applications
 1. WaveNet: A Generative Model for Raw Audio
@@ -232,12 +231,6 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 
 1. Genrating Interpertable Images with Controllable Structure
 
-=======
-### **Applications**
-1. WaveNet: A Generative Model for Raw Audio
-1. Video Pixel Networks
-1. Genrating Interpertable Images with Controllable Structure
->>>>>>> d62fc22e2d0ad90204d8f6009fef9b65bc1c77ca
 1. Language Modeling with Gated Convolutional Networks
 
 ---
