@@ -29,7 +29,7 @@ PixelRNN은 Row LSTM, Diagonal Bi-LSTM, PixelCNN 모델을 제안하고 있습�
 Row LSTM은 아래 그림과 같이 삼각형 형태를 취하며 이미지를 생성합니다.
 <img src="https://user-images.githubusercontent.com/26114165/205895712-bfaeaee0-cd3b-4c0c-a47b-6d025bdce331.png" style="max-width: 25%">
 
-삼각형 형태로 인해 모든 이전 픽셀을 활요하기 힘들지만, 이를 극복하기 위해 이전 셀 값을 입력을 받아 연산하도록 구현하였습니다.
+삼각형 형태로 인해 모든 이전 픽셀을 활용하기 힘들지만, 이를 극복하기 위해 이전 셀 값을 입력을 받아 연산하도록 구현하였습니다.
 
 Diagonal Bi-LSTM은 상단의 모서리에서 시작하여 하단의 반대쪽 모서리에 도달하는 대각선 방식으로 이미지를 생성합니다.
 
