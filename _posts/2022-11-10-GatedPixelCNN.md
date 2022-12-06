@@ -223,22 +223,26 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 
 1. `PixelCNN++`
 
+
 ## Applications
-`1. WaveNet: A Generative Model for Raw Audio`  
-`2. Video Pixel Networks`  
-`3. Genrating Interpertable Images with Controllable Structure`  
-`4. Language Modeling with Gated Convolutional Networks`
+1. WaveNet: A Generative Model for Raw Audio
+
+1. Video Pixel Networks
+
+1. Genrating Interpertable Images with Controllable Structure
+
+1. Language Modeling with Gated Convolutional Networks
 
 ---
 
 # Reference
-1. https://docs.google.com/presentation/d/1tYkGAnxPviU_HXpNMiSeaYtVKmWnMNMj956mLqXBB2Q/edit#slide=id.g1a9ca21d74_0_6839
+1. [Gated PixelCNN Sildes](https://docs.google.com/presentation/d/1tYkGAnxPviU_HXpNMiSeaYtVKmWnMNMj956mLqXBB2Q/edit#slide=id.g1a9ca21d74_0_6839)
 
-1. https://www.slideshare.net/suga93/conditional-image-generation-with-pixelcnn-decoders
+1. [Sildeshare](https://www.slideshare.net/suga93/conditional-image-generation-with-pixelcnn-decoders)
 
-1. https://github.com/anantzoid/Conditional-PixelCNN-decoder
+1. [Gated Pixel Github](https://github.com/anantzoid/Conditional-PixelCNN-decoder)
 
-1. https://towardsdatascience.com/pixelcnns-blind-spot-84e19a3797b9
+1. [PixelCNN’s Blind Spot](https://towardsdatascience.com/pixelcnns-blind-spot-84e19a3797b9)
 
 #### Reverse Footnote
 [^1]: Van Den Oord, Aäron, Nal Kalchbrenner, and Koray Kavukcuoglu. "Pixel recurrent neural networks." International conference on machine learning. PMLR, 2016.
