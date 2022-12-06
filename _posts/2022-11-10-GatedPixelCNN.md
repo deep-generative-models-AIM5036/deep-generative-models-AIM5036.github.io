@@ -12,15 +12,39 @@ img_path: "/assets/img/posts/2022-11-02-GatedPixelCNN"
 
 > Van den Oord, Aaron, et al. "Conditional image generation with pixelcnn decoders." Advances in neural information processing systems 29 (2016).
 
+
 # Introduction
 이 논문은 기존의 PixelRNN과 PixelCNN을 제시한 논문[^1]을 발전시켰습니다.
-해당 논문에서는 두 가지 형태의 PixelRNN\(Row LSTM, Diagonal BiLSTM\)과 PixelCNN을 제시합니다. 각 모델에 대한 자세한 내용은 해당 논문을 참조하시길 바랍니다. 여기서는 각 모델을 장단점을 바탕으로 어떻게 향상시켰는지에 대해 설명하겠습니다.
+해당 논문에서는 두 가지 형태의 PixelRNN\(Row LSTM, Diagonal BiLSTM\)과 PixelCNN을 제시합니다.
 
 PixelRNN은 일반적으로 좋은 성능을 보여줍니다. 하지만, PixelCNN에 비해 학습이 느리다는 단점을 가지고 있습니다. 이는 PixelCNN이 병렬화가 가능하다는 장점 때문에 더 빠르게 학습킬 수 있습니다. 하지만, PixelCNN의 경우 blind spot이 존재한다는 단점이 있습니다. 이 때문에 PixelRNN에 비해 성능이 떨어지는 문제를 가지고 있습니다.
 
 여기서는 두 모델의 장점을 결합한 Gated PixelCNN을 제안합니다. 이 모델이 학습하는데 걸리는 시간을 PixelRNN 대비 절반 이하로 줄였으며 성능 또한 그 이상이라고 합니다.
 
 또한, 저자들은 Gated PixelCNN에 latent 벡터 임베딩을 조건으로 추가한 Conditional PixelCNN을 제안합니다. Conditional PixelCNN은 원-핫 엔코딩 형태로 조건을 주어 여러 클래스로부터 이미지를 생성하는데에 사용될 수 있습니다. 이외에도, 이미지의 high level 정보를 가지고 있는 임베딩을 사용하여 비슷한 특징을 가지고 있는 여러 다양한 이미지를 생성할 수 있습니다.
+
+## Background
+PixelRNN은 Row LSTM, Diagonal Bi-LSTM, PixelCNN 모델을 제안하고 있습니다.  
+### Row LSTM  
+기본적으로, 각 모델들은 $i$번째 픽셀을 (1 ~ $i−1$)번째 픽셀을 이용하여 추론합니다. 즉, Auto-regressive propety를 만족하며 이미지를 생성합니다. 
+
+Row LSTM은 아래 그림과 같이 삼각형 형태를 취하며 이미지를 생성합니다.
+<img src="https://user-images.githubusercontent.com/26114165/205895712-bfaeaee0-cd3b-4c0c-a47b-6d025bdce331.png" style="max-width: 25%">
+
+삼각형 형태로 인해 모든 이전 픽셀을 활용하기 힘들지만, 이를 극복하기 위해 이전 셀 값을 입력을 받아 연산하도록 구현하였습니다.
+
+### Diagonal Bi-LSTM  
+Diagonal Bi-LSTM은 상단의 모서리에서 시작하여 하단의 반대쪽 모서리에 도달하는 대각선 방식으로 이미지를 생성합니다.
+
+
+<img src="https://user-images.githubusercontent.com/26114165/205896127-1c4b1525-19dd-4ac7-aecf-540a90efafae.png" style="max-width: 25%">
+
+이로 인해, 가장 큰 receptive field를 가지게 되고 성능이 우수합니다. 하지만, $i-1$번째까지 모든 픽셀을 사용하므로 생성 속도가 매우 느립니다.
+
+### PixelCNN  
+
+PixelCNN은 이전 pixel을 CNN을 통해 입력받고 그 결과로 새로운 픽셀을 아웃풋으로 내보냅니다. 하지만 receptive field를 보면 CNN 필터는 blind spot을 가지고 있다는 점을 알 수 있습니다. 그리고 이미지 크기가 늘어날수록 blind spot이 커지는 문제가 생깁니다.  
+<img src="https://user-images.githubusercontent.com/60708119/205900000-257bd748-4c93-445e-a5b0-4695f3b061ce.png" style="max-width: 50%">
 
 # Gated PixelCNN
 저자들은 두 종류의 convolutional network stack을 결합하여 blind spot을 제거하였습니다.
@@ -49,13 +73,13 @@ PixelCNN에도 Gated Activation을 사용하도록 디자인하였습니다.
 ## Single layer block in a Gated PixelCNN 
 ### Process 1: Calculate the vertical stack features maps
 
-<img src="https://user-images.githubusercontent.com/60708119/200169369-1e972f87-b12c-464e-b2dd-92755ca4cc00.png" alt="process1" style="max-width: 75%"> 
+<img src="https://user-images.githubusercontent.com/60708119/200169369-1e972f87-b12c-464e-b2dd-92755ca4cc00.png" alt="process1" style="max-width: 50%"> 
 
 Vertical stack의 입력은 vertical 마스크가 있는 3X3 합성곱 층에서 처리됩니다. 특성 맵의 결과는 gated activation unit을 통과하고 다음 vertical stack의 입력이 됩니다.
 
 ### Process 2: Feeding vertical maps into horizontal stack
 
-<img src="https://user-images.githubusercontent.com/60708119/200169417-e66d74bf-330c-4e18-a12d-91d5f5162d09.png" alt="process2" style="max-width: 75%">   
+<img src="https://user-images.githubusercontent.com/60708119/200169417-e66d74bf-330c-4e18-a12d-91d5f5162d09.png" alt="process2" style="max-width: 50%">   
 
 
 Vertical stack 특성 맵은 1X1 합성곱 층에 의해 처리됩니다. 
@@ -70,60 +94,139 @@ Vertical stack 특성 맵은 1X1 합성곱 층에 의해 처리됩니다.
 
 ### Process 3: Calculate horizontal feature maps
 
-<img src="https://user-images.githubusercontent.com/60708119/200169930-83637fc4-9fd1-4f18-94e6-acde25df3c07.png" alt="process3" style="max-width: 75%">  
+<img src="https://user-images.githubusercontent.com/60708119/200169930-83637fc4-9fd1-4f18-94e6-acde25df3c07.png" alt="process3" style="max-width: 50%">  
 
 Vertical stack에서 나온 특성 맵을 horizontal convolution layer의 결과와 더해줍니다. 특성 맵은 gated activation unit을 통과합니다. 이 출력을 모든 이전 픽셀의 정보를 고려하는 ideal receptive format을 갖습니다. 
 
+vertical과 horizontal에 대한 질문이 있어서 코드 첨부합니다.
+
+- 최종 결정은 horizontal stack에서 합니다.
+
+```python
+class GatedConvLayer(nn.Module):
+  """
+  Main building block of the framework. It implements figure 2 of the paper.
+  """
+  def __init__(self, in_channels, nfeats, kernel_size=3, mask_type='A'):
+    super(GatedConvLayer, self).__init__()
+    self.nfeats = nfeats
+    self.mask_type = mask_type
+    self.vconv = MaskedConv(in_channels=in_channels, out_channels=2 * nfeats, kernel_size=kernel_size,
+                            ver_or_hor='V', mask_type=mask_type)
+
+    self.hconv = MaskedConv(in_channels=in_channels, out_channels=2 * nfeats, kernel_size=kernel_size,
+                            ver_or_hor='H', mask_type=mask_type)
+
+    self.v_to_h_conv = nn.Conv2d(in_channels=2 * nfeats, out_channels=2 * nfeats, kernel_size=1)  # 1x1 conv
+
+    self.h_to_h_conv = nn.Conv2d(in_channels=nfeats, out_channels=nfeats, kernel_size=1)  # 1x1 conv
+
+  def GatedActivation(self, x):
+    return torch.tanh(x[:, :self.nfeats]) * torch.sigmoid(x[:, self.nfeats:])
+
+  def forward(self, x):
+    # x should be a list of two elements [v, h]
+    iv, ih = x
+    ov = self.vconv(iv)
+    oh_ = self.hconv(ih)
+    v2h = self.v_to_h_conv(ov)
+    oh = v2h + oh_
+
+    ov = self.GatedActivation(ov)
+
+    oh = self.GatedActivation(oh)
+    oh = self.h_to_h_conv(oh)
+
+    ##############################################################################
+    #Due to the residual connection, if we add it from the first layer, ##########
+    #the current pixel is included, in my implementation I removed the first #####
+    #residual connection to solve this issue #####################################
+    ##############################################################################
+    if self.mask_type == 'B':
+      oh = oh + ih
+
+    return [ov, oh]
+
+class PixelCNN(nn.Module):
+  """
+  Class that stacks several GatedConvLayers, the output has Klevel maps.
+  Klevels indicates the number of possible values that a pixel can have e.g 2 for binary images or
+  256 for gray level imgs.
+  """
+  def __init__(self, nlayers, in_channels, nfeats, Klevels=2, ksz_A=5, ksz_B=3):
+    super(PixelCNN, self).__init__()
+    self.layers = nn.ModuleList(
+      [GatedConvLayer(in_channels=in_channels, nfeats=nfeats, mask_type='A', kernel_size=ksz_A)])
+    for i in range(nlayers):
+      gatedconv = GatedConvLayer(in_channels=nfeats, nfeats=nfeats, mask_type='B', kernel_size=ksz_B)
+      self.layers.append(gatedconv)
+    #TODO make kernel sizes as params
+
+    self.out_conv = nn.Sequential(
+      nn.Conv2d(nfeats, nfeats, 1),
+      nn.ReLU(True),
+      nn.Conv2d(nfeats, Klevels, 1)
+    )
+
+
+  def forward(self, x):
+    x = [x, x]
+    for i, layer in enumerate(self.layers):
+        x = layer(x)
+    logits = self.out_conv(x[1])
+
+    return logits
+```
+
 ### Process 4: Calculate the residual connection on the horizontal stack
 
-<img src="https://user-images.githubusercontent.com/60708119/200170159-5105fd14-2dd9-4c45-b739-b16038385954.png" alt="process4" style="max-width: 75%">  
+<img src="https://user-images.githubusercontent.com/60708119/200170159-5105fd14-2dd9-4c45-b739-b16038385954.png" alt="process4" style="max-width: 50%">  
 
 Residual connection은 이전 단계(processed by a 1X1 convolution)의 출력을 결합합니다. 신경망의 첫 번째 block에는 residual connection이 없고 이 단계를 건너뜁니다.
 
 다음은 vertical stack과 horizontal stack의 계산에 대한 코드입니다.
 
-```
+```python
 def get_weights(shape, name, horizontal, mask_mode='noblind', mask=None):
-    weights_initializer = tf.contrib.layers.xavier_initializer()
-    W = tf.get_variable(name, shape, tf.float32, weights_initializer)
+  weights_initializer = tf.contrib.layers.xavier_initializer()
+  W = tf.get_variable(name, shape, tf.float32, weights_initializer)
 
-    '''
-        Use of masking to hide subsequent pixel values 
-    '''
-    if mask:
-        filter_mid_y = shape[0]//2
-        filter_mid_x = shape[1]//2
-        mask_filter = np.ones(shape, dtype=np.float32)
-        if mask_mode == 'noblind':
-            if horizontal:
-                # All rows after center must be zero
-                mask_filter[filter_mid_y+1:, :, :, :] = 0.0
-                # All columns after center in center row must be zero
-                mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.0
-            else:
-                if mask == 'a':
-                    # In the first layer, can ONLY access pixels above it
-                    mask_filter[filter_mid_y:, :, :, :] = 0.0
-                else:
-                    # In the second layer, can access pixels above or even with it.
-                    # Reason being that the pixels to the right or left of the current pixel
-                    #  only have a receptive field of the layer above the current layer and up.
-                    mask_filter[filter_mid_y+1:, :, :, :] = 0.0
-
-            if mask == 'a':
-                # Center must be zero in first layer
-                mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.0
+  '''
+      Use of masking to hide subsequent pixel values 
+  '''
+  if mask:
+    filter_mid_y = shape[0]//2
+    filter_mid_x = shape[1]//2
+    mask_filter = np.ones(shape, dtype=np.float32)
+    if mask_mode == 'noblind':
+      if horizontal:
+        # All rows after center must be zero
+        mask_filter[filter_mid_y+1:, :, :, :] = 0.0
+        # All columns after center in center row must be zero
+        mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.0
+      else:
+        if mask == 'a':
+          # In the first layer, can ONLY access pixels above it
+          mask_filter[filter_mid_y:, :, :, :] = 0.0
         else:
-            mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.
-            mask_filter[filter_mid_y+1:, :, :, :] = 0.
+          # In the second layer, can access pixels above or even with it.
+          # Reason being that the pixels to the right or left of the current pixel
+          #  only have a receptive field of the layer above the current layer and up.
+          mask_filter[filter_mid_y+1:, :, :, :] = 0.0
 
-            if mask == 'a':
-                mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.
-                
-        W *= mask_filter 
-    return 
+        if mask == 'a':
+          # Center must be zero in first layer
+          mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.0
+    else:
+      mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.
+      mask_filter[filter_mid_y+1:, :, :, :] = 0.
+
+      if mask == 'a':
+          mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.
+            
+    W *= mask_filter 
+  return 
 ```
-
 ## Conditional PixelCNN
 
 $$p(\mathrm{x|h})=\prod_{i=1}^{n^2}p(x_i|x_1, \space \dots,x_{i-1}, \mathrm{h})$$
@@ -153,12 +256,12 @@ PixelCNN은 강력한 unconditional generative model이기 때문에 reconstruct
 먼저, CIFAR-10 데이터 세트에 대해 Gated PixelCNN의 성능을 비교 분석하였습니다.
 
 
-<img src="https://user-images.githubusercontent.com/26114165/201047261-268a32a9-743b-471a-bc35-c75c01a182b6.png" alt="Table 1" style="max-width: 75%">
+<img src="https://user-images.githubusercontent.com/26114165/201047261-268a32a9-743b-471a-bc35-c75c01a182b6.png" alt="Table 1" style="max-width: 50%">
 *Table 1: CIFAR-10에 대해 여러 모델의 bits/dim(낮을수록 좋음) 성능, 괄호 안의 내용은 훈련할 때의 성능*
 
 Gated PixelCNN은 기존의 PixelCNN 보다 0.11 *bits/dim* 낮은 수치를 보여주며, 생성된 샘플의 시각적 품질에 상당한 영향을 주었습니다. 이는 PixelRNN과 거의 비슷한 수준의 성능을 보여주고 있습니다.
 
-<img src="https://user-images.githubusercontent.com/26114165/201047281-8db6ba45-261f-4a99-9241-bba0c54fc5d4.png" alt="Table 2" style="max-width: 75%">
+<img src="https://user-images.githubusercontent.com/26114165/201047281-8db6ba45-261f-4a99-9241-bba0c54fc5d4.png" alt="Table 2" style="max-width: 50%">
 *Table 2: ImageNet에 대해 여러 모델의 bits/dim(낮을수록 좋음) 성능, 괄호 안의 내용은 훈련할 때의 성능*
 
 그 다음에는 ImageNet 데이터 세트에 대해 Gated PixelCNN의 성능을 비교 분석하였습니다. 여기서 Gated PixelCNN은 PixelRNN보다 더 좋은 성능을 보여줍니다. 저자들은 Gated PixelCNN의 성능이 더 좋은 이유가 PixelRNN이 과소적합 되었기 때문이라고 말합니다. 이렇게 생각한 이유는 일반적으로 모델이 클수록 더 좋은 성능을 발휘하고 간단한 모델일수록 더 빠르게 학습되기 때문입니다.
@@ -207,7 +310,7 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 1. Conditional PixelCNN은 클래스에 대한 조건이 주어졌을 때 해당 클래스에 대응되는 다양하고 현실적인 이미지를 이미지를 생성할 수 있습니다.
 1. PixelCNN은 오토인코더에서 강력한 디코더로써 사용될 수 있습니다.
 
-# Limitation
+## Limitation
 하지만, 이러한 PixelCNN도 여전히 많은 한계를 가지고 있습니다.
 
 1. PixelRNN을 압도할 만큼의 성능은 보여주지 못하고 있습니다.
@@ -218,27 +321,28 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 
 # Future Work
 ## Improvements
-1. PixelVAE: A Latent Variable Model for Natural Images
-: PixelCNN과 VAE를 결합한 모델입니다.
+1. PixelVAE
+
+    [PixelVAE](https://deep-generative-models-aim5036.github.io/lvm/2022/11/10/PixelVAE.html)는 latent variable model로 autoregressive decoder(예를 들어, PixelCNN)와 VAE 모델이 결합된 형태입니다. VAE의 conditional output distribution에서 PixelCNN에 의해 마스킹된 convolution을 사용합니다. 
 
 1. PixelCNN++
 
+    [PixelCNN++](https://deep-generative-models-aim5036.github.io/autoregressive%20models/2022/11/13/PixelCNN++.html)은 Gated PixelCNN에 부족한 한계를 해결하기 위한 가설을 새워 성능을 개선하였습니다. 첫번째로는 Discretized Logistic Mixture Likelihood 방법을 적용하였습니다. 즉, softmax 대신 logistic 분포의 조합(mixture)를 사용하였습니다. 두번째로는 Conditioning on Whole Pixels 방법입니다. Green 과 red, 또는 blue와 green, red의 관계를 계수를 통해 표현하였습니다. 이외에도 Downsampling Versus Dilated Convolution 등을 통하여 성능을 향상시켰습니다.
+
 ## Applications
 1. WaveNet: A Generative Model for Raw Audio
-1. Video Pixel Networks
-1. Genrating Interpertable Images with Controllable Structure
-1. Language Modeling with Gated Convolutional Networks
+
+    [WaveNet](https://deep-generative-models-aim5036.github.io/autoregressive%20models/2022/11/13/wavenet.html)은 음성 합성 분야에서 좋은 성능을 보여준 autoregressive generative model입니다. WaveNet의 Gated Activation Unit은 PixelCNN에서 사용된 매커니즘을 차용했습니다. 이 매커니즘을 통해 레이어를 더 깊게 쌓을 수 있고 더 빠르게 학습할 수 있다고 합니다.
 
 ---
-
 # Reference
-1. https://docs.google.com/presentation/d/1tYkGAnxPviU_HXpNMiSeaYtVKmWnMNMj956mLqXBB2Q/edit#slide=id.g1a9ca21d74_0_6839
+1. [Gated PixelCNN Sildes](https://docs.google.com/presentation/d/1tYkGAnxPviU_HXpNMiSeaYtVKmWnMNMj956mLqXBB2Q/edit#slide=id.g1a9ca21d74_0_6839)
 
-1. https://www.slideshare.net/suga93/conditional-image-generation-with-pixelcnn-decoders
+1. [Sildeshare](https://www.slideshare.net/suga93/conditional-image-generation-with-pixelcnn-decoders)
 
-1. https://github.com/anantzoid/Conditional-PixelCNN-decoder
+1. [Gated Pixel Github](https://github.com/anantzoid/Conditional-PixelCNN-decoder)
 
-1. https://towardsdatascience.com/pixelcnns-blind-spot-84e19a3797b9
+1. [PixelCNN’s Blind Spot](https://towardsdatascience.com/pixelcnns-blind-spot-84e19a3797b9)
 
 #### Reverse Footnote
 [^1]: Van Den Oord, Aäron, Nal Kalchbrenner, and Koray Kavukcuoglu. "Pixel recurrent neural networks." International conference on machine learning. PMLR, 2016.
