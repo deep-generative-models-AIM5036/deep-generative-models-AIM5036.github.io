@@ -200,7 +200,7 @@ Figure 6는 각 모델로부터 생성된 이미지를 보여줍니다.
 PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 representaion $h$가 기존의 디코더를 사용한 것보다 질적으로 다르다는 것을 확인할 수 있습니다. 예를 들어, 가장 마지막 행에서 모델이 입력을 정확하게 다시 생성해내는 것이 아니라 다르지만 비슷한 사람이 있는 실내 공간을 생성하는 것을 볼 수 있습니다.
 
 # Conclusion
-저자들은 PixelCNN을 향상시킨 Gated PixelCNN과 Conditional PixelCNN을 제안하였습니다. 수직 및 수평 CNN을 통해 receptive field에서의 "blind spot"을 제거하여 기존의 한계를 극복하였습니다. 
+- 저자들은 PixelCNN을 향상시킨 Gated PixelCNN과 Conditional PixelCNN을 제안하였습니다. 수직 및 수평 CNN을 통해 receptive field에서의 "blind spot"을 제거하여 기존의 한계를 극복하였습니다. 
 
 1. Gated PixelCNN은 더욱 효율적으로 계산이 가능합니다.
 1. Gated PixelCNN은 PixelRNN 이상의 성능을 보여줍니다.
@@ -208,7 +208,7 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 1. PixelCNN은 오토인코더에서 강력한 디코더로써 사용될 수 있습니다.
 
 # Limitation
-하지만, 이러한 PixelCNN도 여전히 많은 한계를 가지고 있습니다.
+- 하지만, 이러한 PixelCNN도 여전히 많은 한계를 가지고 있습니다.
 
 1. PixelRNN을 압도할 만큼의 성능은 보여주지 못하고 있습니다.
 1. 순차적인 구조는 생성이 진행될수록 에러가 커지는 단점을 가지고 있습니다. 
@@ -218,16 +218,16 @@ PixelCNN의 디코더와 함께 bottleneck에서 인코딩된 정보인 represen
 
 # Future Work
 ## Improvements
-1. PixelVAE: A Latent Variable Model for Natural Images
+1. `PixelVAE`: A Latent Variable Model for Natural Images
 : PixelCNN과 VAE를 결합한 모델입니다.
 
-1. PixelCNN++
+1. `PixelCNN++`
 
 ## Applications
-1. WaveNet: A Generative Model for Raw Audio
-1. Video Pixel Networks
-1. Genrating Interpertable Images with Controllable Structure
-1. Language Modeling with Gated Convolutional Networks
+`1. WaveNet: A Generative Model for Raw Audio`  
+`2. Video Pixel Networks`  
+`3. Genrating Interpertable Images with Controllable Structure`  
+`4. Language Modeling with Gated Convolutional Networks`
 
 ---
 
