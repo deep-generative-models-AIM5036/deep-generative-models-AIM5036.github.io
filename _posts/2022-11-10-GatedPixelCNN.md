@@ -74,82 +74,84 @@ Vertical stack 특성 맵은 1X1 합성곱 층에 의해 처리됩니다.
 
 Vertical stack에서 나온 특성 맵을 horizontal convolution layer의 결과와 더해줍니다. 특성 맵은 gated activation unit을 통과합니다. 이 출력을 모든 이전 픽셀의 정보를 고려하는 ideal receptive format을 갖습니다. 
 
-`vertical과 horizontal에 대한 질문이 있어서 코드 첨부합니다.`
+vertical과 horizontal에 대한 질문이 있어서 코드 첨부합니다.
+
 - 최종 결정은 horizontal stack에서 합니다.
-```
+
+```python
 class GatedConvLayer(nn.Module):
-    """
-    Main building block of the framework. It implements figure 2 of the paper.
-    """
-    def __init__(self, in_channels, nfeats, kernel_size=3, mask_type='A'):
-        super(GatedConvLayer, self).__init__()
-        self.nfeats = nfeats
-        self.mask_type = mask_type
-        self.vconv = MaskedConv(in_channels=in_channels, out_channels=2 * nfeats, kernel_size=kernel_size,
-                                ver_or_hor='V', mask_type=mask_type)
+  """
+  Main building block of the framework. It implements figure 2 of the paper.
+  """
+  def __init__(self, in_channels, nfeats, kernel_size=3, mask_type='A'):
+    super(GatedConvLayer, self).__init__()
+    self.nfeats = nfeats
+    self.mask_type = mask_type
+    self.vconv = MaskedConv(in_channels=in_channels, out_channels=2 * nfeats, kernel_size=kernel_size,
+                            ver_or_hor='V', mask_type=mask_type)
 
-        self.hconv = MaskedConv(in_channels=in_channels, out_channels=2 * nfeats, kernel_size=kernel_size,
-                                ver_or_hor='H', mask_type=mask_type)
+    self.hconv = MaskedConv(in_channels=in_channels, out_channels=2 * nfeats, kernel_size=kernel_size,
+                            ver_or_hor='H', mask_type=mask_type)
 
-        self.v_to_h_conv = nn.Conv2d(in_channels=2 * nfeats, out_channels=2 * nfeats, kernel_size=1)  # 1x1 conv
+    self.v_to_h_conv = nn.Conv2d(in_channels=2 * nfeats, out_channels=2 * nfeats, kernel_size=1)  # 1x1 conv
 
-        self.h_to_h_conv = nn.Conv2d(in_channels=nfeats, out_channels=nfeats, kernel_size=1)  # 1x1 conv
+    self.h_to_h_conv = nn.Conv2d(in_channels=nfeats, out_channels=nfeats, kernel_size=1)  # 1x1 conv
 
-    def GatedActivation(self, x):
-        return torch.tanh(x[:, :self.nfeats]) * torch.sigmoid(x[:, self.nfeats:])
+  def GatedActivation(self, x):
+    return torch.tanh(x[:, :self.nfeats]) * torch.sigmoid(x[:, self.nfeats:])
 
-    def forward(self, x):
-        # x should be a list of two elements [v, h]
-        iv, ih = x
-        ov = self.vconv(iv)
-        oh_ = self.hconv(ih)
-        v2h = self.v_to_h_conv(ov)
-        oh = v2h + oh_
+  def forward(self, x):
+    # x should be a list of two elements [v, h]
+    iv, ih = x
+    ov = self.vconv(iv)
+    oh_ = self.hconv(ih)
+    v2h = self.v_to_h_conv(ov)
+    oh = v2h + oh_
 
-        ov = self.GatedActivation(ov)
+    ov = self.GatedActivation(ov)
 
-        oh = self.GatedActivation(oh)
-        oh = self.h_to_h_conv(oh)
+    oh = self.GatedActivation(oh)
+    oh = self.h_to_h_conv(oh)
 
-        ##############################################################################
-        #Due to the residual connection, if we add it from the first layer, ##########
-        #the current pixel is included, in my implementation I removed the first #####
-        #residual connection to solve this issue #####################################
-        ##############################################################################
-        if self.mask_type == 'B':
-            oh = oh + ih
+    ##############################################################################
+    #Due to the residual connection, if we add it from the first layer, ##########
+    #the current pixel is included, in my implementation I removed the first #####
+    #residual connection to solve this issue #####################################
+    ##############################################################################
+    if self.mask_type == 'B':
+      oh = oh + ih
 
-        return [ov, oh]
+    return [ov, oh]
 
 class PixelCNN(nn.Module):
-    """
-    Class that stacks several GatedConvLayers, the output has Klevel maps.
-    Klevels indicates the number of possible values that a pixel can have e.g 2 for binary images or
-    256 for gray level imgs.
-    """
-    def __init__(self, nlayers, in_channels, nfeats, Klevels=2, ksz_A=5, ksz_B=3):
-        super(PixelCNN, self).__init__()
-        self.layers = nn.ModuleList(
-            [GatedConvLayer(in_channels=in_channels, nfeats=nfeats, mask_type='A', kernel_size=ksz_A)])
-        for i in range(nlayers):
-            gatedconv = GatedConvLayer(in_channels=nfeats, nfeats=nfeats, mask_type='B', kernel_size=ksz_B)
-            self.layers.append(gatedconv)
-        #TODO make kernel sizes as params
+  """
+  Class that stacks several GatedConvLayers, the output has Klevel maps.
+  Klevels indicates the number of possible values that a pixel can have e.g 2 for binary images or
+  256 for gray level imgs.
+  """
+  def __init__(self, nlayers, in_channels, nfeats, Klevels=2, ksz_A=5, ksz_B=3):
+    super(PixelCNN, self).__init__()
+    self.layers = nn.ModuleList(
+      [GatedConvLayer(in_channels=in_channels, nfeats=nfeats, mask_type='A', kernel_size=ksz_A)])
+    for i in range(nlayers):
+      gatedconv = GatedConvLayer(in_channels=nfeats, nfeats=nfeats, mask_type='B', kernel_size=ksz_B)
+      self.layers.append(gatedconv)
+    #TODO make kernel sizes as params
 
-        self.out_conv = nn.Sequential(
-            nn.Conv2d(nfeats, nfeats, 1),
-            nn.ReLU(True),
-            nn.Conv2d(nfeats, Klevels, 1)
-        )
+    self.out_conv = nn.Sequential(
+      nn.Conv2d(nfeats, nfeats, 1),
+      nn.ReLU(True),
+      nn.Conv2d(nfeats, Klevels, 1)
+    )
 
 
-    def forward(self, x):
-        x = [x, x]
-        for i, layer in enumerate(self.layers):
-            x = layer(x)
-        logits = self.out_conv(x[1])
+  def forward(self, x):
+    x = [x, x]
+    for i, layer in enumerate(self.layers):
+        x = layer(x)
+    logits = self.out_conv(x[1])
 
-        return logits
+    return logits
 ```
 
 ### Process 4: Calculate the residual connection on the horizontal stack
@@ -160,48 +162,47 @@ Residual connection은 이전 단계(processed by a 1X1 convolution)의 출력�
 
 다음은 vertical stack과 horizontal stack의 계산에 대한 코드입니다.
 
-```
+```python
 def get_weights(shape, name, horizontal, mask_mode='noblind', mask=None):
-    weights_initializer = tf.contrib.layers.xavier_initializer()
-    W = tf.get_variable(name, shape, tf.float32, weights_initializer)
+  weights_initializer = tf.contrib.layers.xavier_initializer()
+  W = tf.get_variable(name, shape, tf.float32, weights_initializer)
 
-    '''
-        Use of masking to hide subsequent pixel values 
-    '''
-    if mask:
-        filter_mid_y = shape[0]//2
-        filter_mid_x = shape[1]//2
-        mask_filter = np.ones(shape, dtype=np.float32)
-        if mask_mode == 'noblind':
-            if horizontal:
-                # All rows after center must be zero
-                mask_filter[filter_mid_y+1:, :, :, :] = 0.0
-                # All columns after center in center row must be zero
-                mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.0
-            else:
-                if mask == 'a':
-                    # In the first layer, can ONLY access pixels above it
-                    mask_filter[filter_mid_y:, :, :, :] = 0.0
-                else:
-                    # In the second layer, can access pixels above or even with it.
-                    # Reason being that the pixels to the right or left of the current pixel
-                    #  only have a receptive field of the layer above the current layer and up.
-                    mask_filter[filter_mid_y+1:, :, :, :] = 0.0
-
-            if mask == 'a':
-                # Center must be zero in first layer
-                mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.0
+  '''
+      Use of masking to hide subsequent pixel values 
+  '''
+  if mask:
+    filter_mid_y = shape[0]//2
+    filter_mid_x = shape[1]//2
+    mask_filter = np.ones(shape, dtype=np.float32)
+    if mask_mode == 'noblind':
+      if horizontal:
+        # All rows after center must be zero
+        mask_filter[filter_mid_y+1:, :, :, :] = 0.0
+        # All columns after center in center row must be zero
+        mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.0
+      else:
+        if mask == 'a':
+          # In the first layer, can ONLY access pixels above it
+          mask_filter[filter_mid_y:, :, :, :] = 0.0
         else:
-            mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.
-            mask_filter[filter_mid_y+1:, :, :, :] = 0.
+          # In the second layer, can access pixels above or even with it.
+          # Reason being that the pixels to the right or left of the current pixel
+          #  only have a receptive field of the layer above the current layer and up.
+          mask_filter[filter_mid_y+1:, :, :, :] = 0.0
 
-            if mask == 'a':
-                mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.
-                
-        W *= mask_filter 
-    return 
+        if mask == 'a':
+          # Center must be zero in first layer
+          mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.0
+    else:
+      mask_filter[filter_mid_y, filter_mid_x+1:, :, :] = 0.
+      mask_filter[filter_mid_y+1:, :, :, :] = 0.
+
+      if mask == 'a':
+          mask_filter[filter_mid_y, filter_mid_x, :, :] = 0.
+            
+    W *= mask_filter 
+  return 
 ```
-
 ## Conditional PixelCNN
 
 $$p(\mathrm{x|h})=\prod_{i=1}^{n^2}p(x_i|x_1, \space \dots,x_{i-1}, \mathrm{h})$$
