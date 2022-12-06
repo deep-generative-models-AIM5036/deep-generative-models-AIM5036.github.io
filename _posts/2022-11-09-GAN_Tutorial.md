@@ -71,6 +71,65 @@ The following figure further clarify this procedure
   </p>
  </center>
 
+ A minimal code for training GAN is given below:
+ 
+ ```python
+class Generator(nn.Module):
+    def __init__(self, input_size, output_size, f):
+        super(Generator, self).__init__()
+        self.map1 = nn.Linear(input_size, output_size)
+        self.f = f
+
+    def forward(self, x):
+        return self.f(self.map1(x))
+
+class Discriminator(nn.Module):
+    def __init__(self, input_size, output_size, f):
+        super(Discriminator, self).__init__()
+        self.map1 = nn.Linear(input_size, output_size)
+        self.f = f
+
+    def forward(self, x):
+        return self.f(self.map1(x))
+
+G = Generator(input_size= g_input_size, output_size=g_output_size, f=generator_activation_function)
+D = Discriminator(input_size= d_input_size, output_size=d_output_size, f=discriminator_activation_function)
+
+criterion = nn.BCELoss()
+d_optimizer = optim.SGD(D.parameters(), lr=d_learning_rate, momentum=sgd_momentum)
+g_optimizer = optim.SGD(G.parameters(), lr=g_learning_rate, momentum=sgd_momentum)
+
+
+d_sampler = get_distribution_sampler(data_mean, data_stddev)
+gi_sampler = get_generator_input_sampler()
+
+for t in training_steps:
+
+    D.zero_grad()
+    d_real_data = d_sampler(d_input_size)
+    d_real_decision = D(preprocess(d_real_data))
+    d_real_error = criterion(d_real_decision, Variable(torch.ones([1])))  # ones = real data
+    d_real_error.backward()
+
+
+    d_gen_input = gi_sampler(minibatch_size, g_input_size)
+    d_fake_data = G(d_gen_input).detach()  # detach to avoid training G on these labels
+    d_fake_decision = D(preprocess(d_fake_data.t()))
+    d_fake_error = criterion(d_fake_decision, Variable(torch.zeros([1])))  # zeros = fake
+    d_fake_error.backward()
+    d_optimizer.step()
+
+
+    G.zero_grad()
+    gen_input = Variable(gi_sampler(minibatch_size, g_input_size))
+    g_fake_data = G(gen_input)
+    dg_fake_decision = D(preprocess(g_fake_data.t()))
+    g_error = criterion(dg_fake_decision, Variable(torch.ones([1])))  # Train G to pretend it's genuine
+
+    g_error.backward()
+    g_optimizer.step()  # Only optimizes G's parameters
+ ```
+
 
 ## Optimal Discriminator 
 
