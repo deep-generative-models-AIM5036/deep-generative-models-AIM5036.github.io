@@ -14,18 +14,29 @@ img_path: "/assets/img/posts/2022-11-02-GatedPixelCNN"
 
 
 # Introduction
-
 이 논문은 기존의 PixelRNN과 PixelCNN을 제시한 논문[^1]을 발전시켰습니다.
 해당 논문에서는 두 가지 형태의 PixelRNN\(Row LSTM, Diagonal BiLSTM\)과 PixelCNN을 제시합니다.
-
-### Background
-PixelRNN은 Row LSTM, Diagonal Bi-LSTM, PixelCNN 모델을 제안하고 있습니다. 기본적으로, $i$번째 픽셀을 (1 ~ $i−1$)번째 픽셀을 이용하여 추론합니다. 즉, Auto regressive propety를 만족하며 이미지를 생성합니다. 
 
 PixelRNN은 일반적으로 좋은 성능을 보여줍니다. 하지만, PixelCNN에 비해 학습이 느리다는 단점을 가지고 있습니다. 이는 PixelCNN이 병렬화가 가능하다는 장점 때문에 더 빠르게 학습킬 수 있습니다. 하지만, PixelCNN의 경우 blind spot이 존재한다는 단점이 있습니다. 이 때문에 PixelRNN에 비해 성능이 떨어지는 문제를 가지고 있습니다.
 
 여기서는 두 모델의 장점을 결합한 Gated PixelCNN을 제안합니다. 이 모델이 학습하는데 걸리는 시간을 PixelRNN 대비 절반 이하로 줄였으며 성능 또한 그 이상이라고 합니다.
 
 또한, 저자들은 Gated PixelCNN에 latent 벡터 임베딩을 조건으로 추가한 Conditional PixelCNN을 제안합니다. Conditional PixelCNN은 원-핫 엔코딩 형태로 조건을 주어 여러 클래스로부터 이미지를 생성하는데에 사용될 수 있습니다. 이외에도, 이미지의 high level 정보를 가지고 있는 임베딩을 사용하여 비슷한 특징을 가지고 있는 여러 다양한 이미지를 생성할 수 있습니다.
+
+# Background
+PixelRNN은 Row LSTM, Diagonal Bi-LSTM, PixelCNN 모델을 제안하고 있습니다. 기본적으로, 각 모델들은 $i$번째 픽셀을 (1 ~ $i−1$)번째 픽셀을 이용하여 추론합니다. 즉, Auto-regressive propety를 만족하며 이미지를 생성합니다. 
+
+Row LSTM은 아래 그림과 같이 삼각형 형태를 취하며 이미지를 생성합니다.
+<img src="https://user-images.githubusercontent.com/26114165/205895712-bfaeaee0-cd3b-4c0c-a47b-6d025bdce331.png" style="max-width: 25%">
+
+삼각형 형태로 인해 모든 이전 픽셀을 활요하기 힘들지만, 이를 극복하기 위해 이전 셀 값을 입력을 받아 연산하도록 구현하였습니다.
+
+Diagonal Bi-LSTM은 상단의 모서리에서 시작하여 하단의 반대쪽 모서리에 도달하는 대각선 방식으로 이미지를 생성합니다.
+
+
+<img src="https://user-images.githubusercontent.com/26114165/205896127-1c4b1525-19dd-4ac7-aecf-540a90efafae.png" style="max-width: 25%">
+
+이로 인해, 가장 큰 receptive field를 가지게 되고 성능이 우수합니다. 하지만, $i-1$번째까지 모든 픽셀을 사용하므로 생성 속도가 매우 느립니다.
 
 # Gated PixelCNN
 저자들은 두 종류의 convolutional network stack을 결합하여 blind spot을 제거하였습니다.
