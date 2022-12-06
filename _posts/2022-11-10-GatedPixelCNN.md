@@ -43,6 +43,9 @@ Diagonal Bi-LSTM은 상단의 모서리에서 시작하여 하단의 반대쪽 �
 
 ### PixelCNN  
 
+PixelCNN은 이전 pixel을 CNN을 통해 입력받고 그 결과로 새로운 픽셀을 아웃풋으로 내보냅니다. 하지만 receptive field를 보면 CNN 필터는 blind spot을 가지고 있다는 점을 알 수 있습니다. 그리고 이미지 크기가 늘어날수록 blind spot이 커지는 문제가 생깁니다.  
+<img src="https://user-images.githubusercontent.com/60708119/205900000-257bd748-4c93-445e-a5b0-4695f3b061ce.png" style="max-width: 50%">
+
 # Gated PixelCNN
 저자들은 두 종류의 convolutional network stack을 결합하여 blind spot을 제거하였습니다.
 
